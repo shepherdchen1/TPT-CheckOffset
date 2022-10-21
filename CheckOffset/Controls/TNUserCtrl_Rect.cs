@@ -24,50 +24,50 @@ namespace TNControls
             base.OnPaint(pe);
         }
 
-        public void Paint(Graphics graphics_show)
+        public void Paint(Graphics graphics_show, TNPictureBox pb)
         {
             if (!Editing)
             {
                 Pen pen_ctrl = new Pen(Color.Blue, 1);
-                graphics_show.DrawRectangle(pen_ctrl, Editing_Rect);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Editing_Rect) );
             }
             else
             {
                 // 框本身
                 Pen pen_ctrl = new Pen(Color.Red, 1);
-                graphics_show.DrawRectangle(pen_ctrl, Editing_Rect);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Editing_Rect));
 
                 // 左上
                 Rectangle rt_left_top = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_left_top);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_left_top));
 
                 // 左
                 Rectangle rt_left = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y + Editing_Rect.Height / 2 - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_left);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_left));
 
                 // 左下
                 Rectangle rt_left_bottom = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_left_bottom);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_left_bottom));
 
                 // 上中
                 Rectangle rt_top = new Rectangle(Editing_Rect.X + Editing_Rect.Width / 2- 5, Editing_Rect.Y - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_top);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_top));
 
                 // 下中
                 Rectangle rt_bottom = new Rectangle(Editing_Rect.X + Editing_Rect.Width / 2 - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_bottom);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_bottom));
 
                 // 右上
                 Rectangle rt_right_top = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_right_top);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right_top));
 
                 // 右
                 Rectangle rt_right = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y + Editing_Rect.Height / 2 - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_right);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right));
 
                 // 右下
                 Rectangle rt_right_bottom = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
-                graphics_show.DrawRectangle(pen_ctrl, rt_right_bottom);
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right_bottom));
             }
         }
 
@@ -139,6 +139,9 @@ namespace TNControls
             }
         }
 
+        /// <summary>
+        /// Image 座標系位置 
+        /// </summary>
         public Rectangle Editing_Rect
         {
             get;

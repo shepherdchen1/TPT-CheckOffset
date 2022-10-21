@@ -50,8 +50,8 @@ namespace CheckOffset
 
             tbImgFile.Text = openFileDialog_Img.FileName;
             m_userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
-            //m_userctrl_image.m_show_image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-            //m_userctrl_image.pb_Image.Image = System.Drawing.Image.FromFile(tbImgFile.Text);
+            m_userctrl_image.pb_Image.ZoomFit();
+
             m_userctrl_image.ll_Test.Text = tbImgFile.Text;
         }
 
@@ -73,6 +73,7 @@ namespace CheckOffset
                     foreach (Rectangle cur_rect in tnGlobal.Detect_Pos.Detect_Rects)
                     {
                         TNUserCtrl_Rect exist_added_rect = new TNUserCtrl_Rect();
+                        TNPictureBox tn_pb = m_userctrl_image.pb_Image as TNPictureBox;
                         exist_added_rect.Editing_Rect = cur_rect;
                         m_userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
@@ -87,12 +88,13 @@ namespace CheckOffset
             }
             else
             {
+                // ·s¼W§¹²¦
                 if (null != m_userctrl_image.pb_Image.Editing_Ctrl)
                 {
                     TNUserCtrl_Rect editing_rect = (TNUserCtrl_Rect)m_userctrl_image.pb_Image.Editing_Ctrl;
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Editing_Rect.Width > min_roi_valid_size && editing_rect.Editing_Rect.Height > min_roi_valid_size)
-                        tnGlobal.Detect_Pos.Detect_Rects.Add(editing_rect.Editing_Rect);
+                        tnGlobal.Detect_Pos.Detect_Rects.Add( editing_rect.Editing_Rect);
 
                     m_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }

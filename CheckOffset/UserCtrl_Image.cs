@@ -25,8 +25,8 @@ namespace CheckOffset
     {
         //private Bitmap? m_Image = null;
         //public Bitmap? m_show_image = null;
-        public Point m_pt_LBtnDown;
-        public Point m_pt_Current;
+        public Point m_pt_LBtnDown; // image 坐標系
+        public Point m_pt_Current;  // image 坐標系
 
         //private float m_scale = 1.0f;
         //private Point m_offset;     // 原始影像座標(m_image)顯示的起點: 往右拉，X值為負值，代表影像原點座標要往負方向開始截取.
@@ -125,7 +125,9 @@ namespace CheckOffset
 
         private void pb_Image_MouseDown(object? sender, MouseEventArgs e)
         {
-            m_pt_LBtnDown = e.Location;
+            // 轉換到 Image 座標系.
+            m_pt_LBtnDown = pb_Image.GetImagePointFromPB(e.Location);
+
             ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
             //if (null != pb_Image.Editing_Ctrl)
             {
@@ -135,7 +137,10 @@ namespace CheckOffset
                     case Editing_Mode.EDT_New_ROI:
                         {
                             if (null != editing_cttl)
-                                editing_cttl.Editing_Rect = new Rectangle(m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
+                            {
+                                Point pt_image = pb_Image.GetImagePointFromPB(m_pt_LBtnDown);
+                                editing_cttl.Editing_Rect = new Rectangle(pt_image.X, pt_image.Y, 0, 0);
+                            }
                         }
                         break;
 
@@ -173,7 +178,7 @@ namespace CheckOffset
                             if (null != new_editing_cttl && null != new_editing_cttl.Editing)
                             {
                                 new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(m_pt_LBtnDown);
-                                new_editing_cttl.Modify_Begin(m_pt_LBtnDown);
+                                new_editing_cttl.Modify_Begin( m_pt_LBtnDown);
 
                                 pb_Image.Refresh();
                             }
@@ -196,7 +201,9 @@ namespace CheckOffset
 
         private void pb_Image_MouseMove(object? sender, MouseEventArgs e)
         {
-            m_pt_Current = e.Location;
+            // 轉換到 Image 座標系.
+            m_pt_Current = pb_Image.GetImagePointFromPB(e.Location);
+
             if (e.Button == MouseButtons.Left)
             {
                 TNUserCtrl_Rect editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
@@ -226,7 +233,9 @@ namespace CheckOffset
 
         private void pb_Image_MouseUp(object? sender, MouseEventArgs e)
         {
-            m_pt_Current = e.Location;
+            // 轉換到 Image 座標系.
+            m_pt_Current = pb_Image.GetImagePointFromPB(e.Location);
+
             if (e.Button == MouseButtons.Left)
             {
                 TNUserCtrl_Rect? editing_cttl = (TNUserCtrl_Rect?)pb_Image.Editing_Ctrl;
@@ -237,6 +246,8 @@ namespace CheckOffset
                         // 編輯
                         editing_cttl.Modify_Done();
 
+                        Apply_Ctrls_To_GlobalSetting();
+
                         pb_Image.Refresh();
                     }
                 }
@@ -245,7 +256,8 @@ namespace CheckOffset
 
         private void pb_Image_MouseClick(object? sender, MouseEventArgs e)
         {
-            m_pt_Current = e.Location;
+            // 轉換到 Image 座標系.
+            m_pt_Current = pb_Image.GetImagePointFromPB(e.Location);
 
             if (null == Query_Editing_Mode)
             {

@@ -45,7 +45,7 @@ namespace TNControls
         protected override void OnPaint(PaintEventArgs pe)
         {
             base.OnPaint(pe);
-            Draw_Ctrl_Refresh();
+            //Draw_Ctrl_Refresh();
         }
 
         //////////////////////////////////////////////////
@@ -154,9 +154,12 @@ namespace TNControls
                 //    DrawXORRectangle(g, pen, editing_cttl.Editing_Rect);
                 //}
 
-                m_move_start_pt = e.Location;
-                m_move_start_offset = m_offset;
+                //m_move_start_pt = e.Location;
+                //m_move_start_offset = m_offset;
             }
+
+            m_move_start_pt = e.Location;
+            m_move_start_offset = m_offset;
         }
 
         private void pb_Image_MouseMove(object? sender, MouseEventArgs e)
@@ -363,18 +366,34 @@ namespace TNControls
             }
         }
 
-        Point GetImagePointFromPB(Point pt)
+        public Point GetImagePointFromPB(Point pt)
         {
             Point real_pt = new Point((Int32)Math.Floor(pt.X / m_scale + m_offset.X)
                                      , (Int32)Math.Floor(pt.Y / m_scale + m_offset.Y));
             return real_pt;
         }
 
-        Point GetPBPointFromImage(Point pt)
+        public Rectangle GetImageRectFromPB(Rectangle rt)
+        {
+            return new Rectangle((Int32)Math.Floor(rt.X / m_scale + m_offset.X)
+                               , (Int32)Math.Floor(rt.Y / m_scale + m_offset.Y)
+                               , (Int32)Math.Floor(rt.Width / m_scale)
+                               , (Int32)Math.Floor(rt.Height / m_scale));
+        }
+
+        public Point GetPBPointFromImage(Point pt)
         {
             Point pb_pt = new Point((Int32)Math.Round((pt.X - m_offset.X) * m_scale, MidpointRounding.AwayFromZero)
                                     , (Int32)Math.Round((pt.Y - m_offset.Y) * m_scale, MidpointRounding.AwayFromZero));
             return pb_pt;
+        }
+
+        public Rectangle GetPBRectFromImage(Rectangle rt)
+        {
+            return new Rectangle((Int32)Math.Round((rt.X - m_offset.X) * m_scale, MidpointRounding.AwayFromZero)
+                                 , (Int32)Math.Round((rt.Y - m_offset.Y) * m_scale, MidpointRounding.AwayFromZero)
+                                 , (Int32)Math.Round(rt.Width * m_scale,  MidpointRounding.AwayFromZero)
+                                 , (Int32)Math.Round(rt.Height * m_scale, MidpointRounding.AwayFromZero));
         }
 
         System.Drawing.Point CalcOffset(System.Drawing.Point display_cursor_pt, float old_scale, float new_scale)
@@ -623,8 +642,10 @@ namespace TNControls
         private void Draw_Ctrl_Refresh()
         {
             if (null == m_show_image)
-                return;                
+                return;
 
+            if (null != m_show_color_image)
+                m_show_color_image.Dispose();
             m_show_color_image = new Bitmap(m_show_image.Width, m_show_image.Height);
             using (Graphics graphics_show = Graphics.FromImage(m_show_color_image))
             {
@@ -650,7 +671,7 @@ namespace TNControls
                         //CreateGraphics().DrawRectangle(pen, rt_final_draw);
                         //graphics_show.DrawRectangle(pen_user_ctrl, rt_final_draw);
 
-                        user_ctrl.Paint(graphics_show);
+                        user_ctrl.Paint(graphics_show, this);
                     }
                 }
 
@@ -687,12 +708,16 @@ namespace TNControls
                         //CreateGraphics().DrawRectangle(pen, editing_cttl.Editing_Rect);
                         //graphics_show.DrawRectangle(pen_edit_ctrl, editing_cttl.Editing_Rect);
 
-                    editing_cttl.Paint(graphics_show);
+                    editing_cttl.Paint(graphics_show, this);
                     //}
                 }
             }
             //m_show_color_image.Save("d:\\temp\\testcolor.bmp");
-            Image = m_show_color_image;
+            //if (null != Image)
+            //    Image.Dispose();
+
+            Bitmap tempBitmap = new Bitmap(m_show_color_image);
+            Image = tempBitmap;
         }
 
         static public void DrawXORRectangle(Graphics graphics, Pen pen, Rectangle rectangle)
