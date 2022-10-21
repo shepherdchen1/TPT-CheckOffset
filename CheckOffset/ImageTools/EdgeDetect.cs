@@ -244,7 +244,7 @@ namespace TN.ImageTools
                         {
                             if (row_buffer[y * bmp_data.Stride + x * pixel_size] >= threshold)
                             {
-                                edge_pos = (float)x;
+                                edge_pos = (float)y;
                                 return true;
                             }
                         }
@@ -256,7 +256,7 @@ namespace TN.ImageTools
                         {
                             if (row_buffer[y * bmp_data.Stride + x * pixel_size] <= threshold)
                             {
-                                edge_pos = (float)x;
+                                edge_pos = (float)y;
                                 return true;
                             }
                         }
@@ -273,7 +273,7 @@ namespace TN.ImageTools
                         {
                             if (row_buffer[y * bmp_data.Stride + x * pixel_size] >= threshold)
                             {
-                                edge_pos = (float)x;
+                                edge_pos = (float)y;
                                 return true;
                             }
                         }
@@ -285,7 +285,7 @@ namespace TN.ImageTools
                         {
                             if (row_buffer[y * bmp_data.Stride + x * pixel_size] <= threshold)
                             {
-                                edge_pos = (float)x;
+                                edge_pos = (float)y;
                                 return true;
                             }
                         }

@@ -30,11 +30,7 @@ namespace TNControls
 
         private void Init_Data()
         {
-            User_Ctrls = new List<Control>();
-
-            TNUserCtrl_Rect editing_ctrl = new TNUserCtrl_Rect();
-            editing_ctrl.Editing_Rect = new Rectangle(10, 10, 20, 20);
-            Editing_Ctrl = editing_ctrl;
+            Editing_Ctrl = null;
 
             MouseWheel += new MouseEventHandler(PB_MouseWheel);
             MouseDown += new System.Windows.Forms.MouseEventHandler(pb_Image_MouseDown);
@@ -65,6 +61,9 @@ namespace TNControls
         Point m_move_start_pt = new Point(0, 0);
         Point m_move_start_offset = new Point(0, 0);
 
+        // for m_user_ctrls should be none null, for compile no warning.
+        public List<Control> m_user_ctrls = new List<Control>();
+
         public event Delegate_Report_GrayLevel_Gray? Report_GrayLevel_Gray;
 
         public Control? Editing_Ctrl
@@ -73,11 +72,12 @@ namespace TNControls
             set;
         }
 
-        public List<Control>? User_Ctrls
+        public List<Control> User_Ctrls
         {
-            get;
-            set;
+            get => m_user_ctrls;
+            set => m_user_ctrls = value;
         }
+
         public float Image_Scale 
         { 
             get => m_scale;
@@ -85,7 +85,7 @@ namespace TNControls
             {
                 m_scale = value;
                 DrawImageToBuffer();
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
             }
         }
         public Point Image_Offset 
@@ -95,7 +95,7 @@ namespace TNControls
             {
                 m_offset = value;
                 DrawImageToBuffer();
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
             }
         }
         public Bitmap? Image_Bmp 
@@ -105,6 +105,9 @@ namespace TNControls
                 m_image = value;
                 m_show_image = value;
                 //Image = m_show_image;
+
+                DrawImageToBuffer();
+                Redraw_Ctrl();
             }
         }
 
@@ -153,9 +156,6 @@ namespace TNControls
                 //    Pen pen = new Pen(Color.White, 1);
                 //    DrawXORRectangle(g, pen, editing_cttl.Editing_Rect);
                 //}
-
-                //m_move_start_pt = e.Location;
-                //m_move_start_offset = m_offset;
             }
 
             m_move_start_pt = e.Location;
@@ -177,7 +177,7 @@ namespace TNControls
                 //OffsetChanged(this, gcnew EventArgs());
 
                 DrawImageToBuffer();
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
 
                 m_busy = false;
             }
@@ -185,7 +185,7 @@ namespace TNControls
             {
                 m_pt_Current = PointToClient(e.Location);
 
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
                 //DrawXORRectangle
                 //m_pt_Current = e.Location;
 
@@ -212,7 +212,7 @@ namespace TNControls
             {
                 m_pt_Current = PointToClient(e.Location);
 
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
                 //DrawXORRectangle
                 //m_pt_Current = e.Location;
 
@@ -439,7 +439,7 @@ namespace TNControls
             m_scale = GetBestFitScale();
             m_offset = new Point(0, 0);
             DrawImageToBuffer();
-            Draw_Ctrl_Refresh();
+            Redraw_Ctrl();
             //pb_Image.Image = m_show_image;
         }
 
@@ -450,12 +450,11 @@ namespace TNControls
 
             if (old_scale != m_scale)
             {
-                //m_offset = CalcOffset(pt_center);
                 m_offset = CalcOffset(display_cursor_pt, old_scale, m_scale);
                 //ScaleChanged(this, new EventArgs());
 
                 DrawImageToBuffer();
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
                 //PB_Image_Refresh();
 
                 //buf_g->DrawImageUnscaled(m_show_image, 0, 0);
@@ -476,7 +475,7 @@ namespace TNControls
                 //ScaleChanged(this, new EventArgs());
 
                 DrawImageToBuffer();
-                Draw_Ctrl_Refresh();
+                Redraw_Ctrl();
                 //PB_Image_Refresh();
             }
 
@@ -639,7 +638,7 @@ namespace TNControls
             Invalidate();
         }
 
-        private void Draw_Ctrl_Refresh()
+        public void Redraw_Ctrl()
         {
             if (null == m_show_image)
                 return;

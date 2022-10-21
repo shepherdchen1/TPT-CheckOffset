@@ -78,8 +78,6 @@ namespace TNControls
 
         public HitTest_Result HitTest(Point pt)
         {
-            HitTest_Result result = new HitTest_Result();
-
             // 左上
             Rectangle rt_left_top = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y - 5, 10, 10);
             if (rt_left_top.Contains(pt))
@@ -179,7 +177,6 @@ namespace TNControls
 
                         return Normalize(pt_left_top, pt_right_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_Top:
                     {
@@ -188,7 +185,6 @@ namespace TNControls
 
                         return Normalize(pt_left_top, pt_right_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_RT:
                     {
@@ -198,7 +194,6 @@ namespace TNControls
 
                         return Normalize(pt_right_top, pt_left_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_Right:
                     {
@@ -207,7 +202,6 @@ namespace TNControls
 
                         return Normalize(pt_right_top, pt_left_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_RB:
                     {
@@ -217,7 +211,6 @@ namespace TNControls
 
                         return Normalize(pt_left_top, pt_right_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_Bottom:
                     {
@@ -226,7 +219,6 @@ namespace TNControls
 
                         return Normalize(pt_left_top, pt_right_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_LB:
                     {
@@ -236,7 +228,6 @@ namespace TNControls
 
                         return Normalize(pt_right_top, pt_left_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_Left:
                     {
@@ -245,7 +236,6 @@ namespace TNControls
 
                         return Normalize(pt_right_top, pt_left_bottom);
                     }
-                    break;
 
                 case HitTest_Result.HT_Client:
                     {
@@ -257,7 +247,6 @@ namespace TNControls
 
                         return Normalize(pt_left_top, pt_right_bottom);
                     }
-                    break;
 
                 default:
                     break;

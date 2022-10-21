@@ -23,11 +23,11 @@ namespace CheckOffset
         }
 
 
-        private UserCtrl_Image m_userctrl_image = null; 
+        private UserCtrl_Image m_userctrl_image = new UserCtrl_Image(); 
 
         private void Init_Data()
         {
-            m_userctrl_image = new UserCtrl_Image();
+            //m_userctrl_image = new UserCtrl_Image();
 
             tabUser.TabPages.Clear();
 
@@ -120,6 +120,7 @@ namespace CheckOffset
             tnGlobal.Detect_Pos = Newtonsoft.Json.JsonConvert.DeserializeObject<tnGlobal.Detect_Pos_Info>(jsonString);
 
             m_userctrl_image.Apply_GlobalSetting_To_Ctrls();
+            m_userctrl_image.Refresh();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -317,6 +318,8 @@ namespace CheckOffset
             {
                 m_userctrl_image.Image = org_bmp;
             }
+
+            m_userctrl_image.Refresh();
         }
 
         private void btn1X_Click(object sender, EventArgs e)

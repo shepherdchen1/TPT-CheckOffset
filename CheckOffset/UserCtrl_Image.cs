@@ -41,13 +41,7 @@ namespace CheckOffset
         public event Delegate_Report_GrayLevel_Gray? Report_GrayLevel_Gray;
         public event Delegate_Query_Editing_Mode?    Query_Editing_Mode;
 
-        //public Control? Editing_Ctrl
-        //{
-        //    get;
-        //    set;
-        //}
-
-        public List<Control>? User_Ctrls
+        public List<Control> User_Ctrls
         {
             get => pb_Image.User_Ctrls;
             set => pb_Image.User_Ctrls = value;
@@ -61,7 +55,7 @@ namespace CheckOffset
                 if ( pb_Image.Editing_Ctrl != value)
                 {
                     // reset old editing control.
-                    TNUserCtrl_Rect rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
+                    TNUserCtrl_Rect? rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
                     if (rt_ctrl_cur_setting != null)
                         rt_ctrl_cur_setting.Editing = false;
                 }
@@ -69,8 +63,9 @@ namespace CheckOffset
                 pb_Image.Editing_Ctrl = value;
                 if (null != value)
                 {
-                    TNUserCtrl_Rect rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
-                    rt_ctrl_cur_setting.Editing = true;
+                    TNUserCtrl_Rect? rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
+                    if ( null != rt_ctrl_cur_setting )
+                        rt_ctrl_cur_setting.Editing = true;
                 }
             } 
         }
@@ -129,9 +124,18 @@ namespace CheckOffset
             m_pt_LBtnDown = pb_Image.GetImagePointFromPB(e.Location);
 
             ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
+
+            if ( null == Query_Editing_Mode )
+            {
+                Log_Utl.Log_Event(Event_Level.Warning
+                                , System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                , $"Query_Editing_Mode is null");
+                return;
+            }
+
             //if (null != pb_Image.Editing_Ctrl)
             {
-                TNUserCtrl_Rect editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                TNUserCtrl_Rect? editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
                 switch (Query_Editing_Mode())
                 {
                     case Editing_Mode.EDT_New_ROI:
@@ -146,7 +150,7 @@ namespace CheckOffset
 
                     case Editing_Mode.EDT_Editing_ROI:
                         {
-                            if (null != editing_cttl && null != editing_cttl.Editing)
+                            if (null != editing_cttl && editing_cttl.Editing)
                             {
                                 editing_cttl.HitTest_Rresult = editing_cttl.HitTest(m_pt_LBtnDown);
                                 if (HitTest_Result.None != editing_cttl.HitTest_Rresult)
@@ -157,8 +161,8 @@ namespace CheckOffset
                                 {
                                     Mouse_Select_Ctrl();
 
-                                    TNUserCtrl_Rect new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
-                                    if (null != new_editing_cttl && null != new_editing_cttl.Editing)
+                                    TNUserCtrl_Rect? new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                                    if (null != new_editing_cttl && new_editing_cttl.Editing)
                                     {
                                         new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(m_pt_LBtnDown);
                                         new_editing_cttl.Modify_Begin(m_pt_LBtnDown);
@@ -174,8 +178,8 @@ namespace CheckOffset
                         {
                             Mouse_Select_Ctrl();
 
-                            TNUserCtrl_Rect new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
-                            if (null != new_editing_cttl && null != new_editing_cttl.Editing)
+                            TNUserCtrl_Rect? new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                            if (null != new_editing_cttl && new_editing_cttl.Editing)
                             {
                                 new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(m_pt_LBtnDown);
                                 new_editing_cttl.Modify_Begin( m_pt_LBtnDown);
@@ -206,11 +210,27 @@ namespace CheckOffset
 
             if (e.Button == MouseButtons.Left)
             {
-                TNUserCtrl_Rect editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                if (null == Query_Editing_Mode)
+                {
+                    Log_Utl.Log_Event(Event_Level.Warning
+                                    , System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                    , $"Query_Editing_Mode is null");
+                    return;
+                }
+
+                TNUserCtrl_Rect? editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
                 switch (Query_Editing_Mode())
                 {
                     case Editing_Mode.EDT_New_ROI:
                         {
+                            if (null == editing_cttl)
+                            {
+                                Log_Utl.Log_Event(Event_Level.Warning
+                                                , System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                                , $"editing_cttl is null");
+
+                                return;
+                            }
                             editing_cttl.Editing_Rect = TNUserCtrl_Rect.Normalize(m_pt_LBtnDown, m_pt_Current);
                         }
                         break;
@@ -218,6 +238,15 @@ namespace CheckOffset
                     case Editing_Mode.EDT_Editing_ROI:
                         {
                             // 編輯
+                            if (null == editing_cttl)
+                            {
+                                Log_Utl.Log_Event(Event_Level.Warning
+                                                , System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                                , $"editing_cttl is null");
+
+                                return;
+                            }
+
                             if (editing_cttl.HitTest_Rresult != HitTest_Result.None)
                                 editing_cttl.Editing_Rect = editing_cttl.Modify_Doing(m_pt_Current);
 
@@ -292,7 +321,7 @@ namespace CheckOffset
                     tn_click_ctrl.Editing = false;
                 }
 
-                TNUserCtrl_Rect ctrl_new_selected = null;
+                TNUserCtrl_Rect? ctrl_new_selected = null;
                 foreach (Control click_ctrl in pb_Image.User_Ctrls)
                 {
                     TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
@@ -368,6 +397,8 @@ namespace CheckOffset
             Editing_Ctrl = null;
 
             Apply_Ctrls_To_GlobalSetting();
+
+            pb_Image.Redraw_Ctrl();
         }
 
         public void Apply_GlobalSetting_To_Ctrls()
@@ -409,7 +440,7 @@ namespace CheckOffset
 
             foreach (Control user_ctrl in User_Ctrls)
             {
-                TNUserCtrl_Rect rt_user_ctrl = user_ctrl as TNUserCtrl_Rect;
+                TNUserCtrl_Rect? rt_user_ctrl = user_ctrl as TNUserCtrl_Rect;
                 if ( null == rt_user_ctrl 
                     || rt_user_ctrl.Editing_Rect.X < 0 || rt_user_ctrl.Editing_Rect.Y < 0 || rt_user_ctrl.Editing_Rect.Width <= 0 || rt_user_ctrl.Editing_Rect.Height <= 0)
                 {
