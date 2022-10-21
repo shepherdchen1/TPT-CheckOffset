@@ -90,7 +90,8 @@ namespace CheckOffset
                 if (null != m_userctrl_image.pb_Image.Editing_Ctrl)
                 {
                     TNUserCtrl_Rect editing_rect = (TNUserCtrl_Rect)m_userctrl_image.pb_Image.Editing_Ctrl;
-                    if (null != editing_rect && editing_rect.Editing_Rect.Width > 0 && editing_rect.Editing_Rect.Height > 0)
+                    const int min_roi_valid_size = 2;
+                    if (null != editing_rect && editing_rect.Editing_Rect.Width > min_roi_valid_size && editing_rect.Editing_Rect.Height > min_roi_valid_size)
                         tnGlobal.Detect_Pos.Detect_Rects.Add(editing_rect.Editing_Rect);
 
                     m_userctrl_image.Apply_GlobalSetting_To_Ctrls();

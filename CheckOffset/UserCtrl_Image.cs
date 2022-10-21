@@ -56,7 +56,23 @@ namespace CheckOffset
         public Control? Editing_Ctrl
         {
             get => pb_Image.Editing_Ctrl;
-            set => pb_Image.Editing_Ctrl = value;
+            set
+            {
+                if ( pb_Image.Editing_Ctrl != value)
+                {
+                    // reset old editing control.
+                    TNUserCtrl_Rect rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
+                    if (rt_ctrl_cur_setting != null)
+                        rt_ctrl_cur_setting.Editing = false;
+                }
+
+                pb_Image.Editing_Ctrl = value;
+                if (null != value)
+                {
+                    TNUserCtrl_Rect rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
+                    rt_ctrl_cur_setting.Editing = true;
+                }
+            } 
         }
 
         public Bitmap? Image 
@@ -111,9 +127,59 @@ namespace CheckOffset
         {
             m_pt_LBtnDown = e.Location;
             ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
-            if (null != pb_Image.Editing_Ctrl)
+            //if (null != pb_Image.Editing_Ctrl)
             {
-                TNUserCtrl_Rect editing_cttl = (TNUserCtrl_Rect)pb_Image.Editing_Ctrl;
+                TNUserCtrl_Rect editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                switch (Query_Editing_Mode())
+                {
+                    case Editing_Mode.EDT_New_ROI:
+                        {
+                            if (null != editing_cttl)
+                                editing_cttl.Editing_Rect = new Rectangle(m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
+                        }
+                        break;
+
+                    case Editing_Mode.EDT_Editing_ROI:
+                        {
+                            if (null != editing_cttl && null != editing_cttl.Editing)
+                            {
+                                editing_cttl.HitTest_Rresult = editing_cttl.HitTest(m_pt_LBtnDown);
+                                if (HitTest_Result.None != editing_cttl.HitTest_Rresult)
+                                {
+                                    editing_cttl.Modify_Begin(m_pt_LBtnDown);
+                                }
+                                else
+                                {
+                                    Mouse_Select_Ctrl();
+
+                                    TNUserCtrl_Rect new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                                    if (null != new_editing_cttl && null != new_editing_cttl.Editing)
+                                    {
+                                        new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(m_pt_LBtnDown);
+                                        new_editing_cttl.Modify_Begin(m_pt_LBtnDown);
+                                    }
+                                }
+
+                                pb_Image.Refresh();
+                            }
+                        }
+                        break;
+
+                    default:
+                        {
+                            Mouse_Select_Ctrl();
+
+                            TNUserCtrl_Rect new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                            if (null != new_editing_cttl && null != new_editing_cttl.Editing)
+                            {
+                                new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(m_pt_LBtnDown);
+                                new_editing_cttl.Modify_Begin(m_pt_LBtnDown);
+
+                                pb_Image.Refresh();
+                            }
+                        }
+                        break;
+                }
                 //using (Graphics g = Graphics.FromImage(pb_Image.Image))
                 //{
 
@@ -123,17 +189,6 @@ namespace CheckOffset
 
                 //m_move_start_pt = e.Location;
                 //m_move_start_offset = m_offset;
-                if (!editing_cttl.Editing)
-                {
-                    editing_cttl.Editing_Rect = new Rectangle(m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
-                }
-                else
-                {
-                    editing_cttl.HitTest_Rresult =  editing_cttl.HitTest(m_pt_LBtnDown);
-                    editing_cttl.Modify_Begin(m_pt_LBtnDown);
-
-                    pb_Image.Refresh();
-                }
 
                 //pb_Image.Editing_Ctrl = editing_cttl;
             }
@@ -144,23 +199,27 @@ namespace CheckOffset
             m_pt_Current = e.Location;
             if (e.Button == MouseButtons.Left)
             {
-                TNUserCtrl_Rect? editing_cttl = (TNUserCtrl_Rect?) pb_Image.Editing_Ctrl;
-                if (editing_cttl != null)
+                TNUserCtrl_Rect editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                switch (Query_Editing_Mode())
                 {
-                    if (!editing_cttl.Editing)
-                    {
-                        editing_cttl.Editing_Rect = new Rectangle(Math.Min(m_pt_LBtnDown.X, m_pt_Current.X)
-                              , Math.Min(m_pt_LBtnDown.Y, m_pt_Current.Y)
-                              , Math.Abs(m_pt_Current.X - m_pt_LBtnDown.X)
-                              , Math.Abs(m_pt_Current.Y - m_pt_LBtnDown.Y));
-                    }
-                    else
-                    {
-                        // 編輯
-                        editing_cttl.Editing_Rect = editing_cttl.Modify_Doing(m_pt_Current);
+                    case Editing_Mode.EDT_New_ROI:
+                        {
+                            editing_cttl.Editing_Rect = TNUserCtrl_Rect.Normalize(m_pt_LBtnDown, m_pt_Current);
+                        }
+                        break;
 
-                        pb_Image.Refresh();
-                    }
+                    case Editing_Mode.EDT_Editing_ROI:
+                        {
+                            // 編輯
+                            if (editing_cttl.HitTest_Rresult != HitTest_Result.None)
+                                editing_cttl.Editing_Rect = editing_cttl.Modify_Doing(m_pt_Current);
+
+                            pb_Image.Refresh();
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -202,39 +261,51 @@ namespace CheckOffset
                     break;
 
                 case Editing_Mode.EDT_Editing_ROI:
-                    break;
-
                 default:
                     {
-                        foreach (Control click_ctrl in pb_Image.User_Ctrls)
-                        {
-                            TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
-                            tn_click_ctrl.Editing = false;
-                        }
-
-                        bool ctrl_selected = false;
-                        foreach (Control click_ctrl in pb_Image.User_Ctrls)
-                        {
-                            TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
-                            if (tn_click_ctrl == null)
-                                continue;
-
-                            if (!tn_click_ctrl.Contain(m_pt_Current))
-                                continue;
-
-                            ctrl_selected = true;
-                            tn_click_ctrl.Editing = true;
-                            pb_Image.Editing_Ctrl = tn_click_ctrl;
-                            break;
-                        }
-
-                        if (!ctrl_selected)
-                            pb_Image.Editing_Ctrl = null;
                     }
                     break;
             }
 
             pb_Image.Invalidate();
+        }
+
+        private bool Mouse_Select_Ctrl()
+        {
+            try
+            {
+                foreach (Control click_ctrl in pb_Image.User_Ctrls)
+                {
+                    TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
+                    tn_click_ctrl.Editing = false;
+                }
+
+                TNUserCtrl_Rect ctrl_new_selected = null;
+                foreach (Control click_ctrl in pb_Image.User_Ctrls)
+                {
+                    TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
+                    if (tn_click_ctrl == null)
+                        continue;
+
+                    if (!tn_click_ctrl.Contain(m_pt_Current))
+                        continue;
+
+                    ctrl_new_selected = tn_click_ctrl;
+                    break;
+                }
+
+                Editing_Ctrl = ctrl_new_selected;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                   , string.Format("Exception catched: error:{0}", ex.Message));
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+
+            return false;
         }
 
         //protected override void OnPaint(PaintEventArgs pe)
@@ -265,20 +336,26 @@ namespace CheckOffset
 
         public void Delete_Editing_ROI(Control ctrl_2be_del)
         {
-            TNUserCtrl_Rect rt_ctrl_2be_delt = ctrl_2be_del as TNUserCtrl_Rect;
-            if ( null == rt_ctrl_2be_delt) 
-                return;
-
-            foreach (Rectangle detect_pos in tnGlobal.Detect_Pos.Detect_Rects)
+            if (ctrl_2be_del == null)
             {
-                if ( detect_pos != rt_ctrl_2be_delt.Editing_Rect)
+                Log_Utl.Log_Event(Event_Level.Warning
+                            , System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                            , $"ctrl_2be_del is null");
+                return;
+            }
+
+            foreach(Control user_ctrl in User_Ctrls)
+            {
+                if (user_ctrl != ctrl_2be_del)
                     continue;
 
-                tnGlobal.Detect_Pos.Detect_Rects.Remove(detect_pos);
+                User_Ctrls.Remove(user_ctrl);
                 break;
             }
 
-            Apply_GlobalSetting_To_Ctrls();
+            Editing_Ctrl = null;
+
+            Apply_Ctrls_To_GlobalSetting();
         }
 
         public void Apply_GlobalSetting_To_Ctrls()

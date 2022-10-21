@@ -156,9 +156,6 @@ namespace TNControls
 
                 m_move_start_pt = e.Location;
                 m_move_start_offset = m_offset;
-
-                if ( !editing_cttl.Editing )
-                    editing_cttl.Editing_Rect = new Rectangle(m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
             }
         }
 

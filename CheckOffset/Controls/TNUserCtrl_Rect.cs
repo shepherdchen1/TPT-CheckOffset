@@ -269,7 +269,7 @@ namespace TNControls
             m_Editing_LBtn_Down = new Point(0, 0);
         }
 
-        private void Normalize(ref Rectangle rt)
+        public static void Normalize(ref Rectangle rt)
         {
             Rectangle rt_dest = rt;
             if (rt.Width < 0)
@@ -287,7 +287,7 @@ namespace TNControls
             rt = rt_dest;
         }
 
-        private Rectangle Normalize(Point pt_1, Point pt_2)
+        public static Rectangle Normalize(Point pt_1, Point pt_2)
         {
             Rectangle rt_dest = new Rectangle( Math.Min( pt_1.X, pt_2.X)
                                             ,  Math.Min( pt_1.Y, pt_2.Y )
