@@ -10,12 +10,13 @@ using static System.Net.Mime.MediaTypeNames;
 using TN.Tools.Debug;
 //using CheckOffset.Controls;
 using TNControls;
+using TN.Insp_Param;
 
 namespace CheckOffset
 {
-    public partial class Form_Main : Form
+    public partial class For_Main : Form
     {
-        public Form_Main()
+        public For_Main()
         {
             InitializeComponent();
 
@@ -23,23 +24,23 @@ namespace CheckOffset
         }
 
 
-        private UserCtrl_Image m_userctrl_image = new UserCtrl_Image(); 
+        private UserCtrl_Image _userctrl_image = new UserCtrl_Image(); 
 
         private void Init_Data()
         {
-            //m_userctrl_image = new UserCtrl_Image();
+            //_userctrl_image = new UserCtrl_Image();
 
             tabUser.TabPages.Clear();
 
             //////////////////////////////////////
             // manual add tab...
             TabPage new_tab_page = new TabPage("Image");
-            m_userctrl_image.Dock = DockStyle.Fill;
-            new_tab_page.Controls.Add(m_userctrl_image);
+            _userctrl_image.Dock = DockStyle.Fill;
+            new_tab_page.Controls.Add(_userctrl_image);
             tabUser.TabPages.Add(new_tab_page);
 
-            m_userctrl_image.Report_GrayLevel_Gray += Event_Update_Gray_Level;
-            m_userctrl_image.Query_Editing_Mode    += Query_Editing_Mode;
+            _userctrl_image.Report_GrayLevel_Gray += Event_Update_Gray_Level;
+            _userctrl_image.Query_Editing_Mode    += Query_Editing_Mode;
         }
 
         private void btnSelectFile_Click(object sender, EventArgs e)
@@ -49,57 +50,73 @@ namespace CheckOffset
                 return;
 
             tbImgFile.Text = openFileDialog_Img.FileName;
-            m_userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
-            m_userctrl_image.pb_Image.ZoomFit();
+            _userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
+            _userctrl_image.Editing_Ctrl = null;
+            _userctrl_image.User_Ctrls.Clear();
+            _userctrl_image.pb_Image.ZoomFit();
 
-            m_userctrl_image.ll_Test.Text = tbImgFile.Text;
+            _userctrl_image.ll_Test.Text = tbImgFile.Text;
         }
 
         private void chkNewInsp_Rect_CheckedChanged(object sender, EventArgs e)
         {
-            if (null == tnGlobal.Detect_Pos)
+            if (null == tnGlobal.Detect_Infos)
                 return;
 
             //aaa
             if (chkNewInsp_Rect.Checked)
             {
-                m_userctrl_image.pb_Image.Editing_Ctrl = null;
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                if (null != m_userctrl_image.User_Ctrls)
+                if (null != _userctrl_image.User_Ctrls)
                 {
-                    m_userctrl_image.User_Ctrls.Clear();
-                    foreach (Rectangle cur_rect in tnGlobal.Detect_Pos.Detect_Rects)
+                    _userctrl_image.User_Ctrls.Clear();
+                    foreach (Struct_Detect_Info cur_detect_infos in tnGlobal.Detect_Infos)
                     {
                         TNUserCtrl_Rect exist_added_rect = new TNUserCtrl_Rect();
-                        TNPictureBox tn_pb = m_userctrl_image.pb_Image as TNPictureBox;
-                        exist_added_rect.Editing_Rect = cur_rect;
-                        m_userctrl_image.User_Ctrls.Add(exist_added_rect);
+                        TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                        exist_added_rect.Editing_Rect = cur_detect_infos.Detect_Rect;
+                        exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                        _userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
                 }
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNUserCtrl_Rect new_added_rect = new TNUserCtrl_Rect();
-                m_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Editing_Rect = new Rectangle(0, 0, 100, 100);
+                Struct_Insp_Param new_insp_param = new Struct_Insp_Param();
+                new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
+                new_added_rect.Insp_param = new_insp_param;
             }
             else
             {
                 // ·s¼W§¹²¦
-                if (null != m_userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNUserCtrl_Rect editing_rect = (TNUserCtrl_Rect)m_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNUserCtrl_Rect editing_rect = (TNUserCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+
+                    Struct_Insp_Param new_insp_param = new Struct_Insp_Param();
+                    new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
+                    editing_rect.Insp_param = new_insp_param;
+
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Editing_Rect.Width > min_roi_valid_size && editing_rect.Editing_Rect.Height > min_roi_valid_size)
-                        tnGlobal.Detect_Pos.Detect_Rects.Add( editing_rect.Editing_Rect);
+                    {
+                        Struct_Detect_Info new_defect_info = new Struct_Detect_Info();
+                        new_defect_info.Detect_Rect = editing_rect.Editing_Rect;
+                        new_defect_info.Detect_Insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
+                        tnGlobal.Detect_Infos.Add(new_defect_info);
+                    }
 
-                    m_userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                m_userctrl_image.pb_Image.Editing_Ctrl = null;
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -107,7 +124,7 @@ namespace CheckOffset
         {
             //if (tabUser.SelectedTab.Name == tabpage_Image.Name)
             //{
-            //    m_userctrl_image.Visible = true;
+            //    _userctrl_image.Visible = true;
             //}
         }
 
@@ -117,10 +134,10 @@ namespace CheckOffset
                 return;
 
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
-            tnGlobal.Detect_Pos = Newtonsoft.Json.JsonConvert.DeserializeObject<tnGlobal.Detect_Pos_Info>(jsonString);
+            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Struct_Detect_Info>>(jsonString);
 
-            m_userctrl_image.Apply_GlobalSetting_To_Ctrls();
-            m_userctrl_image.Refresh();
+            _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+            _userctrl_image.Refresh();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -128,13 +145,13 @@ namespace CheckOffset
             if (DialogResult.OK != saveFileDialog.ShowDialog())
                 return;
 
-            if (null == tnGlobal.Detect_Pos)
+            if (null == tnGlobal.Detect_Infos)
                 return;
 
-            string jsonString = System.Text.Json.JsonSerializer.Serialize<tnGlobal.Detect_Pos_Info>(tnGlobal.Detect_Pos); // tnGlobal.Setting);
+            string jsonString = System.Text.Json.JsonSerializer.Serialize<List<Struct_Detect_Info>>(tnGlobal.Detect_Infos); // tnGlobal.Setting);
 
 
-            jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(tnGlobal.Detect_Pos);
+            jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(tnGlobal.Detect_Infos);
             //if (!File.Exists(path))
             {
                 // Create a file to write to.
@@ -157,64 +174,97 @@ namespace CheckOffset
                 Bitmap bmp = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
 
                 bool check_res = true;
-                if (null != tnGlobal.Detect_Pos)
+                if (null != tnGlobal.Detect_Infos)
                 {
                     //bool first_white = false;
                     int max_valid_gap = (int)numMaxValidPixel.Value;
-                    foreach( Rectangle chk_rect in tnGlobal.Detect_Pos.Detect_Rects )
+                    foreach (Control ctrl_defect_info in _userctrl_image.User_Ctrls)
                     {
+                        TNUserCtrl_Rect rect_user_ctrl = (TNUserCtrl_Rect)ctrl_defect_info;
+                        Struct_Insp_Param chk_insp_param = rect_user_ctrl.Insp_param;
+                        Struct_Insp_Result chk_insp_result = rect_user_ctrl.Insp_result;
+
                         //////////////////////////////////
                         // check X dir.
-                        for (int y = chk_rect.Top; y < chk_rect.Bottom; y++)
+                        if (EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_Horz == chk_insp_param.Insp_Tol_Dir)
                         {
-                            Get_X_Gap(bmp, chk_rect.X, chk_rect.X + chk_rect.Width, y, out float edge_pos_left, out float edge_pos_right);
+                            for (int y = rect_user_ctrl.Editing_Rect.Top; y < rect_user_ctrl.Editing_Rect.Bottom; y++)
+                            {
+                                Get_X_Gap(bmp, rect_user_ctrl.Editing_Rect.X, rect_user_ctrl.Editing_Rect.X + rect_user_ctrl.Editing_Rect.Width, y, out float edge_pos_left, out float edge_pos_right);
 
-                            // no edge found.
-                            if (edge_pos_left < 0 || edge_pos_right < 0)
-                                continue;
+                                // no edge found.
+                                if (edge_pos_left < 0 || edge_pos_right < 0)
+                                    continue;
 
-                            int gap_size = (int)edge_pos_right - (int)edge_pos_left + 1;
-                            if (gap_size < max_valid_gap)
-                                continue;
+                                int gap_size = (int)edge_pos_right - (int)edge_pos_left + 1;
+                                if (gap_size < max_valid_gap)
+                                    continue;
 
-                            labelCheckResult.Text = $"NG";
-                            labelReason.Text = $"X:{edge_pos_left}~{edge_pos_right}, Y:{y} ";
-                            check_res = false;
-                            break;
+                                chk_insp_result.Insp_Result_Type = EN_Insp_Result_Type.EN_Insp_Result_Failure;
+                                chk_insp_result.Defect_Pos = new Rectangle((int) edge_pos_left, y
+                                                                    , (int) ( edge_pos_right - edge_pos_left), 1);
+                                rect_user_ctrl.Insp_result = chk_insp_result;
+
+                                labelCheckResult.ForeColor = Color.Red;
+                                labelCheckResult.Text = $"NG";
+                                labelReason.Text = $"X:{edge_pos_left}~{edge_pos_right}, Y:{y} ";
+                                check_res = false;
+                                break;
+                            }
+
+                            if (!check_res)
+                                break;
+
+                            chk_insp_result.Insp_Result_Type = EN_Insp_Result_Type.EN_Insp_Result_Success;
+                            chk_insp_result.Defect_Pos = new Rectangle(0, 0, 0, 0);
+                            rect_user_ctrl.Insp_result = chk_insp_result;
                         }
-
-                        if (!check_res)
-                            break;
 
                         //////////////////////////////////
                         // check Y dir.
-                        for (int x = chk_rect.Left; x < chk_rect.Right; x++)
+                        if (EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_Vert == chk_insp_param.Insp_Tol_Dir)
                         {
-                            Get_Y_Gap(bmp, x, chk_rect.Y, chk_rect.Y + chk_rect.Height, out float edge_pos_top, out float edge_pos_bottom);
+                            for (int x = rect_user_ctrl.Editing_Rect.Left; x < rect_user_ctrl.Editing_Rect.Right; x++)
+                            {
+                                Get_Y_Gap(bmp, x, rect_user_ctrl.Editing_Rect.Y, rect_user_ctrl.Editing_Rect.Y + rect_user_ctrl.Editing_Rect.Height, out float edge_pos_top, out float edge_pos_bottom);
 
-                            // no edge found.
-                            if (edge_pos_top < 0 || edge_pos_bottom < 0)
-                                continue;
+                                // no edge found.
+                                if (edge_pos_top < 0 || edge_pos_bottom < 0)
+                                    continue;
 
-                            int gap_size = (int)edge_pos_bottom - (int)edge_pos_top + 1;
-                            if (gap_size < max_valid_gap)
-                                continue;
+                                int gap_size = (int)edge_pos_bottom - (int)edge_pos_top + 1;
+                                if (gap_size < max_valid_gap)
+                                    continue;
 
-                            labelCheckResult.Text = $"NG";
-                            labelReason.Text = $"X:{x}, Y:{edge_pos_top}~{edge_pos_bottom}";
-                            check_res = false;
-                            break;
+                                chk_insp_result.Insp_Result_Type = EN_Insp_Result_Type.EN_Insp_Result_Failure;
+                                chk_insp_result.Defect_Pos = new Rectangle(x, (int) edge_pos_top
+                                                                    , 1, (int) ( edge_pos_bottom - edge_pos_top) );
+                                rect_user_ctrl.Insp_result = chk_insp_result;
+
+                                labelCheckResult.ForeColor = Color.Red;
+                                labelCheckResult.Text = $"NG";
+                                labelReason.Text = $"X:{x}, Y:{edge_pos_top}~{edge_pos_bottom}";
+                                check_res = false;
+                                break;
+                            }
+
+                            if (!check_res)
+                                break;
+
+                            chk_insp_result.Insp_Result_Type = EN_Insp_Result_Type.EN_Insp_Result_Success;
+                            chk_insp_result.Defect_Pos = new Rectangle(0, 0, 0, 0);
+                            rect_user_ctrl.Insp_result = chk_insp_result;
                         }
-
-                        if (!check_res)
-                            break;
                     }
 
                     if (check_res)
                     {
+                        labelCheckResult.ForeColor = Color.Green;
                         labelCheckResult.Text = $"OK";
                         labelReason.Text = $"";
                     }
+
+                    _userctrl_image.pb_Image.Repaint();
                 }
             }
             catch(Exception ex)
@@ -312,38 +362,38 @@ namespace CheckOffset
             {
                 Image_Binary.Binary_Image(org_bmp, (int) numThreshold.Value, out Bitmap? dest_bmp);
 
-                m_userctrl_image.Image = dest_bmp;
+                _userctrl_image.Image = dest_bmp;
             }
             else
             {
-                m_userctrl_image.Image = org_bmp;
+                _userctrl_image.Image = org_bmp;
             }
 
-            m_userctrl_image.Refresh();
+            _userctrl_image.Refresh();
         }
 
         private void btn1X_Click(object sender, EventArgs e)
         {
-            m_userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-            m_userctrl_image.Image_Scale = 1.0f;
-            m_userctrl_image.Offset = new Point(0, 0);
+            _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            _userctrl_image.Image_Scale = 1.0f;
+            _userctrl_image.Offset = new Point(0, 0);
 
-            m_userctrl_image.Refresh();
+            _userctrl_image.Refresh();
         }
 
         private void btnFit_Click(object sender, EventArgs e)
         {
-            m_userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-            m_userctrl_image.pb_Image.ZoomFit();
+            _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            _userctrl_image.pb_Image.ZoomFit();
         }
 
         private void btnDeleteROI_Click(object sender, EventArgs e)
         {
-            if (m_userctrl_image.Editing_Ctrl == null)
+            if (_userctrl_image.Editing_Ctrl == null)
                 return;
 
-            m_userctrl_image.Delete_Editing_ROI(m_userctrl_image.Editing_Ctrl);
-            m_userctrl_image.Refresh();
+            _userctrl_image.Delete_Editing_ROI(_userctrl_image.Editing_Ctrl);
+            _userctrl_image.Refresh();
         }
 
         Editing_Mode Query_Editing_Mode()
@@ -351,11 +401,44 @@ namespace CheckOffset
             if (chkNewInsp_Rect.Checked)
                 return Editing_Mode.EDT_New_ROI;
 
-            if (null != m_userctrl_image.Editing_Ctrl)
+            if (null != _userctrl_image.Editing_Ctrl)
                 return Editing_Mode.EDT_Editing_ROI;
 
             return Editing_Mode.EDT_None;
         }
 
-    } // end of     public partial class Form_Main : Form
+        EN_Insp_Tol_Dir Get_Insp_Tol_Dir()
+        {
+            if (rbtnHorz.Checked)
+                return EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_Horz;
+            else if (rbtnVert.Checked)
+                return EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_Vert;
+            else if (rbtnLT45.Checked)
+                return EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_LT45;
+            else if (rbtnRT45.Checked)
+                return EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_RT45;
+
+            return EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+        }
+
+        private void chkSubPixel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkSubPixel.Checked)
+            {
+                Bitmap org_bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+
+                if ( !SubPixel.Apply_Interpolate(org_bmp, EN_SubPixel_Type.EN_SubPixel_Linear, EN_SubPixel_Num.EN_SubPixel_3, out Bitmap bmp_dest) )
+                {
+                    Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                        , $"Apply_Interpolate failed");
+                }
+
+                bmp_dest.Save("d:\\temp\\subpixel.bmp");
+            }
+            else
+            {
+
+            }
+        }
+    } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

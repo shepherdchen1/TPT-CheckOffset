@@ -68,5 +68,16 @@ namespace TN.ImageTools
 
             return res;
         }
+
+        public static byte Normalize(int gray_level)
+        {
+            if (gray_level > 255)
+                return 255;
+
+            if (gray_level < 0)
+                return 0;
+
+            return (byte) gray_level;
+        }
     }
 }

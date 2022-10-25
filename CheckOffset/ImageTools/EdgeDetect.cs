@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using TN.Tools.Debug;
 using System.Drawing.Drawing2D;
+using TNControls;
 
 namespace TN.ImageTools
 {
@@ -303,6 +304,77 @@ namespace TN.ImageTools
             }
 
             return false;
+        }
+    }
+}
+
+namespace TN.Insp_Param
+{
+    public enum EN_Insp_Tol_Dir
+    {
+        EN_Insp_Tol_None = 0
+             , EN_Insp_Tol_Dir_Horz
+             , EN_Insp_Tol_Dir_Vert
+             , EN_Insp_Tol_Dir_Horz_Horz
+             , EN_Insp_Tol_Dir_LT45
+             , EN_Insp_Tol_Dir_RT45
+             , EN_Insp_Tol_Dir_LB45
+             , EN_Insp_Tol_Dir_RB45
+    }
+
+    public struct Struct_Insp_Param
+    {
+        /// <summary>
+        /// data member
+        /// </summary>
+        private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+
+        /// <summary>
+        /// member function
+        /// </summary>
+        public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+
+        public Struct_Insp_Param()
+        {
+            _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+        }
+
+        public string Draw_String()
+        {
+            return $"Dir:{Insp_Tol_Dir}";
+        }
+    }
+
+    public enum EN_Insp_Result_Type
+    {
+        EN_Insp_Result_None = 0
+            , EN_Insp_Result_Success = 1
+            , EN_Insp_Result_Failure = 2
+    }
+    public struct Struct_Insp_Result
+    {
+        public EN_Insp_Result_Type Insp_Result_Type { get; set; }
+
+        public Rectangle Defect_Pos { get; set; }
+
+        public Struct_Insp_Result()
+        {
+            Insp_Result_Type = EN_Insp_Result_Type.EN_Insp_Result_None;
+            Defect_Pos = new Rectangle(0, 0, 0, 0);
+        }
+
+        public string Draw_String()
+        {
+            return $"Result:{Insp_Result_Type}";
+        }
+
+        public void Paint_Defect(Graphics graphics_show, TNPictureBox pb)
+        {
+            if (EN_Insp_Result_Type.EN_Insp_Result_Failure != Insp_Result_Type)
+                return;
+
+            Pen pen_ctrl = new Pen(Color.Red, 1);
+            graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Defect_Pos));
         }
     }
 }

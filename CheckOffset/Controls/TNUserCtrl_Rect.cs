@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CheckOffset;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using TN.Insp_Param;
+
 namespace TNControls
 {
     public partial class TNUserCtrl_Rect : Control
@@ -19,6 +22,46 @@ namespace TNControls
             InitializeComponent();
         }
 
+        /// <summary>
+        /// properties.
+        /// </summary>
+
+        /// <summary>
+        /// Image 座標系位置 
+        /// </summary>
+        public Rectangle Editing_Rect
+        {
+            get;
+            set;
+        }
+
+        public bool Editing { get => _bEditing; set => _bEditing = value; }
+
+        public HitTest_Result HitTest_Rresult { get => _HitTest_Rresult; set => _HitTest_Rresult = value; }
+        public Struct_Insp_Param Insp_param { get => _insp_param; set => _insp_param = value; }
+        public Struct_Insp_Result Insp_result { get => _insp_result; set => _insp_result = value; }
+
+        /// <summary>
+        /// data member
+        /// </summary>
+        private HitTest_Result _HitTest_Rresult = HitTest_Result.None;
+
+        private Rectangle _Editing_Rect_Before_Modify = new Rectangle( 0, 0, 0, 0);
+        private Point _Editing_LBtn_Down = new Point(0, 0);
+
+        private bool _bEditing = false;
+
+        private Struct_Insp_Param _insp_param = new Struct_Insp_Param();
+
+        private Struct_Insp_Result _insp_result = new Struct_Insp_Result();
+
+
+        private bool _bSelected = false;
+
+        /// <summary>
+        /// member functions.
+        /// </summary>
+        /// <param name="pe"></param>
         protected override void OnPaint(PaintEventArgs pe)
         {
             base.OnPaint(pe);
@@ -69,6 +112,14 @@ namespace TNControls
                 Rectangle rt_right_bottom = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right_bottom));
             }
+
+            Font draw_font = new Font("Arial", 16);
+            string draw_string = _insp_param.Draw_String() + "\r\n" + _insp_result.Draw_String();
+            graphics_show.DrawString(_insp_param.Draw_String(), draw_font, new SolidBrush(Color.Green)
+                                , pb.GetPBRectFromImage(Editing_Rect).X
+                                , pb.GetPBRectFromImage(Editing_Rect).Y);
+
+            _insp_result.Paint_Defect(graphics_show, pb);
         }
 
         public bool Contain(Point pt)
@@ -131,43 +182,30 @@ namespace TNControls
             Pen pen = new Pen(Color.Red, 1);
             e.Graphics.DrawRectangle(pen, Editing_Rect);
 
-            if (m_bEditing)
+            if (_bEditing)
             {
 
             }
         }
 
-        /// <summary>
-        /// Image 座標系位置 
-        /// </summary>
-        public Rectangle Editing_Rect
-        {
-            get;
-            set;
-        }
-
-        public bool Editing { get => m_bEditing; set => m_bEditing = value; }
-        private bool m_bEditing = false;
-
-
         // HitTest + translation.
         public void Modify_Begin(Point pt_start)
         {
-            m_Editing_Rect_Before_Modify = Editing_Rect;
-            m_Editing_LBtn_Down = pt_start;
+            _Editing_Rect_Before_Modify = Editing_Rect;
+            _Editing_LBtn_Down = pt_start;
         }
 
         public Rectangle Modify_Doing(Point pt_cur)
         {
-            int offset_x = pt_cur.X - m_Editing_LBtn_Down.X;
-            int offset_y = pt_cur.Y - m_Editing_LBtn_Down.Y;
+            int offset_x = pt_cur.X - _Editing_LBtn_Down.X;
+            int offset_y = pt_cur.Y - _Editing_LBtn_Down.Y;
 
-            Point pt_left_top       = new Point(m_Editing_Rect_Before_Modify.X,                                      m_Editing_Rect_Before_Modify.Y);
-            Point pt_right_top      = new Point(m_Editing_Rect_Before_Modify.X + m_Editing_Rect_Before_Modify.Width, m_Editing_Rect_Before_Modify.Y);
-            Point pt_right_bottom   = new Point(m_Editing_Rect_Before_Modify.X + m_Editing_Rect_Before_Modify.Width, m_Editing_Rect_Before_Modify.Y + m_Editing_Rect_Before_Modify.Height);
-            Point pt_left_bottom    = new Point(m_Editing_Rect_Before_Modify.X,                                      m_Editing_Rect_Before_Modify.Y + m_Editing_Rect_Before_Modify.Height);
+            Point pt_left_top       = new Point(_Editing_Rect_Before_Modify.X,                                      _Editing_Rect_Before_Modify.Y);
+            Point pt_right_top      = new Point(_Editing_Rect_Before_Modify.X + _Editing_Rect_Before_Modify.Width, _Editing_Rect_Before_Modify.Y);
+            Point pt_right_bottom   = new Point(_Editing_Rect_Before_Modify.X + _Editing_Rect_Before_Modify.Width, _Editing_Rect_Before_Modify.Y + _Editing_Rect_Before_Modify.Height);
+            Point pt_left_bottom    = new Point(_Editing_Rect_Before_Modify.X,                                      _Editing_Rect_Before_Modify.Y + _Editing_Rect_Before_Modify.Height);
 
-            switch (m_HitTest_Rresult)
+            switch (_HitTest_Rresult)
             {
                 case HitTest_Result.HT_LT:
                     {
@@ -257,8 +295,8 @@ namespace TNControls
 
         public void Modify_Done()
         {
-            m_HitTest_Rresult = HitTest_Result.None;
-            m_Editing_LBtn_Down = new Point(0, 0);
+            _HitTest_Rresult = HitTest_Result.None;
+            _Editing_LBtn_Down = new Point(0, 0);
         }
 
         public static void Normalize(ref Rectangle rt)
@@ -287,14 +325,6 @@ namespace TNControls
                                             ,  Math.Abs( pt_1.Y - pt_2.Y) );
             return rt_dest;
         }
-
-
-        public HitTest_Result HitTest_Rresult { get => m_HitTest_Rresult; set => m_HitTest_Rresult = value; }
-
-        private HitTest_Result m_HitTest_Rresult;
-
-        private Rectangle m_Editing_Rect_Before_Modify;
-        private Point m_Editing_LBtn_Down;
 
     }
 

@@ -30,7 +30,7 @@ namespace TN.Tools
 		public class ExceptionDump
 		{
 			private static object Log_File_Monitor = new object();
-			private static string m_dump_path = "D:\\Log";
+			private static string _dump_path = "D:\\Log";
 		
 		// Property:	TimeStampFile
 		// Purpose:		取得以目前日期做為名稱的ExceptionDump檔案名稱
@@ -53,8 +53,8 @@ namespace TN.Tools
 		// Access:		READ, WRITE
 		public static string DefaultDumpPath
 		{
-			get{ return m_dump_path; }
-			set{ m_dump_path = value; }
+			get{ return _dump_path; }
+			set{ _dump_path = value; }
 		}
 
 		// Property:	DefaultDumpPath
@@ -62,7 +62,7 @@ namespace TN.Tools
 		// Access:		READ Only
 		public static string DefaultDumpFile
 		{
-			get { return m_dump_path + "\\" + GetDateStampFile(); }		
+			get { return _dump_path + "\\" + GetDateStampFile(); }		
 		}
 
 		//=================================================================================================
@@ -133,7 +133,7 @@ namespace TN.Tools
 		//=================================================================================================
 		public static void SaveToDefaultFile(Exception e, string context)
 		{
-			SaveToFile(e, context, m_dump_path + "\\" + GetDateStampFile());
+			SaveToFile(e, context, _dump_path + "\\" + GetDateStampFile());
 		}
 
 
@@ -151,7 +151,7 @@ namespace TN.Tools
 		//=================================================================================================
 		public static void SaveToDefaultFile(Exception e)
 		{
-			SaveToFile(e, m_dump_path + "\\" + GetDateStampFile());
+			SaveToFile(e, _dump_path + "\\" + GetDateStampFile());
 		}
 
 		//=================================================================================================

@@ -27,19 +27,19 @@ namespace TN.Tools
 			//public static Log_Utl()
 			//         {
 			//	PathLog = "d:\\Log";
-			//	m_event_log_locker = new object();
+			//	_event_log_locker = new object();
 			//}
 
 			public static void Init()
             {
                 PathLog = "d:\\Log";
-                m_event_log_locker = new object();
+                _event_log_locker = new object();
             }
 
             public static string? PathLog
             { get; set; }
 
-			private static object? m_event_log_locker;
+			private static object? _event_log_locker;
 
 			public static bool EnableLogStep;
 
@@ -85,17 +85,17 @@ namespace TN.Tools
 				// 建立檔案
 				try
 				{
-					if (null != m_event_log_locker )
-						Monitor.Enter(m_event_log_locker);
+					if (null != _event_log_locker )
+						Monitor.Enter(_event_log_locker);
 
 
 					string event_file = string.Format("{0}\\Event_{1:yyyyMMdd_HH}.log", log_path, date_now);
-					StreamWriter stream_writer = new StreamWriter(event_file, true);					
-					stream_writer.Write(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title + "\r\n\t");
+					StreamWriter strea_writer = new StreamWriter(event_file, true);					
+					strea_writer.Write(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title + "\r\n\t");
 
 					string strEventLr = string.Format("{0}:", event_lv);
-					stream_writer.Write(strEventLr + ":" + context + "\r\n\r\n");
-					stream_writer.Close();
+					strea_writer.Write(strEventLr + ":" + context + "\r\n\r\n");
+					strea_writer.Close();
 				}
 				catch (Exception e)
 				{
@@ -104,8 +104,8 @@ namespace TN.Tools
 				}
 				finally
 				{
-                    if (null != m_event_log_locker)
-                        Monitor.Exit(m_event_log_locker);
+                    if (null != _event_log_locker)
+                        Monitor.Exit(_event_log_locker);
 				}
 
 				Trace.WriteLine(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title);
@@ -145,17 +145,17 @@ namespace TN.Tools
 				// 建立檔案
 				try
 				{
-                    if (null != m_event_log_locker)
-                        Monitor.Enter(m_event_log_locker);
+                    if (null != _event_log_locker)
+                        Monitor.Enter(_event_log_locker);
 
 
 					string event_file = string.Format("{0}\\Step_{1:yyyyMMdd_HH}.log", log_path, date_now);
-					StreamWriter stream_writer = new StreamWriter(event_file, true);
-					stream_writer.Write(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title + "\r\n\t");
-					stream_writer.Write(context + "\r\n");
-					stream_writer.Close();
+					StreamWriter strea_writer = new StreamWriter(event_file, true);
+					strea_writer.Write(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title + "\r\n\t");
+					strea_writer.Write(context + "\r\n");
+					strea_writer.Close();
 
-///VS					VS.FreeUtility.SafeFree(stream_writer);
+///VS					VS.FreeUtility.SafeFree(strea_writer);
 				}
 				catch (Exception e)
 				{
@@ -164,8 +164,8 @@ namespace TN.Tools
 				}
 				finally
 				{
-                    if (null != m_event_log_locker)
-                        Monitor.Exit(m_event_log_locker);
+                    if (null != _event_log_locker)
+                        Monitor.Exit(_event_log_locker);
 				}
 
 				Trace.WriteLine(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title);

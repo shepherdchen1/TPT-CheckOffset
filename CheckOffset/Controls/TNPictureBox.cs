@@ -46,23 +46,23 @@ namespace TNControls
 
         //////////////////////////////////////////////////
         /// data member...
-        private Bitmap? m_image      = null; // 8bit bitmap original file's bitmap.
-        public  Bitmap? m_show_image = null; // 8bit bitmap scaled display bitmap only visible rect.
-        private Bitmap? m_show_color_image = null; // transfer m_show_image to color bitmap.
-        public Point m_pt_LBtnDown;
-        public Point m_pt_Current;
+        private Bitmap? _image      = null; // 8bit bitmap original file's bitmap.
+        public  Bitmap? _show_image = null; // 8bit bitmap scaled display bitmap only visible rect.
+        private Bitmap? _show_color_image = null; // transfer _show_image to color bitmap.
+        public Point _pt_LBtnDown;
+        public Point _pt_Current;
 
-        private float m_scale = 1.0f;
-        private Point m_offset;     // 原始影像座標(m_image)顯示的起點: 往右拉，X值為負值，代表影像原點座標要往負方向開始截取.
+        private float _scale = 1.0f;
+        private Point _offset;     // 原始影像座標(_image)顯示的起點: 往右拉，X值為負值，代表影像原點座標要往負方向開始截取.
 
-        bool m_busy = false;
-        bool m_enable_zoom = true;
+        bool _busy = false;
+        bool _enable_zoom = true;
 
-        Point m_move_start_pt = new Point(0, 0);
-        Point m_move_start_offset = new Point(0, 0);
+        Point _move_start_pt = new Point(0, 0);
+        Point _move_start_offset = new Point(0, 0);
 
-        // for m_user_ctrls should be none null, for compile no warning.
-        public List<Control> m_user_ctrls = new List<Control>();
+        // for _user_ctrls should be none null, for compile no warning.
+        public List<Control> _user_ctrls = new List<Control>();
 
         public event Delegate_Report_GrayLevel_Gray? Report_GrayLevel_Gray;
 
@@ -74,37 +74,37 @@ namespace TNControls
 
         public List<Control> User_Ctrls
         {
-            get => m_user_ctrls;
-            set => m_user_ctrls = value;
+            get => _user_ctrls;
+            set => _user_ctrls = value;
         }
 
         public float Image_Scale 
         { 
-            get => m_scale;
+            get => _scale;
             set
             {
-                m_scale = value;
+                _scale = value;
                 DrawImageToBuffer();
                 Redraw_Ctrl();
             }
         }
         public Point Image_Offset 
         { 
-            get => m_offset;
+            get => _offset;
             set
             {
-                m_offset = value;
+                _offset = value;
                 DrawImageToBuffer();
                 Redraw_Ctrl();
             }
         }
         public Bitmap? Image_Bmp 
         { 
-            get => m_image; 
+            get => _image; 
             set {
-                m_image = value;
-                m_show_image = value;
-                //Image = m_show_image;
+                _image = value;
+                _show_image = value;
+                //Image = _show_image;
 
                 DrawImageToBuffer();
                 Redraw_Ctrl();
@@ -124,9 +124,9 @@ namespace TNControls
             Width += (int)(e.Delta * scale);
             Height += e.Delta;
 
-            if (m_enable_zoom && !m_busy)
+            if (_enable_zoom && !_busy)
             {
-                m_busy = true;
+                _busy = true;
 
                 //Point center_pt = GetImagePointFromPB(new Point(Width / 2, Height / 2));
                 // zoomin/out by cursor
@@ -137,7 +137,7 @@ namespace TNControls
                 else if (e.Delta < 0)
                     ZoomOut(e.Location/*center_pt*/);
 
-                m_busy = false;
+                _busy = false;
             }
 
             //PB_Image_Refresh();
@@ -145,8 +145,8 @@ namespace TNControls
 
         private void pb_Image_MouseDown(object? sender, MouseEventArgs e)
         {
-            m_pt_LBtnDown = e.Location;
-            //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", m_pt_LBtnDown.X, m_pt_LBtnDown.Y, 0, 0);
+            _pt_LBtnDown = e.Location;
+            //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, 0, 0);
             if (null != Editing_Ctrl)
             {
                 TNUserCtrl_Rect editing_cttl = (TNUserCtrl_Rect)Editing_Ctrl;
@@ -158,38 +158,38 @@ namespace TNControls
                 //}
             }
 
-            m_move_start_pt = e.Location;
-            m_move_start_offset = m_offset;
+            _move_start_pt = e.Location;
+            _move_start_offset = _offset;
         }
 
         private void pb_Image_MouseMove(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
-                m_busy = true;
+                _busy = true;
 
-                m_offset = m_move_start_offset;
-                m_offset.X += (Int32)((m_move_start_pt.X - e.Location.X) / m_scale);
-                m_offset.Y += (Int32)((m_move_start_pt.Y - e.Location.Y) / m_scale);
+                _offset = _move_start_offset;
+                _offset.X += (Int32)((_move_start_pt.X - e.Location.X) / _scale);
+                _offset.Y += (Int32)((_move_start_pt.Y - e.Location.Y) / _scale);
 
-                m_offset.X = Math.Max(m_offset.X, 0);
-                m_offset.Y = Math.Max(m_offset.Y, 0);
+                _offset.X = Math.Max(_offset.X, 0);
+                _offset.Y = Math.Max(_offset.Y, 0);
                 //OffsetChanged(this, gcnew EventArgs());
 
                 DrawImageToBuffer();
                 Redraw_Ctrl();
 
-                m_busy = false;
+                _busy = false;
             }
             else if (e.Button == MouseButtons.Left)
             {
-                m_pt_Current = PointToClient(e.Location);
+                _pt_Current = PointToClient(e.Location);
 
                 Redraw_Ctrl();
                 //DrawXORRectangle
-                //m_pt_Current = e.Location;
+                //_pt_Current = e.Location;
 
-                //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", m_pt_LBtnDown.X, m_pt_LBtnDown.Y, m_pt_Current.X, m_pt_Current.Y);
+                //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, _pt_Current.X, _pt_Current.Y);
 
                 //if (null != Editing_Ctrl)
                 //{
@@ -204,19 +204,19 @@ namespace TNControls
         {
             if (e.Button == MouseButtons.Right)
             {
-                m_busy = true;
+                _busy = true;
 
-                m_busy = false;
+                _busy = false;
             }
             else if (e.Button == MouseButtons.Left)
             {
-                m_pt_Current = PointToClient(e.Location);
+                _pt_Current = PointToClient(e.Location);
 
                 Redraw_Ctrl();
                 //DrawXORRectangle
-                //m_pt_Current = e.Location;
+                //_pt_Current = e.Location;
 
-                //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", m_pt_LBtnDown.X, m_pt_LBtnDown.Y, m_pt_Current.X, m_pt_Current.Y);
+                //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, _pt_Current.X, _pt_Current.Y);
 
                 //if (null != Editing_Ctrl)
                 //{
@@ -239,15 +239,15 @@ namespace TNControls
             {
                 Pen pen = new Pen(Color.White, 1);
 
-                foreach (Control enum_ctrl in User_Ctrls)
+                foreach (Control enu_ctrl in User_Ctrls)
                 {
-                    TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enum_ctrl;
+                    TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enu_ctrl;
                     Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
                     Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
                     Rectangle rt_draw = user_ctrl.Editing_Rect;
                     rt_draw.Offset(pt_offset);
-                    Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * m_scale), (int)(rt_draw.Top * m_scale)
-                                                            , (int)(rt_draw.Width * m_scale), (int)(rt_draw.Height * m_scale));
+                    Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
+                                                            , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
                     CreateGraphics().DrawRectangle(pen, rt_final_draw);
                 }
             }
@@ -262,20 +262,20 @@ namespace TNControls
                 //    DrawXORRectangle(g, pen, editing_cttl.Editing_Rect);
                 //}
 
-                //editing_cttl.Editing_Rect = new Rectangle(Math.Min(m_pt_LBtnDown.X, m_pt_Current.X)
-                //                      , Math.Min(m_pt_LBtnDown.Y, m_pt_Current.Y)
-                //                      , Math.Abs(m_pt_Current.X - m_pt_LBtnDown.X)
-                //                      , Math.Abs(m_pt_Current.Y - m_pt_LBtnDown.Y));
+                //editing_cttl.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
+                //                      , Math.Min(_pt_LBtnDown.Y, _pt_Current.Y)
+                //                      , Math.Abs(_pt_Current.X - _pt_LBtnDown.X)
+                //                      , Math.Abs(_pt_Current.Y - _pt_LBtnDown.Y));
 
                 //Bitmap color_bmp = new Bitmap(pb_Image.Image.Width, pb_Image.Image.Height);
 
                 using (Graphics g = Graphics.FromImage(color_bmp))
                 {
-                    if (null != m_show_image)
+                    if (null != _show_image)
                     {
-                        g.DrawImageUnscaled(m_show_image, 0, 0);
-                        Image = m_show_image;
-                        //m_show_image.Save("d:\\temp\\test.bmp");
+                        g.DrawImageUnscaled(_show_image, 0, 0);
+                        Image = _show_image;
+                        //_show_image.Save("d:\\temp\\test.bmp");
                     }
 
                     Pen pen = new Pen(Color.White, 1);
@@ -285,7 +285,7 @@ namespace TNControls
                 }
             }
 
-            //Image = m_show_image;
+            //Image = _show_image;
         }
 
         private void pb_Image_Paint(object sender, PaintEventArgs e)
@@ -337,7 +337,7 @@ namespace TNControls
 
                 Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, bmp_data);
 
-                Point pt_image = new Point((int)(pt_Current.X / m_scale + m_offset.X), (int)(pt_Current.Y / m_scale + m_offset.Y));
+                Point pt_image = new Point((int)(pt_Current.X / _scale + _offset.X), (int)(pt_Current.Y / _scale + _offset.Y));
 
                 Report_Display_Info report_display_info = new Report_Display_Info
                 {
@@ -345,7 +345,7 @@ namespace TNControls
                                 ,
                     Gray_Level = gray_level
                                 ,
-                    Scale = m_scale
+                    Scale = _scale
                 };
                 if (null != Report_GrayLevel_Gray)
                 {
@@ -368,40 +368,40 @@ namespace TNControls
 
         public Point GetImagePointFromPB(Point pt)
         {
-            Point real_pt = new Point((Int32)Math.Floor(pt.X / m_scale + m_offset.X)
-                                     , (Int32)Math.Floor(pt.Y / m_scale + m_offset.Y));
+            Point real_pt = new Point((Int32)Math.Floor(pt.X / _scale + _offset.X)
+                                     , (Int32)Math.Floor(pt.Y / _scale + _offset.Y));
             return real_pt;
         }
 
         public Rectangle GetImageRectFromPB(Rectangle rt)
         {
-            return new Rectangle((Int32)Math.Floor(rt.X / m_scale + m_offset.X)
-                               , (Int32)Math.Floor(rt.Y / m_scale + m_offset.Y)
-                               , (Int32)Math.Floor(rt.Width / m_scale)
-                               , (Int32)Math.Floor(rt.Height / m_scale));
+            return new Rectangle((Int32)Math.Floor(rt.X / _scale + _offset.X)
+                               , (Int32)Math.Floor(rt.Y / _scale + _offset.Y)
+                               , (Int32)Math.Floor(rt.Width / _scale)
+                               , (Int32)Math.Floor(rt.Height / _scale));
         }
 
         public Point GetPBPointFromImage(Point pt)
         {
-            Point pb_pt = new Point((Int32)Math.Round((pt.X - m_offset.X) * m_scale, MidpointRounding.AwayFromZero)
-                                    , (Int32)Math.Round((pt.Y - m_offset.Y) * m_scale, MidpointRounding.AwayFromZero));
+            Point pb_pt = new Point((Int32)Math.Round((pt.X - _offset.X) * _scale, MidpointRounding.AwayFromZero)
+                                    , (Int32)Math.Round((pt.Y - _offset.Y) * _scale, MidpointRounding.AwayFromZero));
             return pb_pt;
         }
 
         public Rectangle GetPBRectFromImage(Rectangle rt)
         {
-            return new Rectangle((Int32)Math.Round((rt.X - m_offset.X) * m_scale, MidpointRounding.AwayFromZero)
-                                 , (Int32)Math.Round((rt.Y - m_offset.Y) * m_scale, MidpointRounding.AwayFromZero)
-                                 , (Int32)Math.Round(rt.Width * m_scale,  MidpointRounding.AwayFromZero)
-                                 , (Int32)Math.Round(rt.Height * m_scale, MidpointRounding.AwayFromZero));
+            return new Rectangle((Int32)Math.Round((rt.X - _offset.X) * _scale, MidpointRounding.AwayFromZero)
+                                 , (Int32)Math.Round((rt.Y - _offset.Y) * _scale, MidpointRounding.AwayFromZero)
+                                 , (Int32)Math.Round(rt.Width * _scale,  MidpointRounding.AwayFromZero)
+                                 , (Int32)Math.Round(rt.Height * _scale, MidpointRounding.AwayFromZero));
         }
 
         System.Drawing.Point CalcOffset(System.Drawing.Point display_cursor_pt, float old_scale, float new_scale)
         {
-            // 1. 以原有倍率取得滑鼠座標 在 m_image 坐標系的位置
-            m_scale = old_scale;
+            // 1. 以原有倍率取得滑鼠座標 在 _image 坐標系的位置
+            _scale = old_scale;
             Point pt_new = GetImagePointFromPB(display_cursor_pt);
-            m_scale = new_scale;
+            _scale = new_scale;
 
             // 轉到新倍率坐標系
             pt_new.X = (int)(pt_new.X * new_scale);
@@ -411,7 +411,7 @@ namespace TNControls
             pt_new.X -= display_cursor_pt.X;
             pt_new.Y -= display_cursor_pt.Y;
 
-            // 找到新坐標系原點在 m_image 坐標系位置
+            // 找到新坐標系原點在 _image 坐標系位置
             pt_new.X = (int)(pt_new.X / new_scale);
             pt_new.Y = (int)(pt_new.Y / new_scale);
 
@@ -423,10 +423,10 @@ namespace TNControls
 
         float GetBestFitScale()
         {
-            if (null != m_image)
+            if (null != _image)
             {
-                float scale_x = ClientSize.Width / (float)m_image.Width;
-                float scale_y = ClientSize.Height / (float)m_image.Height;
+                float scale_x = ClientSize.Width / (float)_image.Width;
+                float scale_y = ClientSize.Height / (float)_image.Height;
 
                 return ((scale_x > scale_y) ? scale_y : scale_x);
             }
@@ -436,28 +436,28 @@ namespace TNControls
 
         public void ZoomFit()
         {
-            m_scale = GetBestFitScale();
-            m_offset = new Point(0, 0);
+            _scale = GetBestFitScale();
+            _offset = new Point(0, 0);
             DrawImageToBuffer();
             Redraw_Ctrl();
-            //pb_Image.Image = m_show_image;
+            //pb_Image.Image = _show_image;
         }
 
         private void ZoomIn(Point display_cursor_pt)
         {
-            float old_scale = m_scale;
-            m_scale *= 1.25f;
+            float old_scale = _scale;
+            _scale *= 1.25f;
 
-            if (old_scale != m_scale)
+            if (old_scale != _scale)
             {
-                m_offset = CalcOffset(display_cursor_pt, old_scale, m_scale);
+                _offset = CalcOffset(display_cursor_pt, old_scale, _scale);
                 //ScaleChanged(this, new EventArgs());
 
                 DrawImageToBuffer();
                 Redraw_Ctrl();
                 //PB_Image_Refresh();
 
-                //buf_g->DrawImageUnscaled(m_show_image, 0, 0);
+                //buf_g->DrawImageUnscaled(_show_image, 0, 0);
             }
 
             //OffsetChanged(this, new EventArgs());
@@ -465,13 +465,13 @@ namespace TNControls
 
         private void ZoomOut(Point display_cursor_pt)
         {
-            float old_scale = m_scale;
-            m_scale /= 1.25f;
+            float old_scale = _scale;
+            _scale /= 1.25f;
 
-            if (old_scale != m_scale)
+            if (old_scale != _scale)
             {
-                //m_offset = CalcOffset(pt_center);
-                m_offset = CalcOffset(display_cursor_pt, old_scale, m_scale);
+                //_offset = CalcOffset(pt_center);
+                _offset = CalcOffset(display_cursor_pt, old_scale, _scale);
                 //ScaleChanged(this, new EventArgs());
 
                 DrawImageToBuffer();
@@ -503,15 +503,15 @@ namespace TNControls
         System.Drawing.Rectangle CalcShowRect()
         {
             System.Drawing.Rectangle show_rect = new Rectangle(0, 0, 0, 0);
-            //System.Drawing.Rectangle show_rect = new Rectangle(m_offset.X, m_offset.Y, 0, 0);
+            //System.Drawing.Rectangle show_rect = new Rectangle(_offset.X, _offset.Y, 0, 0);
 
-            if (null != m_show_image)
+            if (null != _show_image)
             {
-                show_rect.Location = m_offset;
-                show_rect.Width = (Int32)(ClientSize.Width / m_scale + 0.5f);
-                show_rect.Width = Math.Max(show_rect.Width, m_show_image.Width);
-                show_rect.Height = (Int32)(ClientSize.Height / m_scale + 0.5f);
-                show_rect.Height = Math.Max(show_rect.Height, m_show_image.Height);
+                show_rect.Location = _offset;
+                show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
+                show_rect.Width = Math.Max(show_rect.Width, _show_image.Width);
+                show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
+                show_rect.Height = Math.Max(show_rect.Height, _show_image.Height);
             }
 
             return show_rect;
@@ -520,9 +520,9 @@ namespace TNControls
         System.Drawing.Rectangle CalcLockRect()
         {
             System.Drawing.Rectangle show_rect = CalcShowRect();
-            if (null != m_image)
+            if (null != _image)
             {
-                System.Drawing.Rectangle img_rect = new System.Drawing.Rectangle(0, 0, m_image.Width, m_image.Height);
+                System.Drawing.Rectangle img_rect = new System.Drawing.Rectangle(0, 0, _image.Width, _image.Height);
                 show_rect = System.Drawing.Rectangle.Intersect(show_rect, img_rect);
             }
             return show_rect;
@@ -530,18 +530,18 @@ namespace TNControls
 
         void DrawImageToBuffer()
         {
-            if (null == m_image)
+            if (null == _image)
             {
-                //if (m_show_image)
+                //if (_show_image)
                 //{
-                //    delete m_show_image;
-                //    m_show_image = nullptr;
+                //    delete _show_image;
+                //    _show_image = nullptr;
                 //}
                 return;
             }
 
             // Create new bitmap
-            m_show_image = new Bitmap(ClientSize.Width, ClientSize.Height, m_image.PixelFormat);
+            _show_image = new Bitmap(ClientSize.Width, ClientSize.Height, _image.PixelFormat);
 
             Rectangle lock_rect = CalcLockRect();  // 取得要Lock的影像範圍
             Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
@@ -549,52 +549,52 @@ namespace TNControls
             if (lock_rect.Width == 0 || lock_rect.Height == 0)
                 return;
 
-            Int32 bytes_per_pixel = GetPixelLength(m_image.PixelFormat);
+            Int32 bytes_per_pixel = GetPixelLength(_image.PixelFormat);
 
             if (bytes_per_pixel == 0)
                 return;
 
-            //m_image.Save("d:\\temp\\Source.bmp");
+            //_image.Save("d:\\temp\\Source.bmp");
 
             // Get raw data
-            System.Drawing.Imaging.BitmapData fromBitmapData = m_image.LockBits(lock_rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, m_image.PixelFormat);
-            System.Drawing.Imaging.BitmapData destBitmapData = m_show_image.LockBits(new Rectangle(0, 0, m_show_image.Width, m_show_image.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, m_show_image.PixelFormat);
+            System.Drawing.Imaging.BitmapData fromBitmapData = _image.LockBits(lock_rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, _image.PixelFormat);
+            System.Drawing.Imaging.BitmapData destBitmapData = _show_image.LockBits(new Rectangle(0, 0, _show_image.Width, _show_image.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, _show_image.PixelFormat);
 
             unsafe
             {
-                byte* from_ptr = (byte*)(fromBitmapData.Scan0.ToPointer());
+                byte* fro_ptr = (byte*)(fromBitmapData.Scan0.ToPointer());
                 byte* dest_ptr = (byte*)(destBitmapData.Scan0.ToPointer());
-                Int32 from_pitch = fromBitmapData.Stride;
+                Int32 fro_pitch = fromBitmapData.Stride;
                 Int32 dest_pitch = destBitmapData.Stride;
 
-                Int32 copy_width = m_show_image.Width;
-                Int32 copy_height = m_show_image.Height;
-                byte* from_line_ptr = from_ptr;        // 來源端某行的位置
+                Int32 copy_width = _show_image.Width;
+                Int32 copy_height = _show_image.Height;
+                byte* fro_line_ptr = fro_ptr;        // 來源端某行的位置
                 byte* dest_line_ptr = dest_ptr;        // 目的端某行的位置
-                byte* from_now_ptr = from_line_ptr;    // 來源端目前的位置
+                byte* fro_now_ptr = fro_line_ptr;    // 來源端目前的位置
                 byte* dest_now_ptr = dest_line_ptr;    // 目的端目前的位置
 
                 Int32 offset_h = 0; // 來源端與目的端高度offset
 
                 for (int h = 0; h < copy_height; h++)
                 {
-                    Int32 from_height = (Int32)(h / m_scale + 0.5) - lock_rect.Y;
+                    Int32 fro_height = (Int32)(h / _scale + 0.5) - lock_rect.Y;
 
-                    if (show_rect.Y + from_height < 0)
+                    if (show_rect.Y + fro_height < 0)
                     {
                         offset_h++;
                         continue;
                     }
 
                     // 是否已達bottom.
-                    if (show_rect.Y + from_height >= lock_rect.Height)
+                    if (show_rect.Y + fro_height >= lock_rect.Height)
                         break;
 
-                    from_line_ptr = from_ptr + from_pitch * (Int32)(((h - offset_h) / m_scale));
-                    //from_line_ptr = from_ptr + from_pitch * (Int32)(((h - offset_h) / m_scale) + lock_rect.Y);
+                    fro_line_ptr = fro_ptr + fro_pitch * (Int32)(((h - offset_h) / _scale));
+                    //fro_line_ptr = fro_ptr + fro_pitch * (Int32)(((h - offset_h) / _scale) + lock_rect.Y);
                     // 1018- dest_line_ptr = dest_ptr + dest_pitch * h;
                     dest_line_ptr = dest_ptr + dest_pitch * (Int32)(h - offset_h);
-                    from_now_ptr = from_line_ptr;
+                    fro_now_ptr = fro_line_ptr;
                     dest_now_ptr = dest_line_ptr;
 
                     Int32 offset_w = 0; // 來源端與目的端寬度offset
@@ -603,54 +603,54 @@ namespace TNControls
 
                     for (int w = 0; w < copy_width; w++)
                     {
-                        Int32 from_weight = (Int32)(w / m_scale + 0.5) - lock_rect_x;
+                        Int32 fro_weight = (Int32)(w / _scale + 0.5) - lock_rect_x;
 
-                        if (show_rect_x + from_weight < 0)
+                        if (show_rect_x + fro_weight < 0)
                         {
                             offset_w++;
                             //1018-   dest_now_ptr += bytes_per_pixel;
                             continue;
                         }
-                        else if (show_rect_x + from_weight >= lock_rect.Width)
+                        else if (show_rect_x + fro_weight >= lock_rect.Width)
                             break;
 
-                        from_now_ptr = from_line_ptr + (Int32)((w - offset_w) / m_scale) * bytes_per_pixel;
-                        //from_now_ptr = from_line_ptr + (Int32)((w - offset_w) / m_scale + lock_rect_x) * bytes_per_pixel;
+                        fro_now_ptr = fro_line_ptr + (Int32)((w - offset_w) / _scale) * bytes_per_pixel;
+                        //fro_now_ptr = fro_line_ptr + (Int32)((w - offset_w) / _scale + lock_rect_x) * bytes_per_pixel;
                         for (int n = 0; n < bytes_per_pixel; n++)
-                            dest_now_ptr[n] = from_now_ptr[n];
+                            dest_now_ptr[n] = fro_now_ptr[n];
 
                         dest_now_ptr += bytes_per_pixel;
                     }
                 }
             }
 
-            m_image.UnlockBits(fromBitmapData);
-            m_show_image.UnlockBits(destBitmapData);
+            _image.UnlockBits(fromBitmapData);
+            _show_image.UnlockBits(destBitmapData);
 
-            if (m_image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
-                m_show_image.Palette = m_image.Palette;
+            if (_image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
+                _show_image.Palette = _image.Palette;
 
-            //m_show_image.Save("d:\\temp\\test.bmp");
+            //_show_image.Save("d:\\temp\\test.bmp");
 
-            m_show_color_image = new Bitmap(m_show_image.Width, m_show_image.Height);
+            _show_color_image = new Bitmap(_show_image.Width, _show_image.Height);
 
-            Image = m_show_image;
+            Image = _show_image;
             Invalidate();
         }
 
         public void Redraw_Ctrl()
         {
-            if (null == m_show_image)
+            if (null == _show_image)
                 return;
 
-            if (null != m_show_color_image)
-                m_show_color_image.Dispose();
-            m_show_color_image = new Bitmap(m_show_image.Width, m_show_image.Height);
-            using (Graphics graphics_show = Graphics.FromImage(m_show_color_image))
+            if (null != _show_color_image)
+                _show_color_image.Dispose();
+            _show_color_image = new Bitmap(_show_image.Width, _show_image.Height);
+            using (Graphics graphics_show = Graphics.FromImage(_show_color_image))
             {
-                graphics_show.DrawImage(m_show_image, 0, 0);
-                //m_show_image.Save("d:\\temp\\test1.bmp");
-                //m_show_color_image.Save("d:\\temp\\testcolor1.bmp");
+                graphics_show.DrawImage(_show_image, 0, 0);
+                //_show_image.Save("d:\\temp\\test1.bmp");
+                //_show_color_image.Save("d:\\temp\\testcolor1.bmp");
 
                 Pen pen = new Pen(Color.White, 1);
 
@@ -658,15 +658,15 @@ namespace TNControls
                 {
                     Pen pen_user_ctrl = new Pen(Color.White, 1);
 
-                    foreach (Control enum_ctrl in User_Ctrls)
+                    foreach (Control enu_ctrl in User_Ctrls)
                     {
-                        TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enum_ctrl;
+                        TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enu_ctrl;
                         Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
                         Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
                         Rectangle rt_draw = user_ctrl.Editing_Rect;
                         rt_draw.Offset(pt_offset);
-                        Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * m_scale), (int)(rt_draw.Top * m_scale)
-                                                                , (int)(rt_draw.Width * m_scale), (int)(rt_draw.Height * m_scale));
+                        Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
+                                                                , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
                         //CreateGraphics().DrawRectangle(pen, rt_final_draw);
                         //graphics_show.DrawRectangle(pen_user_ctrl, rt_final_draw);
 
@@ -684,21 +684,21 @@ namespace TNControls
                     //    DrawXORRectangle(g, pen, editing_cttl.Editing_Rect);
                     //}
 
-                    //editing_cttl.Editing_Rect = new Rectangle(Math.Min(m_pt_LBtnDown.X, m_pt_Current.X)
-                    //                      , Math.Min(m_pt_LBtnDown.Y, m_pt_Current.Y)
-                    //                      , Math.Abs(m_pt_Current.X - m_pt_LBtnDown.X)
-                    //                      , Math.Abs(m_pt_Current.Y - m_pt_LBtnDown.Y));
+                    //editing_cttl.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
+                    //                      , Math.Min(_pt_LBtnDown.Y, _pt_Current.Y)
+                    //                      , Math.Abs(_pt_Current.X - _pt_LBtnDown.X)
+                    //                      , Math.Abs(_pt_Current.Y - _pt_LBtnDown.Y));
 
                     //Bitmap color_bmp = new Bitmap(pb_Image.Image.Width, pb_Image.Image.Height);
                     //Bitmap color_bmp = new Bitmap(Width, Height);
 
                     //using (Graphics g = Graphics.FromImage(color_bmp))
                     //{
-                        if (null != m_show_image)
+                        if (null != _show_image)
                         {
-                            //g.DrawImageUnscaled(m_show_image, 0, 0);
-                            //Image = m_show_image;
-                            //m_show_image.Save("d:\\temp\\test.bmp");
+                            //g.DrawImageUnscaled(_show_image, 0, 0);
+                            //Image = _show_image;
+                            //_show_image.Save("d:\\temp\\test.bmp");
                         }
 
                         Pen pen_edit_ctrl = new Pen(Color.White, 1);
@@ -711,11 +711,11 @@ namespace TNControls
                     //}
                 }
             }
-            //m_show_color_image.Save("d:\\temp\\testcolor.bmp");
+            //_show_color_image.Save("d:\\temp\\testcolor.bmp");
             //if (null != Image)
             //    Image.Dispose();
 
-            Bitmap tempBitmap = new Bitmap(m_show_color_image);
+            Bitmap tempBitmap = new Bitmap(_show_color_image);
             Image = tempBitmap;
         }
 
@@ -741,6 +741,12 @@ namespace TNControls
         private string GetDebuggerDisplay()
         {
             return ToString();
+        }
+
+        public void Repaint()
+        {
+            DrawImageToBuffer();
+            Redraw_Ctrl();
         }
     }
 

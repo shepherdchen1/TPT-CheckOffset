@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-
+using TN.Insp_Param;
 using TN.Tools;
 using TN.Tools.Debug;
 
@@ -111,22 +111,9 @@ namespace CheckOffset
             return item;
         }
 
-        /// <summary>
-        /// 環境設定
-        /// </summary>
-        public class Setting_Info
-        {
-            public bool EnableLogStep = true;              // 是否輸出Log\Step.
-        }
+        public static Struct_Setting_Info Setting = new Struct_Setting_Info();
 
-        public static Setting_Info Setting = new Setting_Info();
-
-        public class Detect_Pos_Info
-        {
-            public List<Rectangle> Detect_Rects = new List<Rectangle>();              // 是否輸出Log\Step.
-        }
-
-        public static Detect_Pos_Info? Detect_Pos = new Detect_Pos_Info();
+        public static List<Struct_Detect_Info> Detect_Infos = new List<Struct_Detect_Info>();
 
         // change to public for update progress
         public static BackgroundWorker BKWorker_Delete_Log = new BackgroundWorker();
@@ -138,12 +125,12 @@ namespace CheckOffset
 
             Log_Utl.EnableLogStep = Setting.EnableLogStep;
 
-            //if (null != Program.Form_Main)
-            //    Program.Form_Main.Message = "initialize....";
+            //if (null != Program.For_Main)
+            //    Program.For_Main.Message = "initialize....";
 
             //Shelf_Mgr.Update_INV3_QTY(MySql);
-            //if (null != Program.Form_Main)
-            //    Program.Form_Main.Message = "initialize done.";
+            //if (null != Program.For_Main)
+            //    Program.For_Main.Message = "initialize done.";
 
 
             ///////////////////////////////////////////////////
@@ -409,8 +396,8 @@ namespace CheckOffset
 
             try
             {
-                //if (null != Program.Form_Main)
-                //    Program.Form_Main.Message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + (string)e.UserState;
+                //if (null != Program.For_Main)
+                //    Program.For_Main.Message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + (string)e.UserState;
 
                 //Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                 //                                   , string.Format("BKWorker_Job quit"));
@@ -448,5 +435,35 @@ namespace CheckOffset
             {
             }
         }
+
+    } // end of     public static class tnGlobal
+
+    /// <summary>
+    /// 環境設定
+    /// </summary>
+    public struct Struct_Setting_Info
+    {
+        public bool EnableLogStep = true;              // 是否輸出Log\Step.
+
+        public Struct_Setting_Info()
+        {
+            EnableLogStep = true;
+        }
     }
-}
+
+    public class Struct_Detect_Info
+    {
+        public Rectangle Detect_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
+
+        public Struct_Insp_Param Detect_Insp_param = new Struct_Insp_Param();
+
+        public Struct_Insp_Result Detect_Insp_Result = new Struct_Insp_Result();
+
+        public Struct_Detect_Info()
+        {
+            Detect_Rect = new Rectangle(0, 0, 0, 0);
+            Detect_Insp_param = new Struct_Insp_Param();
+            Detect_Insp_Result = new Struct_Insp_Result();
+        }
+    }
+} // end of namespace CheckOffset

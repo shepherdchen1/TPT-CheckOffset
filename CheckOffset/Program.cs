@@ -2,7 +2,7 @@ namespace CheckOffset
 {
     internal static class Program
     {
-        public static Form_Main? s_Form_Main;
+        public static For_Main? s_For_Main;
 
         /// <summary>
         ///  The main entry point for the application.
@@ -15,8 +15,8 @@ namespace CheckOffset
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            s_Form_Main = new Form_Main();
-            Application.Run(s_Form_Main);
+            s_For_Main = new For_Main();
+            Application.Run(s_For_Main);
         }
     }
 }
