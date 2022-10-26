@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TN.ImageTools;
 using TN.Tools.Debug;
 
 namespace TN.ImageTools
@@ -33,58 +34,51 @@ namespace TN.ImageTools
                     return false;
                 }
 
-                bmp_dest = new Bitmap(bmp_src.Width * subpixel_num, bmp_src.Height * subpixel_num, bmp_src.PixelFormat );
-
-                if (!Image_Buffer_Gray.GetBuffer((Bitmap)bmp_dest, ref bmp_data_dest))
-                    return false;
-
                 if (!Image_Buffer_Gray.GetBuffer((Bitmap)bmp_src, ref bmp_data_src))
                     return false;
 
                 IntPtr ptr_buffer_src = bmp_data_src.Scan0;
                 int pixel_size_src = bmp_data_src.Stride / bmp_data_src.Width;
+
+                int[,] buffer = new int[bmp_data_src.Height * subpixel_num, bmp_data_src.Width * subpixel_num];
+
+                bmp_dest = new Bitmap(bmp_src.Width * subpixel_num, bmp_src.Height * subpixel_num, bmp_src.PixelFormat);
+
+                if (!Image_Buffer_Gray.GetBuffer((Bitmap)bmp_dest, ref bmp_data_dest))
+                    return false;
+
                 IntPtr ptr_buffer_dest = bmp_data_dest.Scan0;
                 int pixel_size_dest = bmp_data_dest.Stride / bmp_data_dest.Width;
 
+                ////////////////////////////////////////////////////
+                // assign source to destion for all center pixel.
                 unsafe
                 {
-                    // assign source to destion for all center pixel.
                     for (int x = 0; x < bmp_src.Width; x++)
                     {
                         for (int y = 0; y < bmp_src.Height; y++)
                         {
-                            *(Image_Buffer_Gray.Get_Pointer(bmp_data_dest, (byte*)ptr_buffer_dest.ToPointer()
-                                                    , x * subpixel_num + subpixel_num / 2
-                                                    , y * subpixel_num + subpixel_num / 2))
-                                    = *(Image_Buffer_Gray.Get_Pointer(bmp_data_src, (byte*)ptr_buffer_src.ToPointer()
+                            buffer[y * subpixel_num + subpixel_num / 2, x * subpixel_num + subpixel_num / 2]
+                                        = *(Image_Buffer_Gray.Get_Pointer(bmp_data_src, (byte*)ptr_buffer_src.ToPointer()
                                                                     , x, y));
                         }
                     }
                 }
 
-                int gray_level = 0;
+                ////////////////////////////////////////////////////
+                // extend column for N * subpixel_num + subpixel_num / 2 row.
                 for(int x = 0; x < bmp_src.Width; x++)
                 {
                     for(int y = 0; y < bmp_src.Height; y++)
                     {
                         // update y = subpixel_num / 2, 1 * subpixel_num + subpixel_num / 2, 2 * subpixel_num + subpixel_num / 2, ...., (height - 1) * subpixel_num + subpixel_num / 2 
-                        if (!Apply_Interpolate_Col(bmp_data_src, x, y, ptr_buffer_src, pixel_size_src, EN_SubPixel_Type.EN_SubPixel_Linear, en_subpixel_num
+                        if (!Apply_Interpolate_Col(bmp_data_src, x, y, EN_SubPixel_Type.EN_SubPixel_Linear, subpixel_num
                                                 , bmp_data_dest, ptr_buffer_dest, pixel_size_dest
-                                                , out int[,] subpixel_res))
+                                                , ref buffer) )
                         {
                             subpixel_failed = true;
                             Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                                                              , $"Apply_Linear failed");
-                            break;
-                        }
-
-                        if (!Assign_SubPixel_Res(x, y, subpixel_res
-                                                , EN_SubPixel_Type.EN_SubPixel_Linear, en_subpixel_num
-                                                , bmp_data_dest, ptr_buffer_dest, pixel_size_dest))
-                        {
-                            subpixel_failed = true;
-                            Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                 , $"Assign_SubPixel_Res failed");
                             break;
                         }
                     }
@@ -93,37 +87,29 @@ namespace TN.ImageTools
                         break;
                 }
 
-                for (int x = 0; x < bmp_src.Width; x++)
+                for (int y = 0; y < bmp_src.Height; y++)
                 {
-                    for (int y = 0; y < bmp_src.Height; y++)
+                    if (!Apply_Interpolate_Row(bmp_data_src, y,  EN_SubPixel_Type.EN_SubPixel_Linear, subpixel_num
+                                            , bmp_data_dest, ptr_buffer_dest, pixel_size_dest
+                                            , ref buffer))
                     {
-                        if (!Apply_Interpolate_Row(bmp_data_src, x, y, ptr_buffer_src, pixel_size_src, EN_SubPixel_Type.EN_SubPixel_Linear, en_subpixel_num
-                                                , bmp_data_dest, ptr_buffer_dest, pixel_size_dest
-                                                , out int[,] subpixel_res))
-                        {
-                            subpixel_failed = true;
-                            Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                             , $"Apply_Linear failed");
-                            break;
-                        }
-
-                        if (!Assign_SubPixel_Res(x, y, subpixel_res
-                                            , EN_SubPixel_Type.EN_SubPixel_Linear, en_subpixel_num
-                                            , bmp_data_dest, ptr_buffer_dest, pixel_size_dest))
-                        {
-                            subpixel_failed = true;
-                            Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                 , $"Assign_SubPixel_Res failed");
-                            break;
-                        }
-                    }
-
-                    if (subpixel_failed)
+                        subpixel_failed = true;
+                        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                                            , $"Apply_Linear failed");
                         break;
+                    }
                 }
 
                 if (!subpixel_failed)
                 {
+                    if (!Assign_SubPixel_Res(buffer
+                                    , bmp_data_dest, ptr_buffer_dest, pixel_size_dest))
+                    {
+                        subpixel_failed = true;
+                        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                                , $"Assign_SubPixel_Res failed");
+                    }
+
                     ColorPalette pal = bmp_dest.Palette;
                     for (int i = 0; i <= 255; i++)
                     {
@@ -159,26 +145,24 @@ namespace TN.ImageTools
        private static bool Apply_Interpolate_Col(BitmapData bmp_data_src
                         , int x
                         , int y
-                        , IntPtr ptr_buffer_src
-                        , int pixel_size_src
+
                         , EN_SubPixel_Type en_subpixel_type
-                        , EN_SubPixel_Num  en_subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
+                        , int  subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
 
                         , BitmapData bmp_data_interpolated_src
                         , IntPtr ptr_buffer_interpolated_src
                         , int pixel_size_interpolated_src
 
-                        , out int[,] sub_pixels         /// sub pixel result.
+                        , ref int[,] sub_pixels         /// sub pixel result.
                         )
         {
-            sub_pixels = null;
             try
             {
                 if (EN_SubPixel_Type.EN_SubPixel_Linear == en_subpixel_type)
                 {
-                    return Apply_Linear_Col(bmp_data_src, x, y, ptr_buffer_src, pixel_size_src
+                    return Apply_Linear_Col(bmp_data_src, x, y
                                         , bmp_data_interpolated_src, ptr_buffer_interpolated_src, pixel_size_interpolated_src
-                                        , en_subpixel_num, out sub_pixels);
+                                        , subpixel_num, ref sub_pixels);
                 }
                 else
                 {
@@ -200,28 +184,25 @@ namespace TN.ImageTools
         }
 
         private static bool Apply_Interpolate_Row(BitmapData bmp_data_src
-                 , int x
                  , int y
-                 , IntPtr ptr_buffer_src
-                 , int pixel_size_src
+
                  , EN_SubPixel_Type en_subpixel_type
-                 , EN_SubPixel_Num en_subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
+                 , int subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
 
                  , BitmapData bmp_data_interpolated_src
                  , IntPtr ptr_buffer_interpolated_src
                  , int pixel_size_interpolated_src
 
-                 , out int[,] sub_pixels         /// sub pixel result.
+                 , ref int[,] sub_pixels         /// sub pixel result.
                  )
         {
-            sub_pixels = null;
             try
             {
                 if (EN_SubPixel_Type.EN_SubPixel_Linear == en_subpixel_type)
                 {
-                    return Apply_Linear_Row(bmp_data_src, x, y, ptr_buffer_src, pixel_size_src
+                    return Apply_Linear_Row(bmp_data_src, y  
                                         , bmp_data_interpolated_src, ptr_buffer_interpolated_src, pixel_size_interpolated_src
-                                        , en_subpixel_num, out sub_pixels);
+                                        , subpixel_num, ref sub_pixels);
                 }
                 else
                 {
@@ -245,122 +226,14 @@ namespace TN.ImageTools
         private static bool Apply_Linear_Col(BitmapData bmp_data_src
                         , int x
                         , int y
-                        , IntPtr ptr_buffer_src
-                        , int pixel_size_src
 
                         , BitmapData bmp_data_interpolated_src
                         , IntPtr ptr_buffer_interpolated_src
                         , int pixel_size_interpolated_src
 
-                        , EN_SubPixel_Num  en_subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
-                        , out int[,] sub_pixels         /// sub pixel result.
+                        , int subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
+                        , ref int[,] sub_pixels         /// sub pixel result.
                         )
-        {
-            sub_pixels = null;
-            try
-            {
-                int subpixel_num = Get_Subpixel_Num(en_subpixel_num);
-                if (subpixel_num <= 0)
-                {
-                    Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                        , $"subpixel_num <= 0 for EN_SubPixel_Num:{en_subpixel_num}");
-                    return false;
-                }
-
-                sub_pixels = new int[subpixel_num, subpixel_num];
-
-                /// 產生 for [y: y * subpixel_num, x: x * subpixel_num - subpixel_num/ 2 ~  x * subpixel_num + subpixel_num/ 2]
-                Apply_Linear_Col(bmp_data_src, x, y, ptr_buffer_src, pixel_size_src, subpixel_num, ref sub_pixels);
-
-
-                /// 產生 for [y: y * subpixel_num - subpixel_num/ 2, x: x * subpixel_num - subpixel_num/ 2 ~  x * subpixel_num + subpixel_num/ 2]
-                ///    ~     [y: y * subpixel_num + subpixel_num/ 2, x: x * subpixel_num - subpixel_num/ 2 ~  x * subpixel_num + subpixel_num/ 2]
-                //Apply_Linear_Row(bmp_data_src, x, y //, ptr_buffer_src, pixel_size_src
-                //                , bmp_data_interpolated_src, ptr_buffer_interpolated_src, pixel_size_interpolated_src
-                //                , subpixel_num, ref sub_pixels);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
-                // 儲存Exception到檔案
-                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-            }
-
-            return false;
-        }
-
-        private static bool Apply_Linear_Row(BitmapData bmp_data_src
-                      , int x
-                      , int y
-                      , IntPtr ptr_buffer_src
-                      , int pixel_size_src
-
-                      , BitmapData bmp_data_interpolated_src
-                      , IntPtr ptr_buffer_interpolated_src
-                      , int pixel_size_interpolated_src
-
-                      , EN_SubPixel_Num en_subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
-                      , out int[,] sub_pixels         /// sub pixel result.
-                      )
-        {
-            sub_pixels = null;
-            try
-            {
-                int subpixel_num = Get_Subpixel_Num(en_subpixel_num);
-                if (subpixel_num <= 0)
-                {
-                    Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                        , $"subpixel_num <= 0 for EN_SubPixel_Num:{en_subpixel_num}");
-                    return false;
-                }
-
-                sub_pixels = new int[subpixel_num, subpixel_num];
-
-                unsafe
-                {
-                    for (int interpolate_x = 0; interpolate_x < subpixel_num; interpolate_x++)
-                    {
-                        sub_pixels[subpixel_num / 2, interpolate_x] = *(Image_Buffer_Gray.Get_Pointer(bmp_data_interpolated_src, (byte*)ptr_buffer_interpolated_src.ToPointer()
-                                                                                                , interpolate_x
-                                                                                                , y * subpixel_num + subpixel_num / 2));
-                    }
-                }
-
-                /// 產生 for [y: y * subpixel_num, x: x * subpixel_num - subpixel_num/ 2 ~  x * subpixel_num + subpixel_num/ 2]
-                //Apply_Linear_Col(bmp_data_src, x, y, ptr_buffer_src, pixel_size_src, subpixel_num, ref sub_pixels);
-
-
-                /// 產生 for [y: y * subpixel_num - subpixel_num/ 2, x: x * subpixel_num - subpixel_num/ 2 ~  x * subpixel_num + subpixel_num/ 2]
-                ///    ~     [y: y * subpixel_num + subpixel_num/ 2, x: x * subpixel_num - subpixel_num/ 2 ~  x * subpixel_num + subpixel_num/ 2]
-                Apply_Linear_Row(bmp_data_src, x, y //, ptr_buffer_src, pixel_size_src
-                                , bmp_data_interpolated_src, ptr_buffer_interpolated_src, pixel_size_interpolated_src
-                                , subpixel_num, ref sub_pixels);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
-                // 儲存Exception到檔案
-                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-            }
-
-            return false;
-        }
-
-        private static bool Apply_Linear_Col(BitmapData bmp_data_src
-                 , int x
-                 , int y
-                 , IntPtr ptr_buffer_src
-                 , int pixel_size_src
-
-                 , int subpixel_num           /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
-                 , ref int[,] sub_pixels         /// sub pixel result.
-                 )
         {
             try
             {
@@ -374,24 +247,21 @@ namespace TN.ImageTools
                 float f_increate_percentage = 1.0f / subpixel_num;
                 unsafe
                 {
-                    byte* buffer_src = (byte*)ptr_buffer_src.ToPointer();
-
                     ///////////////////////////////////
                     /// calculate y * subpixel_num. y 所在row 內插產生 x= 0-1, 3-4
-                    byte gray_level_prev = 0;
-                    byte gray_level_cur = *(buffer_src + y * bmp_data_src.Stride + x * pixel_size_src);
-                    byte gray_level_next = 0;
+                    byte gray_level_cur = Image_Binary.Normalize( sub_pixels[ y * subpixel_num + subpixel_num / 2, x * subpixel_num + subpixel_num / 2] );
 
                     if (0 == x)
                     {
                         for (int interpolate_x = 0; interpolate_x < subpixel_num / 2; interpolate_x++)
                         {
-                            sub_pixels[subpixel_num / 2, interpolate_x] = gray_level_cur;
+                            sub_pixels[y * subpixel_num + subpixel_num / 2, x * subpixel_num + interpolate_x] 
+                                    = gray_level_cur;
                         }
                     }
                     else
                     {
-                        gray_level_prev = *(buffer_src + y * bmp_data_src.Stride + (x - 1) * pixel_size_src);
+                        byte gray_level_prev = Image_Binary.Normalize( sub_pixels[ y * subpixel_num + subpixel_num / 2, ( x - 1 ) * subpixel_num + subpixel_num / 2 ] );
                         for (int interpolate_x = 0; interpolate_x < subpixel_num / 2; interpolate_x++)
                         {
                             int dist_to_cur = subpixel_num / 2 - interpolate_x;
@@ -399,13 +269,13 @@ namespace TN.ImageTools
                             float f_cur_percentage = f_increate_percentage * (subpixel_num - dist_to_cur);                    // ( x, y ) 百分比
 
                             int gray_level_interpolate = (int)(gray_level_prev * f_prev_percentage + gray_level_cur * f_cur_percentage);
-                            sub_pixels[subpixel_num / 2, interpolate_x] = Image_Binary.Normalize(gray_level_interpolate);
+                            sub_pixels[y * subpixel_num + subpixel_num / 2, x * subpixel_num + interpolate_x] = Image_Binary.Normalize(gray_level_interpolate);
                         }
                     }
 
                     ///////////////////////////////////
                     /// interpolate_x == subpixel_num / 2 正中央，保留
-                    sub_pixels[subpixel_num / 2, subpixel_num / 2] = gray_level_cur;
+                    //sub_pixels[subpixel_num / 2, subpixel_num / 2] = gray_level_cur;
 
                     ///////////////////////////////////
                     /// x = ( subpixel_num / 2, subpixel_num - 1 ]
@@ -413,12 +283,12 @@ namespace TN.ImageTools
                     {
                         for (int interpolate_x = subpixel_num / 2 + 1; interpolate_x < subpixel_num; interpolate_x++)
                         {
-                            sub_pixels[subpixel_num / 2, interpolate_x] = gray_level_cur;
+                            sub_pixels[y * subpixel_num + subpixel_num / 2, x * subpixel_num + interpolate_x] = gray_level_cur;
                         }
                     }
                     else
                     {
-                        gray_level_next = *(buffer_src + y * bmp_data_src.Stride + (x + 1) * pixel_size_src);
+                        byte gray_level_next = Image_Binary.Normalize( sub_pixels[y * subpixel_num + subpixel_num / 2, (x + 1) * subpixel_num + subpixel_num / 2] );
                         for (int interpolate_x = 0; interpolate_x < subpixel_num / 2; interpolate_x++)
                         {
                             int dist_to_cur = interpolate_x + 1;
@@ -426,7 +296,7 @@ namespace TN.ImageTools
                             float f_cur_percentage = f_increate_percentage * (subpixel_num - dist_to_cur);                    // ( x, y ) 百分比
 
                             int gray_level_interpolate = (int)(gray_level_cur * f_cur_percentage + gray_level_next * f_next_percentage);
-                            sub_pixels[subpixel_num / 2, subpixel_num / 2 + dist_to_cur] = Image_Binary.Normalize(gray_level_interpolate);
+                            sub_pixels[y * subpixel_num + subpixel_num / 2, x * subpixel_num +  subpixel_num / 2 + dist_to_cur] = Image_Binary.Normalize(gray_level_interpolate);
                         }
                     }
                 }
@@ -444,8 +314,8 @@ namespace TN.ImageTools
             return false;
         }
 
+
         private static bool Apply_Linear_Row(BitmapData bmp_data_src
-          , int x_src
           , int y_src
 
           , BitmapData bmp_data_interpolated_src
@@ -471,7 +341,7 @@ namespace TN.ImageTools
                     byte* buffer_interpolated_src = (byte*)ptr_buffer_interpolated_src.ToPointer();
 
                     ///////////////////////////////////
-                    /// calculate y * subpixel_num. y 所在row 內插產生 x= 0-1, 3-4
+                    /// calculate y * subpixel_num. y 所在row 內插產生 x= 0-1
 
                     if (0 == y_src)
                     {
@@ -480,11 +350,9 @@ namespace TN.ImageTools
                         // x : [ x_src * subpixel_num - subpixel_num / 2, x_src * subpixel_num + subpixel_num ): x 方向 共 subpixel_num pixel
                         for (int interpolate_y = 0; interpolate_y < subpixel_num / 2; interpolate_y++)
                         {
-                            for (int interpolate_x = 0; interpolate_x < subpixel_num; interpolate_x++)
+                            for (int interpolate_x = 0; interpolate_x < sub_pixels.GetLength(1); interpolate_x++)
                             {
-                                sub_pixels[interpolate_y, interpolate_x] = *(Image_Buffer_Gray.Get_Pointer( bmp_data_interpolated_src, buffer_interpolated_src
-                                                                                                        , x_src * subpixel_num + interpolate_x
-                                                                                                        , subpixel_num / 2 ));
+                                sub_pixels[interpolate_y, interpolate_x] = sub_pixels[subpixel_num / 2, interpolate_x];
                             }
                         }
                     }
@@ -492,21 +360,18 @@ namespace TN.ImageTools
                     {
                         for (int interpolate_y = 0; interpolate_y < subpixel_num / 2; interpolate_y++)
                         {
-                            for (int interpolate_x = 0; interpolate_x < subpixel_num; interpolate_x++)
+                            for (int interpolate_x = 0; interpolate_x < sub_pixels.GetLength(1); interpolate_x++)
                             {
-                                int x_2be_updated = x_src * subpixel_num + interpolate_x;
-                                byte *gray_level_prev = Image_Buffer_Gray.Get_Pointer(bmp_data_interpolated_src, buffer_interpolated_src
-                                                                                    , x_2be_updated
-                                                                                    , ( y_src - 1) * subpixel_num + subpixel_num / 2 );
-                                byte* gray_level_cur = Image_Buffer_Gray.Get_Pointer(bmp_data_interpolated_src, buffer_interpolated_src
-                                                                                    , x_2be_updated
-                                                                                    , y_src * subpixel_num + subpixel_num / 2 );
+                                int x_2be_updated = interpolate_x; // x_src * subpixel_num + interpolate_x;
+                                int gray_level_prev = sub_pixels[(y_src - 1) * subpixel_num + subpixel_num / 2, x_2be_updated];
+                                int gray_level_cur  = sub_pixels[    y_src   * subpixel_num + subpixel_num / 2, x_2be_updated];
+
                                 int dist_to_cur = subpixel_num / 2 - interpolate_y;
                                 float f_prev_percentage = f_increate_percentage * dist_to_cur;   // ( x-1, y ) 百分比
                                 float f_cur_percentage = f_increate_percentage * (subpixel_num - dist_to_cur);                    // ( x, y ) 百分比
 
-                                int gray_level_interpolate = (int)( (*gray_level_prev) * f_prev_percentage + (*gray_level_cur) * f_cur_percentage);
-                                sub_pixels[interpolate_y, interpolate_x] = Image_Binary.Normalize(gray_level_interpolate);
+                                int gray_level_interpolate = (int)( gray_level_prev * f_prev_percentage + gray_level_cur * f_cur_percentage);
+                                sub_pixels[y_src * subpixel_num + interpolate_y, interpolate_x] = Image_Binary.Normalize(gray_level_interpolate);
                             }
                         }
                     }
@@ -523,11 +388,10 @@ namespace TN.ImageTools
                         // x : [ x_src * subpixel_num - subpixel_num / 2, x_src * subpixel_num + subpixel_num ): x 方向 共 subpixel_num pixel
                         for (int interpolate_y = subpixel_num / 2 + 1; interpolate_y < subpixel_num; interpolate_y++)
                         {
-                            for (int interpolate_x = 0; interpolate_x < subpixel_num; interpolate_x++)
+                            for (int interpolate_x = 0; interpolate_x < sub_pixels.GetLength(1); interpolate_x++)
                             {
-                                sub_pixels[interpolate_y, interpolate_x] = *(Image_Buffer_Gray.Get_Pointer(bmp_data_interpolated_src, buffer_interpolated_src
-                                                                                                        , x_src * subpixel_num + interpolate_x
-                                                                                                        , y_src * subpixel_num + subpixel_num / 2));
+                                sub_pixels[y_src * subpixel_num + interpolate_y, interpolate_x]
+                                    = sub_pixels[y_src * subpixel_num + subpixel_num / 2, interpolate_x];
                             }
                         }
                     }
@@ -535,41 +399,25 @@ namespace TN.ImageTools
                     {
 
                         ///////////////////////////////////
-                        /// calculate other y 內插產生 y= 0-1, 3-4
+                        /// calculate other y 內插產生 y= 3-4
                         for (int interpolate_y = subpixel_num / 2 + 1; interpolate_y < subpixel_num; interpolate_y++)
                         {
-                            for (int interpolate_x = 0; interpolate_x < subpixel_num; interpolate_x++)
+                            for (int interpolate_x = 0; interpolate_x < sub_pixels.GetLength(1); interpolate_x++)
                             {
-                                int x_2be_updated = x_src * subpixel_num + interpolate_x;
-                                byte* gray_level_cur = Image_Buffer_Gray.Get_Pointer(bmp_data_interpolated_src, buffer_interpolated_src
-                                                                        , x_2be_updated
-                                                                        , y_src * subpixel_num + subpixel_num / 2);
-                                byte* gray_level_next = Image_Buffer_Gray.Get_Pointer(bmp_data_interpolated_src, buffer_interpolated_src
-                                                                        , x_2be_updated
-                                                                        , (y_src + 1) * subpixel_num + subpixel_num / 2 );
+                                int x_2be_updated = interpolate_x; // x_src * subpixel_num + interpolate_x;
+                                int gray_level_cur  = sub_pixels[   y_src     * subpixel_num + subpixel_num / 2, x_2be_updated];
+                                int gray_level_next = sub_pixels[ (y_src + 1) * subpixel_num + subpixel_num / 2, x_2be_updated];
+
                                 int dist_to_cur = interpolate_y - subpixel_num / 2;
                                 float f_cur_percentage  = f_increate_percentage * (subpixel_num - dist_to_cur);   // ( x-1, y ) 百分比
                                 float f_next_percentage = f_increate_percentage * dist_to_cur;                    // ( x, y ) 百分比
 
-                                int gray_level_interpolate = (int)( (*gray_level_cur) * f_cur_percentage + (*gray_level_next) * f_next_percentage);
-                                sub_pixels[interpolate_y, interpolate_x] = Image_Binary.Normalize(gray_level_interpolate);
+                                int gray_level_interpolate = (int)( gray_level_cur * f_cur_percentage + gray_level_next * f_next_percentage);
+                                sub_pixels[y_src * subpixel_num + interpolate_y, interpolate_x] 
+                                    = Image_Binary.Normalize(gray_level_interpolate);
                             }
                         }
                     }
-
-                    /// calculate y * subpixel_num. y 所在row 內插產生 x= 0-1, 3-4
-
-                    ///////////////////////////////////
-                    /// calculate other y 內插產生 y= 0-1, 3-4
-                    //for (int interpolate_x = 0; interpolate_x < subpixel_num / 2; interpolate_x++)
-                    //{
-                    //    int dist_to_cur = interpolate_x + 1;
-                    //    float f_next_percentage = f_increate_percentage * dist_to_cur;   // ( x-1, y ) 百分比
-                    //    float f_cur_percentage = f_increate_percentage * (subpixel_num - dist_to_cur);                    // ( x, y ) 百分比
-
-                    //    int gray_level_interpolate = (int) ( gray_level_cur * f_cur_percentage + gray_level_next * f_next_percentage );
-                    //    sub_pixels[interpolate_x, subpixel_num / 2] = Image_Binary.Normalize(gray_level_interpolate);
-                    //}
                 }
 
                 return true;
@@ -585,49 +433,23 @@ namespace TN.ImageTools
             return false;
         }
 
-        private static bool Assign_SubPixel_Res(int x_src, int y_src
-                                            , int[,] sub_pixel_res         /// sub pixel result.
+        private static bool Assign_SubPixel_Res( int[,] sub_pixel_res         /// sub pixel result.
 
-                                            , EN_SubPixel_Type subpixel_type
-                                            , EN_SubPixel_Num en_subpixel_num        /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
-
-                                            , BitmapData bmpdata
-                                            , IntPtr ptr_buffer_dest
-                                            , int pixel_size_dest
-                                            )
-        {
-            int subpixel_num = Get_Subpixel_Num(en_subpixel_num);
-            if (subpixel_num <= 0)
-            {
-                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                    , $"subpixel_num <= 0 for EN_SubPixel_Num:{en_subpixel_num}");
-                return false;
-            }
-
-            return Assign_SubPixel_Res_n(x_src, y_src, subpixel_num, sub_pixel_res, bmpdata, ptr_buffer_dest, pixel_size_dest);
-        }
-
-        private static bool Assign_SubPixel_Res_n(int x_src, int y_src
-
-                                                , int subpixel_num
-                                                , int[,] sub_pixel_res         /// sub pixel result.                
-                                                , BitmapData bmpdata_dest
-                                                , IntPtr ptr_buffer_dest
-                                                , int pixel_size_dest
-                                                 )
+                                     , BitmapData bmpdata
+                                     , IntPtr ptr_buffer_dest
+                                     , int pixel_size_dest
+                                     )
         {
             try
             {
                 unsafe
                 {
                     byte* ptr = (byte*)ptr_buffer_dest.ToPointer();
-                    for (int subpixel_x = 0; subpixel_x < subpixel_num; subpixel_x++)
+                    for (int subpixel_x = 0; subpixel_x < sub_pixel_res.GetLength(1); subpixel_x++)
                     {
-                        for (int subpixel_y = 0; subpixel_y < subpixel_num; subpixel_y++)
+                        for (int subpixel_y = 0; subpixel_y < sub_pixel_res.GetLength(0); subpixel_y++)
                         {
-                            int new_y = y_src * subpixel_num + subpixel_y;
-                            int new_x = x_src * subpixel_num + subpixel_x;
-                            * (ptr + new_y * bmpdata_dest.Stride + new_x * pixel_size_dest) = (byte) sub_pixel_res[subpixel_y, subpixel_x];
+                            *(ptr + subpixel_y * bmpdata.Stride + subpixel_x * pixel_size_dest) =  Image_Binary.Normalize( sub_pixel_res[subpixel_y, subpixel_x] );
                         }
                     }
                 }
@@ -644,6 +466,89 @@ namespace TN.ImageTools
 
             return false;
         }
+
+        //private static bool Assign_SubPixel_Res(int x_src, int y_src
+        //                                    , int[,] sub_pixel_res         /// sub pixel result.
+
+        //                                    , EN_SubPixel_Type subpixel_type
+        //                                    , EN_SubPixel_Num en_subpixel_num        /// 一 Pixel 拆成 subpixel_num * subpixel_num pixels
+
+        //                                    , BitmapData bmpdata
+        //                                    , IntPtr ptr_buffer_dest
+        //                                    , int pixel_size_dest
+        //                                    )
+        //{
+        //    int subpixel_num = Get_Subpixel_Num(en_subpixel_num);
+        //    if (subpixel_num <= 0)
+        //    {
+        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+        //            , $"subpixel_num <= 0 for EN_SubPixel_Num:{en_subpixel_num}");
+        //        return false;
+        //    }
+
+        //    return Assign_SubPixel_Res_n(x_src, y_src, subpixel_num, sub_pixel_res, bmpdata, ptr_buffer_dest, pixel_size_dest);
+        //}
+
+        //private static bool Assign_SubPixel_Res_n(int x_src, int y_src
+
+        //                                        , int subpixel_num
+        //                                        , int[,] sub_pixel_res         /// sub pixel result.                
+        //                                        , BitmapData bmpdata_dest
+        //                                        , IntPtr ptr_buffer_dest
+        //                                        , int pixel_size_dest
+        //                                         )
+        //{
+        //    try
+        //    {
+        //        unsafe
+        //        {
+        //            byte* ptr = (byte*)ptr_buffer_dest.ToPointer();
+        //            for (int subpixel_x = 0; subpixel_x < subpixel_num; subpixel_x++)
+        //            {
+        //                for (int subpixel_y = 0; subpixel_y < subpixel_num; subpixel_y++)
+        //                {
+        //                    int new_y = y_src * subpixel_num + subpixel_y;
+        //                    int new_x = x_src * subpixel_num + subpixel_x;
+        //                    * (ptr + new_y * bmpdata_dest.Stride + new_x * pixel_size_dest) = (byte) sub_pixel_res[subpixel_y, subpixel_x];
+        //                }
+        //            }
+        //        }
+
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+        //           , string.Format("Exception catched: error:{0}", ex.Message));
+        //        // 儲存Exception到檔案
+        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+        //    }
+
+        //    return false;
+        //}
+
+        //private unsafe static bool Assign_SubPixel_Res(BitmapData bmp_data
+        //                                , byte* ptr_buffer
+        //                                , int x, int y
+        //                                , int gray_level
+        //                                  )
+        //{
+        //    try
+        //    {
+        //        *(Image_Buffer_Gray.Get_Pointer(bmp_data, ptr_buffer, x, y)) = (byte)gray_level;
+
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+        //           , string.Format("Exception catched: error:{0}", ex.Message));
+        //        // 儲存Exception到檔案
+        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+        //    }
+
+        //    return false;
+        //}
 
         private static int Get_Subpixel_Num(EN_SubPixel_Num en_subpixel_num)
         {

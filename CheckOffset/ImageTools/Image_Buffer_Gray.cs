@@ -63,5 +63,11 @@ namespace TN.ImageTools
         {
             return ptr_buffer + y * bmpdata.Stride + x;
         }
+
+        public static unsafe byte* Get_Pointer(BitmapData bmpdata, IntPtr ptr_buffer, int x, int y)
+        {
+            byte * ptr = (byte*) ptr_buffer.ToPointer();
+            return ptr + y * bmpdata.Stride + x;
+        }
     }
 }

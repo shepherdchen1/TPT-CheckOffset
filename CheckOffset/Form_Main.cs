@@ -49,6 +49,9 @@ namespace CheckOffset
             if (dlg_res != DialogResult.OK)
                 return;
 
+            if (null != _userctrl_image.Image )
+                _userctrl_image.Image.Dispose();
+
             tbImgFile.Text = openFileDialog_Img.FileName;
             _userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
             _userctrl_image.Editing_Ctrl = null;
@@ -374,6 +377,9 @@ namespace CheckOffset
 
         private void btn1X_Click(object sender, EventArgs e)
         {
+            if (null != _userctrl_image.Image)
+                _userctrl_image.Image.Dispose();
+
             _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
             _userctrl_image.Image_Scale = 1.0f;
             _userctrl_image.Offset = new Point(0, 0);
@@ -383,6 +389,9 @@ namespace CheckOffset
 
         private void btnFit_Click(object sender, EventArgs e)
         {
+            if (null != _userctrl_image.Image)
+                _userctrl_image.Image.Dispose();
+
             _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
             _userctrl_image.pb_Image.ZoomFit();
         }

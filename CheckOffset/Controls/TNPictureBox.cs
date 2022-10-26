@@ -31,6 +31,10 @@ namespace TNControls
         private void Init_Data()
         {
             Editing_Ctrl = null;
+            Image = null;
+
+            Show_Image = null;
+            _show_color_image = null;
 
             MouseWheel += new MouseEventHandler(PB_MouseWheel);
             MouseDown += new System.Windows.Forms.MouseEventHandler(pb_Image_MouseDown);
@@ -47,7 +51,7 @@ namespace TNControls
         //////////////////////////////////////////////////
         /// data member...
         private Bitmap? _image      = null; // 8bit bitmap original file's bitmap.
-        public  Bitmap? _show_image = null; // 8bit bitmap scaled display bitmap only visible rect.
+        private Bitmap? _show_image = null; // 8bit bitmap scaled display bitmap only visible rect.
         private Bitmap? _show_color_image = null; // transfer _show_image to color bitmap.
         public Point _pt_LBtnDown;
         public Point _pt_Current;
@@ -103,11 +107,24 @@ namespace TNControls
             get => _image; 
             set {
                 _image = value;
-                _show_image = value;
+
+                Show_Image = value;
                 //Image = _show_image;
 
                 DrawImageToBuffer();
                 Redraw_Ctrl();
+            }
+        }
+
+        private Bitmap? Show_Image
+        {
+            get => _show_image;
+            set
+            {
+                if (null != _show_image)
+                    _show_image.Dispose();
+
+                _show_image = value;
             }
         }
 
@@ -335,7 +352,8 @@ namespace TNControls
                     gray_level = (int)*(ptr + pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size);
                 }
 
-                Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, bmp_data);
+                //Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, bmp_data);
+                //bmp_data = null;
 
                 Point pt_image = new Point((int)(pt_Current.X / _scale + _offset.X), (int)(pt_Current.Y / _scale + _offset.Y));
 
@@ -530,112 +548,124 @@ namespace TNControls
 
         void DrawImageToBuffer()
         {
-            if (null == _image)
+            try
             {
-                //if (_show_image)
-                //{
-                //    delete _show_image;
-                //    _show_image = nullptr;
-                //}
-                return;
-            }
-
-            // Create new bitmap
-            _show_image = new Bitmap(ClientSize.Width, ClientSize.Height, _image.PixelFormat);
-
-            Rectangle lock_rect = CalcLockRect();  // 取得要Lock的影像範圍
-            Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
-
-            if (lock_rect.Width == 0 || lock_rect.Height == 0)
-                return;
-
-            Int32 bytes_per_pixel = GetPixelLength(_image.PixelFormat);
-
-            if (bytes_per_pixel == 0)
-                return;
-
-            //_image.Save("d:\\temp\\Source.bmp");
-
-            // Get raw data
-            System.Drawing.Imaging.BitmapData fromBitmapData = _image.LockBits(lock_rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, _image.PixelFormat);
-            System.Drawing.Imaging.BitmapData destBitmapData = _show_image.LockBits(new Rectangle(0, 0, _show_image.Width, _show_image.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, _show_image.PixelFormat);
-
-            unsafe
-            {
-                byte* fro_ptr = (byte*)(fromBitmapData.Scan0.ToPointer());
-                byte* dest_ptr = (byte*)(destBitmapData.Scan0.ToPointer());
-                Int32 fro_pitch = fromBitmapData.Stride;
-                Int32 dest_pitch = destBitmapData.Stride;
-
-                Int32 copy_width = _show_image.Width;
-                Int32 copy_height = _show_image.Height;
-                byte* fro_line_ptr = fro_ptr;        // 來源端某行的位置
-                byte* dest_line_ptr = dest_ptr;        // 目的端某行的位置
-                byte* fro_now_ptr = fro_line_ptr;    // 來源端目前的位置
-                byte* dest_now_ptr = dest_line_ptr;    // 目的端目前的位置
-
-                Int32 offset_h = 0; // 來源端與目的端高度offset
-
-                for (int h = 0; h < copy_height; h++)
+                if (null == _image)
                 {
-                    Int32 fro_height = (Int32)(h / _scale + 0.5) - lock_rect.Y;
+                    //if (_show_image)
+                    //{
+                    //    delete _show_image;
+                    //    _show_image = nullptr;
+                    //}
+                    return;
+                }
 
-                    if (show_rect.Y + fro_height < 0)
+                // Create new bitmap
+                _show_image = new Bitmap(ClientSize.Width, ClientSize.Height, _image.PixelFormat);
+
+                Rectangle lock_rect = CalcLockRect();  // 取得要Lock的影像範圍
+                Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
+
+                if (lock_rect.Width == 0 || lock_rect.Height == 0)
+                    return;
+
+                Int32 bytes_per_pixel = GetPixelLength(_image.PixelFormat);
+
+                if (bytes_per_pixel == 0)
+                    return;
+
+                //_image.Save("d:\\temp\\Source.bmp");
+
+                // Get raw data
+                System.Drawing.Imaging.BitmapData fromBitmapData = _image.LockBits(lock_rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, _image.PixelFormat);
+                System.Drawing.Imaging.BitmapData destBitmapData = _show_image.LockBits(new Rectangle(0, 0, _show_image.Width, _show_image.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, _show_image.PixelFormat);
+
+                unsafe
+                {
+                    byte* fro_ptr = (byte*)(fromBitmapData.Scan0.ToPointer());
+                    byte* dest_ptr = (byte*)(destBitmapData.Scan0.ToPointer());
+                    Int32 fro_pitch = fromBitmapData.Stride;
+                    Int32 dest_pitch = destBitmapData.Stride;
+
+                    Int32 copy_width = _show_image.Width;
+                    Int32 copy_height = _show_image.Height;
+                    byte* fro_line_ptr = fro_ptr;        // 來源端某行的位置
+                    byte* dest_line_ptr = dest_ptr;        // 目的端某行的位置
+                    byte* fro_now_ptr = fro_line_ptr;    // 來源端目前的位置
+                    byte* dest_now_ptr = dest_line_ptr;    // 目的端目前的位置
+
+                    Int32 offset_h = 0; // 來源端與目的端高度offset
+
+                    for (int h = 0; h < copy_height; h++)
                     {
-                        offset_h++;
-                        continue;
-                    }
+                        Int32 fro_height = (Int32)(h / _scale + 0.5) - lock_rect.Y;
 
-                    // 是否已達bottom.
-                    if (show_rect.Y + fro_height >= lock_rect.Height)
-                        break;
-
-                    fro_line_ptr = fro_ptr + fro_pitch * (Int32)(((h - offset_h) / _scale));
-                    //fro_line_ptr = fro_ptr + fro_pitch * (Int32)(((h - offset_h) / _scale) + lock_rect.Y);
-                    // 1018- dest_line_ptr = dest_ptr + dest_pitch * h;
-                    dest_line_ptr = dest_ptr + dest_pitch * (Int32)(h - offset_h);
-                    fro_now_ptr = fro_line_ptr;
-                    dest_now_ptr = dest_line_ptr;
-
-                    Int32 offset_w = 0; // 來源端與目的端寬度offset
-                    Int32 show_rect_x = show_rect.X;
-                    Int32 lock_rect_x = lock_rect.X;
-
-                    for (int w = 0; w < copy_width; w++)
-                    {
-                        Int32 fro_weight = (Int32)(w / _scale + 0.5) - lock_rect_x;
-
-                        if (show_rect_x + fro_weight < 0)
+                        if (show_rect.Y + fro_height < 0)
                         {
-                            offset_w++;
-                            //1018-   dest_now_ptr += bytes_per_pixel;
+                            offset_h++;
                             continue;
                         }
-                        else if (show_rect_x + fro_weight >= lock_rect.Width)
+
+                        // 是否已達bottom.
+                        if (show_rect.Y + fro_height >= lock_rect.Height)
                             break;
 
-                        fro_now_ptr = fro_line_ptr + (Int32)((w - offset_w) / _scale) * bytes_per_pixel;
-                        //fro_now_ptr = fro_line_ptr + (Int32)((w - offset_w) / _scale + lock_rect_x) * bytes_per_pixel;
-                        for (int n = 0; n < bytes_per_pixel; n++)
-                            dest_now_ptr[n] = fro_now_ptr[n];
+                        fro_line_ptr = fro_ptr + fro_pitch * (Int32)(((h - offset_h) / _scale));
+                        //fro_line_ptr = fro_ptr + fro_pitch * (Int32)(((h - offset_h) / _scale) + lock_rect.Y);
+                        // 1018- dest_line_ptr = dest_ptr + dest_pitch * h;
+                        dest_line_ptr = dest_ptr + dest_pitch * (Int32)(h - offset_h);
+                        fro_now_ptr = fro_line_ptr;
+                        dest_now_ptr = dest_line_ptr;
 
-                        dest_now_ptr += bytes_per_pixel;
+                        Int32 offset_w = 0; // 來源端與目的端寬度offset
+                        Int32 show_rect_x = show_rect.X;
+                        Int32 lock_rect_x = lock_rect.X;
+
+                        for (int w = 0; w < copy_width; w++)
+                        {
+                            Int32 fro_weight = (Int32)(w / _scale + 0.5) - lock_rect_x;
+
+                            if (show_rect_x + fro_weight < 0)
+                            {
+                                offset_w++;
+                                //1018-   dest_now_ptr += bytes_per_pixel;
+                                continue;
+                            }
+                            else if (show_rect_x + fro_weight >= lock_rect.Width)
+                                break;
+
+                            fro_now_ptr = fro_line_ptr + (Int32)((w - offset_w) / _scale) * bytes_per_pixel;
+                            //fro_now_ptr = fro_line_ptr + (Int32)((w - offset_w) / _scale + lock_rect_x) * bytes_per_pixel;
+                            for (int n = 0; n < bytes_per_pixel; n++)
+                                dest_now_ptr[n] = fro_now_ptr[n];
+
+                            dest_now_ptr += bytes_per_pixel;
+                        }
                     }
                 }
+
+                _image.UnlockBits(fromBitmapData);
+                _show_image.UnlockBits(destBitmapData);
+
+                if (_image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
+                    _show_image.Palette = _image.Palette;
+
+                //_show_image.Save("d:\\temp\\test.bmp");
+
+                if (null != _show_color_image)
+                    _show_color_image.Dispose();
+                _show_color_image = new Bitmap(_show_image.Width, _show_image.Height);
+
+                //Image = _show_image;
+                Invalidate();
             }
-
-            _image.UnlockBits(fromBitmapData);
-            _show_image.UnlockBits(destBitmapData);
-
-            if (_image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
-                _show_image.Palette = _image.Palette;
-
-            //_show_image.Save("d:\\temp\\test.bmp");
-
-            _show_color_image = new Bitmap(_show_image.Width, _show_image.Height);
-
-            Image = _show_image;
-            Invalidate();
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                   , string.Format("Exception catched: error:{0}", ex.Message));
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
         }
 
         public void Redraw_Ctrl()
@@ -714,6 +744,11 @@ namespace TNControls
             //_show_color_image.Save("d:\\temp\\testcolor.bmp");
             //if (null != Image)
             //    Image.Dispose();
+
+            if (null != Image)
+            {
+                Image.Dispose();
+            }
 
             Bitmap tempBitmap = new Bitmap(_show_color_image);
             Image = tempBitmap;
