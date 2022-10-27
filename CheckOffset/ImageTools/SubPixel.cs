@@ -18,12 +18,13 @@ namespace TN.ImageTools
                       , out Bitmap bmp_dest                 /// sub pixel result.
                       )
         {
-            bmp_dest = null;
+            bmp_dest = new Bitmap(0,0);
             bool res = false;
 
-            BitmapData bmp_data_src = null;
-            BitmapData bmp_data_dest = null;
+            BitmapData? bmp_data_src = null;
+            BitmapData? bmp_data_dest = null;
             bool subpixel_failed = false;
+
             try
             {
                 int subpixel_num = Get_Subpixel_Num(en_subpixel_num);
@@ -37,6 +38,13 @@ namespace TN.ImageTools
                 if (!Image_Buffer_Gray.GetBuffer((Bitmap)bmp_src, ref bmp_data_src))
                     return false;
 
+                if ( null == bmp_data_src)
+                {
+                    Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                         , $"bmp_data_src is null");
+                    return false;
+                }
+
                 IntPtr ptr_buffer_src = bmp_data_src.Scan0;
                 int pixel_size_src = bmp_data_src.Stride / bmp_data_src.Width;
 
@@ -45,6 +53,9 @@ namespace TN.ImageTools
                 bmp_dest = new Bitmap(bmp_src.Width * subpixel_num, bmp_src.Height * subpixel_num, bmp_src.PixelFormat);
 
                 if (!Image_Buffer_Gray.GetBuffer((Bitmap)bmp_dest, ref bmp_data_dest))
+                    return false;
+
+                if ( null == bmp_data_dest)
                     return false;
 
                 IntPtr ptr_buffer_dest = bmp_data_dest.Scan0;
@@ -123,20 +134,20 @@ namespace TN.ImageTools
             }
             catch (Exception ex)
             {
-                bmp_dest = null;
+                bmp_dest = new Bitmap(0,0);
 
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
             finally
             {
                 if (null != bmp_data_src)
-                    Image_Buffer_Gray.ReleaseBuffer((Bitmap)bmp_src, bmp_data_src);
+                    Image_Buffer_Gray.ReleaseBuffer((Bitmap)bmp_src, ref bmp_data_src);
 
                 if (null != bmp_data_dest)
-                    Image_Buffer_Gray.ReleaseBuffer((Bitmap)bmp_dest, bmp_data_dest);
+                    Image_Buffer_Gray.ReleaseBuffer((Bitmap)bmp_dest, ref bmp_data_dest);
             }
 
             return res;
@@ -175,7 +186,7 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -215,7 +226,7 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -306,7 +317,7 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -425,7 +436,7 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -459,7 +470,7 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -569,8 +580,6 @@ namespace TN.ImageTools
                 default:
                     return 0;
             }
-
-            return 0;
         }
     }
 

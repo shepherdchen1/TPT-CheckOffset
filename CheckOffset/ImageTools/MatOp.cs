@@ -11,7 +11,7 @@ namespace TN.ImageTools
     {
         public static bool Multiply(int[,] src_mat1, int[,] src_mat2, out int[,] dest_mat )
         {
-            dest_mat = null;
+            dest_mat = new int[0,0];
             try
             {
                 if (   src_mat1.GetLength(1) != src_mat2.GetLength(0) ) 
@@ -38,12 +38,12 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
 
-            dest_mat = null;
+            dest_mat = new int[0, 0];
             return false;
         }
     }

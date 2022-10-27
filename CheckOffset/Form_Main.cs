@@ -273,7 +273,7 @@ namespace CheckOffset
             catch(Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -304,7 +304,7 @@ namespace CheckOffset
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -337,7 +337,7 @@ namespace CheckOffset
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -448,6 +448,13 @@ namespace CheckOffset
             {
 
             }
+        }
+
+        private void btnBmp2Array_Click(object sender, EventArgs e)
+        {
+            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            byte[,] buffer = (byte[,]) Image_Buffer_Gray.Clone_Bmp_2_2DArray(bmp);
+
         }
     } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

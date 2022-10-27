@@ -42,19 +42,19 @@ namespace TN.ImageTools
 
                 bool res = _Find_Edge_X(bmp_data, x_start, x_end, y, first_white, threshold, out edge_pos );
 
-                Image_Buffer_Gray.ReleaseBuffer(bmp, bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
                 return res;
             }
             catch(Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
             finally
             {
-                Image_Buffer_Gray.ReleaseBuffer(bmp, bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
             }
 
             return false;
@@ -193,19 +193,19 @@ namespace TN.ImageTools
 
                 bool res = _Find_Edge_Y(bmp_data, y_start, y_end, x, first_white, threshold, out edge_pos);
 
-                Image_Buffer_Gray.ReleaseBuffer(bmp, bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
                 return res;
             }
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
             finally
             {
-                Image_Buffer_Gray.ReleaseBuffer(bmp, bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
             }
 
             return false;
@@ -298,7 +298,7 @@ namespace TN.ImageTools
             catch(Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                     , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }

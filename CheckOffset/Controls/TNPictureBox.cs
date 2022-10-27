@@ -34,7 +34,7 @@ namespace TNControls
             Image = null;
 
             Show_Image = null;
-            _show_color_image = null;
+            Show_Color_Image = null;
 
             MouseWheel += new MouseEventHandler(PB_MouseWheel);
             MouseDown += new System.Windows.Forms.MouseEventHandler(pb_Image_MouseDown);
@@ -50,8 +50,8 @@ namespace TNControls
 
         //////////////////////////////////////////////////
         /// data member...
-        private Bitmap? _image      = null; // 8bit bitmap original file's bitmap.
-        private Bitmap? _show_image = null; // 8bit bitmap scaled display bitmap only visible rect.
+        private Bitmap? _image      = null; // 8bit bitmap original file's bitmap. 整張影像
+        private Bitmap? _show_image = null; // 8bit bitmap scaled display bitmap only visible rect. 顯示部分影像
         private Bitmap? _show_color_image = null; // transfer _show_image to color bitmap.
         public Point _pt_LBtnDown;
         public Point _pt_Current;
@@ -108,9 +108,6 @@ namespace TNControls
             set {
                 _image = value;
 
-                Show_Image = value;
-                //Image = _show_image;
-
                 DrawImageToBuffer();
                 Redraw_Ctrl();
             }
@@ -125,6 +122,18 @@ namespace TNControls
                     _show_image.Dispose();
 
                 _show_image = value;
+            }
+        }
+
+        private Bitmap? Show_Color_Image
+        {
+            get => _show_color_image;
+            set
+            {
+                if (null != _show_color_image)
+                    _show_color_image.Dispose();
+
+                _show_color_image = value;
             }
         }
 
@@ -244,66 +253,66 @@ namespace TNControls
             Report_Cursor_Gray_Level(e);
         }
 
-        private void PB_Image_Refresh()
-        {
-            //pb_Image.Refresh();
-            //Refresh();
+        //private void PB_Image_Refresh()
+        //{
+        //    //pb_Image.Refresh();
+        //    //Refresh();
 
-            Bitmap color_bmp = new Bitmap(Width, Height);
+        //    Bitmap color_bmp = new Bitmap(Width, Height);
 
 
-            if (null != User_Ctrls && User_Ctrls.Count > 0)
-            {
-                Pen pen = new Pen(Color.White, 1);
+        //    if (null != User_Ctrls && User_Ctrls.Count > 0)
+        //    {
+        //        Pen pen = new Pen(Color.White, 1);
 
-                foreach (Control enu_ctrl in User_Ctrls)
-                {
-                    TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enu_ctrl;
-                    Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
-                    Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
-                    Rectangle rt_draw = user_ctrl.Editing_Rect;
-                    rt_draw.Offset(pt_offset);
-                    Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
-                                                            , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
-                    CreateGraphics().DrawRectangle(pen, rt_final_draw);
-                }
-            }
+        //        foreach (Control enu_ctrl in User_Ctrls)
+        //        {
+        //            TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enu_ctrl;
+        //            Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
+        //            Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
+        //            Rectangle rt_draw = user_ctrl.Editing_Rect;
+        //            rt_draw.Offset(pt_offset);
+        //            Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
+        //                                                    , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
+        //            CreateGraphics().DrawRectangle(pen, rt_final_draw);
+        //        }
+        //    }
 
-            if (null != Editing_Ctrl)
-            {
-                TNUserCtrl_Rect editing_cttl = (TNUserCtrl_Rect)Editing_Ctrl;
-                //using (Graphics g = Graphics.FromImage(pb_Image.Image))
-                //{
+        //    if (null != Editing_Ctrl)
+        //    {
+        //        TNUserCtrl_Rect editing_cttl = (TNUserCtrl_Rect)Editing_Ctrl;
+        //        //using (Graphics g = Graphics.FromImage(pb_Image.Image))
+        //        //{
 
-                //    Pen pen = new Pen(Color.White, 1);
-                //    DrawXORRectangle(g, pen, editing_cttl.Editing_Rect);
-                //}
+        //        //    Pen pen = new Pen(Color.White, 1);
+        //        //    DrawXORRectangle(g, pen, editing_cttl.Editing_Rect);
+        //        //}
 
-                //editing_cttl.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
-                //                      , Math.Min(_pt_LBtnDown.Y, _pt_Current.Y)
-                //                      , Math.Abs(_pt_Current.X - _pt_LBtnDown.X)
-                //                      , Math.Abs(_pt_Current.Y - _pt_LBtnDown.Y));
+        //        //editing_cttl.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
+        //        //                      , Math.Min(_pt_LBtnDown.Y, _pt_Current.Y)
+        //        //                      , Math.Abs(_pt_Current.X - _pt_LBtnDown.X)
+        //        //                      , Math.Abs(_pt_Current.Y - _pt_LBtnDown.Y));
 
-                //Bitmap color_bmp = new Bitmap(pb_Image.Image.Width, pb_Image.Image.Height);
+        //        //Bitmap color_bmp = new Bitmap(pb_Image.Image.Width, pb_Image.Image.Height);
 
-                using (Graphics g = Graphics.FromImage(color_bmp))
-                {
-                    if (null != _show_image)
-                    {
-                        g.DrawImageUnscaled(_show_image, 0, 0);
-                        Image = _show_image;
-                        //_show_image.Save("d:\\temp\\test.bmp");
-                    }
+        //        using (Graphics g = Graphics.FromImage(color_bmp))
+        //        {
+        //            if (null != Show_Image)
+        //            {
+        //                g.DrawImageUnscaled(Show_Image, 0, 0);
+        //                Image = _show_image;
+        //                //_show_image.Save("d:\\temp\\test.bmp");
+        //            }
 
-                    Pen pen = new Pen(Color.White, 1);
-                    //g.DrawRectangle(pen, editing_cttl.Editing_Rect);
+        //            Pen pen = new Pen(Color.White, 1);
+        //            //g.DrawRectangle(pen, editing_cttl.Editing_Rect);
 
-                    CreateGraphics().DrawRectangle(pen, editing_cttl.Editing_Rect);
-                }
-            }
+        //            CreateGraphics().DrawRectangle(pen, editing_cttl.Editing_Rect);
+        //        }
+        //    }
 
-            //Image = _show_image;
-        }
+        //    //Image = _show_image;
+        //}
 
         private void pb_Image_Paint(object sender, PaintEventArgs e)
         {
@@ -373,14 +382,14 @@ namespace TNControls
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                                    , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
             finally
             {
                 if (null != bmp_data)
-                    Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, bmp_data);
+                    Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, ref bmp_data);
             }
         }
 
@@ -523,13 +532,13 @@ namespace TNControls
             System.Drawing.Rectangle show_rect = new Rectangle(0, 0, 0, 0);
             //System.Drawing.Rectangle show_rect = new Rectangle(_offset.X, _offset.Y, 0, 0);
 
-            if (null != _show_image)
+            if (null != Show_Image)
             {
                 show_rect.Location = _offset;
                 show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
-                show_rect.Width = Math.Max(show_rect.Width, _show_image.Width);
+                show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
                 show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
-                show_rect.Height = Math.Max(show_rect.Height, _show_image.Height);
+                show_rect.Height = Math.Max(show_rect.Height, Show_Image.Height);
             }
 
             return show_rect;
@@ -561,7 +570,7 @@ namespace TNControls
                 }
 
                 // Create new bitmap
-                _show_image = new Bitmap(ClientSize.Width, ClientSize.Height, _image.PixelFormat);
+                Show_Image = new Bitmap(ClientSize.Width, ClientSize.Height, _image.PixelFormat);
 
                 Rectangle lock_rect = CalcLockRect();  // 取得要Lock的影像範圍
                 Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
@@ -578,7 +587,7 @@ namespace TNControls
 
                 // Get raw data
                 System.Drawing.Imaging.BitmapData fromBitmapData = _image.LockBits(lock_rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, _image.PixelFormat);
-                System.Drawing.Imaging.BitmapData destBitmapData = _show_image.LockBits(new Rectangle(0, 0, _show_image.Width, _show_image.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, _show_image.PixelFormat);
+                System.Drawing.Imaging.BitmapData destBitmapData = Show_Image.LockBits(new Rectangle(0, 0, _show_image.Width, _show_image.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, _show_image.PixelFormat);
 
                 unsafe
                 {
@@ -587,8 +596,8 @@ namespace TNControls
                     Int32 fro_pitch = fromBitmapData.Stride;
                     Int32 dest_pitch = destBitmapData.Stride;
 
-                    Int32 copy_width = _show_image.Width;
-                    Int32 copy_height = _show_image.Height;
+                    Int32 copy_width = Show_Image.Width;
+                    Int32 copy_height = Show_Image.Height;
                     byte* fro_line_ptr = fro_ptr;        // 來源端某行的位置
                     byte* dest_line_ptr = dest_ptr;        // 目的端某行的位置
                     byte* fro_now_ptr = fro_line_ptr;    // 來源端目前的位置
@@ -645,16 +654,13 @@ namespace TNControls
                 }
 
                 _image.UnlockBits(fromBitmapData);
-                _show_image.UnlockBits(destBitmapData);
+                Show_Image.UnlockBits(destBitmapData);
 
                 if (_image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
-                    _show_image.Palette = _image.Palette;
+                    Show_Image.Palette = _image.Palette;
 
                 //_show_image.Save("d:\\temp\\test.bmp");
-
-                if (null != _show_color_image)
-                    _show_color_image.Dispose();
-                _show_color_image = new Bitmap(_show_image.Width, _show_image.Height);
+                Show_Color_Image = new Bitmap(Show_Image.Width, Show_Image.Height);
 
                 //Image = _show_image;
                 Invalidate();
@@ -662,7 +668,7 @@ namespace TNControls
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                   , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
@@ -670,15 +676,13 @@ namespace TNControls
 
         public void Redraw_Ctrl()
         {
-            if (null == _show_image)
+            if (null == Show_Image)
                 return;
 
-            if (null != _show_color_image)
-                _show_color_image.Dispose();
-            _show_color_image = new Bitmap(_show_image.Width, _show_image.Height);
-            using (Graphics graphics_show = Graphics.FromImage(_show_color_image))
+            Show_Color_Image = new Bitmap(Show_Image.Width, Show_Image.Height);
+            using (Graphics graphics_show = Graphics.FromImage(Show_Color_Image))
             {
-                graphics_show.DrawImage(_show_image, 0, 0);
+                graphics_show.DrawImage(Show_Image, 0, 0);
                 //_show_image.Save("d:\\temp\\test1.bmp");
                 //_show_color_image.Save("d:\\temp\\testcolor1.bmp");
 
@@ -724,7 +728,7 @@ namespace TNControls
 
                     //using (Graphics g = Graphics.FromImage(color_bmp))
                     //{
-                        if (null != _show_image)
+                        if (null != Show_Image)
                         {
                             //g.DrawImageUnscaled(_show_image, 0, 0);
                             //Image = _show_image;
@@ -750,7 +754,7 @@ namespace TNControls
                 Image.Dispose();
             }
 
-            Bitmap tempBitmap = new Bitmap(_show_color_image);
+            Bitmap tempBitmap = new Bitmap(Show_Color_Image);
             Image = tempBitmap;
         }
 

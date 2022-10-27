@@ -56,14 +56,14 @@ namespace TN.ImageTools
             catch (Exception ex)
             {
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , string.Format("Exception catched: error:{0}", ex.Message));
+                               , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
             finally
             {
-                Image_Buffer_Gray.ReleaseBuffer(src_bmp, src_bmp_data);
-                Image_Buffer_Gray.ReleaseBuffer(bmp_binary, dest_bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer(src_bmp, ref src_bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer(bmp_binary, ref dest_bmp_data);
             }
 
             return res;

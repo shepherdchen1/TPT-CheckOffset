@@ -56,8 +56,6 @@ namespace TNControls
         private Struct_Insp_Result _insp_result = new Struct_Insp_Result();
 
 
-        private bool _bSelected = false;
-
         /// <summary>
         /// member functions.
         /// </summary>

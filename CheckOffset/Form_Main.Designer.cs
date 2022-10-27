@@ -49,6 +49,7 @@
             this.btnFit = new System.Windows.Forms.Button();
             this.btn1X = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.chkSubPixel = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.numMaxValidPixel = new System.Windows.Forms.NumericUpDown();
             this.chkDisplayBinary = new System.Windows.Forms.CheckBox();
@@ -56,6 +57,8 @@
             this.label6 = new System.Windows.Forms.Label();
             this.btnDetect = new System.Windows.Forms.Button();
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.btnBmp2Array = new System.Windows.Forms.Button();
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.labelReason = new System.Windows.Forms.Label();
             this.labelCheckResult = new System.Windows.Forms.Label();
@@ -68,7 +71,6 @@
             this.openFileDialog_Img = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_Setting = new System.Windows.Forms.OpenFileDialog();
-            this.chkSubPixel = new System.Windows.Forms.CheckBox();
             this.pnlSetting.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -79,6 +81,7 @@
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).BeginInit();
+            this.tabPage4.SuspendLayout();
             this.pnlHeader.SuspendLayout();
             this.pnlFooter.SuspendLayout();
             this.tabUser.SuspendLayout();
@@ -99,6 +102,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Location = new System.Drawing.Point(15, 15);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.Padding = new System.Drawing.Point(20, 3);
@@ -322,6 +326,17 @@
             this.tabPage3.Text = "過濾";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // chkSubPixel
+            // 
+            this.chkSubPixel.AutoSize = true;
+            this.chkSubPixel.Location = new System.Drawing.Point(16, 287);
+            this.chkSubPixel.Name = "chkSubPixel";
+            this.chkSubPixel.Size = new System.Drawing.Size(108, 27);
+            this.chkSubPixel.TabIndex = 17;
+            this.chkSubPixel.Text = "SubPixel";
+            this.chkSubPixel.UseVisualStyleBackColor = true;
+            this.chkSubPixel.CheckedChanged += new System.EventHandler(this.chkSubPixel_CheckedChanged);
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -394,6 +409,26 @@
             0,
             0,
             0});
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.btnBmp2Array);
+            this.tabPage4.Location = new System.Drawing.Point(4, 32);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(350, 836);
+            this.tabPage4.TabIndex = 2;
+            this.tabPage4.Text = "測試";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // btnBmp2Array
+            // 
+            this.btnBmp2Array.Location = new System.Drawing.Point(48, 70);
+            this.btnBmp2Array.Name = "btnBmp2Array";
+            this.btnBmp2Array.Size = new System.Drawing.Size(173, 34);
+            this.btnBmp2Array.TabIndex = 0;
+            this.btnBmp2Array.Text = "bmp to 2d array";
+            this.btnBmp2Array.UseVisualStyleBackColor = true;
+            this.btnBmp2Array.Click += new System.EventHandler(this.btnBmp2Array_Click);
             // 
             // pnlHeader
             // 
@@ -504,17 +539,6 @@
             this.openFileDialog_Setting.FileName = "openFileDialog1";
             this.openFileDialog_Setting.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
             // 
-            // chkSubPixel
-            // 
-            this.chkSubPixel.AutoSize = true;
-            this.chkSubPixel.Location = new System.Drawing.Point(16, 287);
-            this.chkSubPixel.Name = "chkSubPixel";
-            this.chkSubPixel.Size = new System.Drawing.Size(108, 27);
-            this.chkSubPixel.TabIndex = 17;
-            this.chkSubPixel.Text = "SubPixel";
-            this.chkSubPixel.UseVisualStyleBackColor = true;
-            this.chkSubPixel.CheckedChanged += new System.EventHandler(this.chkSubPixel_CheckedChanged);
-            // 
             // For_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
@@ -539,6 +563,7 @@
             this.tabPage3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).EndInit();
+            this.tabPage4.ResumeLayout(false);
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.pnlFooter.ResumeLayout(false);
@@ -591,5 +616,7 @@
         private RadioButton rbtnHorz;
         private GroupBox groupBox4;
         private CheckBox chkSubPixel;
+        private TabPage tabPage4;
+        private Button btnBmp2Array;
     }
 }
