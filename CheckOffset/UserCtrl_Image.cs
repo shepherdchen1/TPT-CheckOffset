@@ -55,7 +55,7 @@ namespace CheckOffset
                 if ( pb_Image.Editing_Ctrl != value)
                 {
                     // reset old editing control.
-                    TNUserCtrl_Rect? rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
+                    TNCustCtrl_Rect? rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNCustCtrl_Rect;
                     if (rt_ctrl_cur_setting != null)
                         rt_ctrl_cur_setting.Editing = false;
                 }
@@ -63,11 +63,17 @@ namespace CheckOffset
                 pb_Image.Editing_Ctrl = value;
                 if (null != value)
                 {
-                    TNUserCtrl_Rect? rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNUserCtrl_Rect;
+                    TNCustCtrl_Rect? rt_ctrl_cur_setting = pb_Image.Editing_Ctrl as TNCustCtrl_Rect;
                     if ( null != rt_ctrl_cur_setting )
                         rt_ctrl_cur_setting.Editing = true;
                 }
             } 
+        }
+
+        public List<Control> Cache_Ctrl
+        {
+            get => pb_Image.Cache_Ctrl;
+            set => pb_Image.Cache_Ctrl = value;
         }
 
         public Bitmap? Image 
@@ -135,7 +141,7 @@ namespace CheckOffset
 
             //if (null != pb_Image.Editing_Ctrl)
             {
-                TNUserCtrl_Rect? editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                TNCustCtrl_Rect? editing_cttl = Editing_Ctrl as TNCustCtrl_Rect;
                 switch (Query_Editing_Mode())
                 {
                     case Editing_Mode.EDT_New_ROI:
@@ -143,7 +149,9 @@ namespace CheckOffset
                             if (null != editing_cttl)
                             {
                                 Point pt_image = pb_Image.GetImagePointFromPB(_pt_LBtnDown);
-                                editing_cttl.Editing_Rect = new Rectangle(pt_image.X, pt_image.Y, 0, 0);
+                                TNCustCtrl_Rect.Struct_Pos_Info pos_info = editing_cttl.Pos_Info;
+                                pos_info.Editing_Rect = new Rectangle(pt_image.X, pt_image.Y, 0, 0);
+                                editing_cttl.Pos_Info = pos_info;
                             }
                         }
                         break;
@@ -161,7 +169,7 @@ namespace CheckOffset
                                 {
                                     Mouse_Select_Ctrl();
 
-                                    TNUserCtrl_Rect? new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                                    TNCustCtrl_Rect? new_editing_cttl = Editing_Ctrl as TNCustCtrl_Rect;
                                     if (null != new_editing_cttl && new_editing_cttl.Editing)
                                     {
                                         new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(_pt_LBtnDown);
@@ -178,7 +186,7 @@ namespace CheckOffset
                         {
                             Mouse_Select_Ctrl();
 
-                            TNUserCtrl_Rect? new_editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                            TNCustCtrl_Rect? new_editing_cttl = Editing_Ctrl as TNCustCtrl_Rect;
                             if (null != new_editing_cttl && new_editing_cttl.Editing)
                             {
                                 new_editing_cttl.HitTest_Rresult = new_editing_cttl.HitTest(_pt_LBtnDown);
@@ -218,7 +226,7 @@ namespace CheckOffset
                     return;
                 }
 
-                TNUserCtrl_Rect? editing_cttl = Editing_Ctrl as TNUserCtrl_Rect;
+                TNCustCtrl_Rect? editing_cttl = Editing_Ctrl as TNCustCtrl_Rect;
                 switch (Query_Editing_Mode())
                 {
                     case Editing_Mode.EDT_New_ROI:
@@ -231,7 +239,9 @@ namespace CheckOffset
 
                                 return;
                             }
-                            editing_cttl.Editing_Rect = TNUserCtrl_Rect.Normalize(_pt_LBtnDown, _pt_Current);
+                            TNCustCtrl_Rect.Struct_Pos_Info pos_info = editing_cttl.Pos_Info;
+                            pos_info.Editing_Rect = TNCustCtrl_Rect.Normalize(_pt_LBtnDown, _pt_Current);
+                            editing_cttl.Pos_Info = pos_info;
                         }
                         break;
 
@@ -248,7 +258,11 @@ namespace CheckOffset
                             }
 
                             if (editing_cttl.HitTest_Rresult != HitTest_Result.None)
-                                editing_cttl.Editing_Rect = editing_cttl.Modify_Doing(_pt_Current);
+                            {
+                                TNCustCtrl_Rect.Struct_Pos_Info pos_info = editing_cttl.Pos_Info;
+                                pos_info.Editing_Rect = editing_cttl.Modify_Doing(_pt_Current);
+                                editing_cttl.Pos_Info = pos_info;
+                            }
 
                             pb_Image.Refresh();
                         }
@@ -267,7 +281,7 @@ namespace CheckOffset
 
             if (e.Button == MouseButtons.Left)
             {
-                TNUserCtrl_Rect? editing_cttl = (TNUserCtrl_Rect?)pb_Image.Editing_Ctrl;
+                TNCustCtrl_Rect? editing_cttl = (TNCustCtrl_Rect?)pb_Image.Editing_Ctrl;
                 if (editing_cttl != null)
                 {
                     if (editing_cttl.Editing)
@@ -317,14 +331,14 @@ namespace CheckOffset
             {
                 foreach (Control click_ctrl in pb_Image.User_Ctrls)
                 {
-                    TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
+                    TNCustCtrl_Rect tn_click_ctrl = (TNCustCtrl_Rect)click_ctrl;
                     tn_click_ctrl.Editing = false;
                 }
 
-                TNUserCtrl_Rect? ctrl_new_selected = null;
+                TNCustCtrl_Rect? ctrl_new_selected = null;
                 foreach (Control click_ctrl in pb_Image.User_Ctrls)
                 {
-                    TNUserCtrl_Rect tn_click_ctrl = (TNUserCtrl_Rect)click_ctrl;
+                    TNCustCtrl_Rect tn_click_ctrl = (TNCustCtrl_Rect)click_ctrl;
                     if (tn_click_ctrl == null)
                         continue;
 
@@ -359,13 +373,15 @@ namespace CheckOffset
             _pt_Current = e.Location;
             if (e.Button == MouseButtons.Left)
             {
-                TNUserCtrl_Rect? editing_cttl = (TNUserCtrl_Rect?)pb_Image.Editing_Ctrl;
+                TNCustCtrl_Rect? editing_cttl = (TNCustCtrl_Rect?)pb_Image.Editing_Ctrl;
                 if (editing_cttl != null)
                 {
-                    editing_cttl.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
+                    TNCustCtrl_Rect.Struct_Pos_Info pos_info = editing_cttl.Pos_Info;
+                    pos_info.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
                           , Math.Min(_pt_LBtnDown.Y, _pt_Current.Y)
                           , Math.Abs(_pt_Current.X - _pt_LBtnDown.X)
                           , Math.Abs(_pt_Current.Y - _pt_LBtnDown.Y));
+                    editing_cttl.Pos_Info = pos_info;
                 }
             }
         }
@@ -412,8 +428,8 @@ namespace CheckOffset
             {
                 foreach (Struct_Detect_Info detect_info in tnGlobal.Detect_Infos)
                 {
-                    TNUserCtrl_Rect new_detect = new TNUserCtrl_Rect();
-                    new_detect.Editing_Rect = detect_info.Detect_Rect;
+                    TNCustCtrl_Rect new_detect = new TNCustCtrl_Rect();
+                    new_detect.Pos_Info.Editing_Rect = detect_info.Detect_Rect;
                     new_detect.Insp_param = detect_info.Detect_Insp_param;
                     User_Ctrls.Add(new_detect);
                 }
@@ -441,9 +457,9 @@ namespace CheckOffset
 
             foreach (Control user_ctrl in User_Ctrls)
             {
-                TNUserCtrl_Rect? rt_user_ctrl = user_ctrl as TNUserCtrl_Rect;
+                TNCustCtrl_Rect? rt_user_ctrl = user_ctrl as TNCustCtrl_Rect;
                 if ( null == rt_user_ctrl 
-                    || rt_user_ctrl.Editing_Rect.X < 0 || rt_user_ctrl.Editing_Rect.Y < 0 || rt_user_ctrl.Editing_Rect.Width <= 0 || rt_user_ctrl.Editing_Rect.Height <= 0)
+                    || rt_user_ctrl.Pos_Info.Editing_Rect.X < 0 || rt_user_ctrl.Pos_Info.Editing_Rect.Y < 0 || rt_user_ctrl.Pos_Info.Editing_Rect.Width <= 0 || rt_user_ctrl.Pos_Info.Editing_Rect.Height <= 0)
                 {
                     Log_Utl.Log_Event(Event_Level.Warning, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                                     , $"rt_user_ctrl is null");
@@ -451,7 +467,7 @@ namespace CheckOffset
                 }
 
                 Struct_Detect_Info new_detect_info = new Struct_Detect_Info();
-                new_detect_info.Detect_Rect = rt_user_ctrl.Editing_Rect;
+                new_detect_info.Detect_Rect = rt_user_ctrl.Pos_Info.Editing_Rect;
                 new_detect_info.Detect_Insp_param = rt_user_ctrl.Insp_param;
 
                 tnGlobal.Detect_Infos.Add(new_detect_info);

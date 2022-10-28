@@ -12,6 +12,8 @@ using TN.Tools.Debug;
 using TNControls;
 using TN.Insp_Param;
 
+using OpenSource;
+
 namespace CheckOffset
 {
     public partial class For_Main : Form
@@ -78,9 +80,9 @@ namespace CheckOffset
                     _userctrl_image.User_Ctrls.Clear();
                     foreach (Struct_Detect_Info cur_detect_infos in tnGlobal.Detect_Infos)
                     {
-                        TNUserCtrl_Rect exist_added_rect = new TNUserCtrl_Rect();
+                        TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                         TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
-                        exist_added_rect.Editing_Rect = cur_detect_infos.Detect_Rect;
+                        exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
                         exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
                         _userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
@@ -88,10 +90,10 @@ namespace CheckOffset
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
-                TNUserCtrl_Rect new_added_rect = new TNUserCtrl_Rect();
+                TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
                 _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
-                new_added_rect.Editing_Rect = new Rectangle(0, 0, 100, 100);
+                new_added_rect.Pos_Info.Editing_Rect = new Rectangle(0, 0, 100, 100);
                 Struct_Insp_Param new_insp_param = new Struct_Insp_Param();
                 new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                 new_added_rect.Insp_param = new_insp_param;
@@ -101,17 +103,17 @@ namespace CheckOffset
                 // ·s¼W§¹²¦
                 if (null != _userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNUserCtrl_Rect editing_rect = (TNUserCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
 
                     Struct_Insp_Param new_insp_param = new Struct_Insp_Param();
                     new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                     editing_rect.Insp_param = new_insp_param;
 
                     const int min_roi_valid_size = 2;
-                    if (null != editing_rect && editing_rect.Editing_Rect.Width > min_roi_valid_size && editing_rect.Editing_Rect.Height > min_roi_valid_size)
+                    if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
                     {
                         Struct_Detect_Info new_defect_info = new Struct_Detect_Info();
-                        new_defect_info.Detect_Rect = editing_rect.Editing_Rect;
+                        new_defect_info.Detect_Rect = editing_rect.Pos_Info.Editing_Rect;
                         new_defect_info.Detect_Insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                         tnGlobal.Detect_Infos.Add(new_defect_info);
                     }
@@ -183,7 +185,7 @@ namespace CheckOffset
                     int max_valid_gap = (int)numMaxValidPixel.Value;
                     foreach (Control ctrl_defect_info in _userctrl_image.User_Ctrls)
                     {
-                        TNUserCtrl_Rect rect_user_ctrl = (TNUserCtrl_Rect)ctrl_defect_info;
+                        TNCustCtrl_Rect rect_user_ctrl = (TNCustCtrl_Rect)ctrl_defect_info;
                         Struct_Insp_Param chk_insp_param = rect_user_ctrl.Insp_param;
                         Struct_Insp_Result chk_insp_result = rect_user_ctrl.Insp_result;
 
@@ -191,9 +193,9 @@ namespace CheckOffset
                         // check X dir.
                         if (EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_Horz == chk_insp_param.Insp_Tol_Dir)
                         {
-                            for (int y = rect_user_ctrl.Editing_Rect.Top; y < rect_user_ctrl.Editing_Rect.Bottom; y++)
+                            for (int y = rect_user_ctrl.Pos_Info.Editing_Rect.Top; y < rect_user_ctrl.Pos_Info.Editing_Rect.Bottom; y++)
                             {
-                                Get_X_Gap(bmp, rect_user_ctrl.Editing_Rect.X, rect_user_ctrl.Editing_Rect.X + rect_user_ctrl.Editing_Rect.Width, y, out float edge_pos_left, out float edge_pos_right);
+                                Get_X_Gap(bmp, rect_user_ctrl.Pos_Info.Editing_Rect.X, rect_user_ctrl.Pos_Info.Editing_Rect.X + rect_user_ctrl.Pos_Info.Editing_Rect.Width, y, out float edge_pos_left, out float edge_pos_right);
 
                                 // no edge found.
                                 if (edge_pos_left < 0 || edge_pos_right < 0)
@@ -227,9 +229,9 @@ namespace CheckOffset
                         // check Y dir.
                         if (EN_Insp_Tol_Dir.EN_Insp_Tol_Dir_Vert == chk_insp_param.Insp_Tol_Dir)
                         {
-                            for (int x = rect_user_ctrl.Editing_Rect.Left; x < rect_user_ctrl.Editing_Rect.Right; x++)
+                            for (int x = rect_user_ctrl.Pos_Info.Editing_Rect.Left; x < rect_user_ctrl.Pos_Info.Editing_Rect.Right; x++)
                             {
-                                Get_Y_Gap(bmp, x, rect_user_ctrl.Editing_Rect.Y, rect_user_ctrl.Editing_Rect.Y + rect_user_ctrl.Editing_Rect.Height, out float edge_pos_top, out float edge_pos_bottom);
+                                Get_Y_Gap(bmp, x, rect_user_ctrl.Pos_Info.Editing_Rect.Y, rect_user_ctrl.Pos_Info.Editing_Rect.Y + rect_user_ctrl.Pos_Info.Editing_Rect.Height, out float edge_pos_top, out float edge_pos_bottom);
 
                                 // no edge found.
                                 if (edge_pos_top < 0 || edge_pos_bottom < 0)
@@ -453,8 +455,43 @@ namespace CheckOffset
         private void btnBmp2Array_Click(object sender, EventArgs e)
         {
             Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-            byte[,] buffer = (byte[,]) Image_Buffer_Gray.Clone_Bmp_2_2DArray(bmp);
+            byte[,]? buffer = (byte[,]?) Image_Buffer_Gray.Clone_Bmp_2_2DArray(bmp);
 
+        }
+
+        private void btnCannyEdgeDetect_Click(object sender, EventArgs e)
+        {
+            _userctrl_image.Cache_Ctrl.Clear();
+
+            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+
+            Canny edge_detect = new Canny(bmp, 1000, (float) numMinHysteresisThreshold.Value);
+
+            List<Point> detected_edge_points = new List<Point>();
+            // NOTE: edge_detect.EdgeMap is [width, height]
+            for ( int y = 0; y < edge_detect.EdgeMap.GetLength(1); y++ )
+            {
+                for ( int x = 0; x < edge_detect.EdgeMap.GetLength(0); x++ )
+                {
+                    if (edge_detect.EdgeMap[x, y] < 128)
+                        continue;
+
+                    detected_edge_points.Add(new Point(x, y));
+                }
+            }
+
+            TNControls.TNCustCtrl_Points edge_points = new TNCustCtrl_Points();
+            edge_points.Pos_Info.Points = detected_edge_points.ToArray();
+            _userctrl_image.Cache_Ctrl.Add(edge_points);
+
+            _userctrl_image.pb_Image.Repaint();
+
+
+        }
+
+        private void btnSaveBinary_Click(object sender, EventArgs e)
+        {
+            _userctrl_image.pb_Image.Image.Save($"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
         }
     } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

@@ -66,7 +66,8 @@ namespace TNControls
         Point _move_start_offset = new Point(0, 0);
 
         // for _user_ctrls should be none null, for compile no warning.
-        public List<Control> _user_ctrls = new List<Control>();
+        private List<Control> _user_ctrls = new List<Control>();
+        private List<Control> _cache_ctrls = new List<Control>();
 
         public event Delegate_Report_GrayLevel_Gray? Report_GrayLevel_Gray;
 
@@ -80,6 +81,12 @@ namespace TNControls
         {
             get => _user_ctrls;
             set => _user_ctrls = value;
+        }
+
+        public List<Control> Cache_Ctrl
+        {
+            get => _cache_ctrls;
+            set => _cache_ctrls = value;
         }
 
         public float Image_Scale 
@@ -175,7 +182,7 @@ namespace TNControls
             //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, 0, 0);
             if (null != Editing_Ctrl)
             {
-                TNUserCtrl_Rect editing_cttl = (TNUserCtrl_Rect)Editing_Ctrl;
+                TNCustCtrl_Rect editing_cttl = (TNCustCtrl_Rect)Editing_Ctrl;
                 //using (Graphics g = Graphics.FromImage(pb_Image.Image))
                 //{
 
@@ -536,9 +543,10 @@ namespace TNControls
             {
                 show_rect.Location = _offset;
                 show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
-                show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
+                //show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
+                show_rect.Width = Math.Max(show_rect.Width, Image_Bmp.Width - _offset.X);
                 show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
-                show_rect.Height = Math.Max(show_rect.Height, Show_Image.Height);
+                show_rect.Height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y);
             }
 
             return show_rect;
@@ -694,23 +702,24 @@ namespace TNControls
 
                     foreach (Control enu_ctrl in User_Ctrls)
                     {
-                        TNUserCtrl_Rect user_ctrl = (TNUserCtrl_Rect)enu_ctrl;
+                        TNCustCtrl_Rect user_ctrl = (TNCustCtrl_Rect)enu_ctrl;
                         Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
                         Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
-                        Rectangle rt_draw = user_ctrl.Editing_Rect;
+                        TNCustCtrl_Rect.Struct_Pos_Info pos_info = user_ctrl.Pos_Info;
+                        Rectangle rt_draw = pos_info.Editing_Rect;
                         rt_draw.Offset(pt_offset);
                         Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
                                                                 , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
                         //CreateGraphics().DrawRectangle(pen, rt_final_draw);
                         //graphics_show.DrawRectangle(pen_user_ctrl, rt_final_draw);
 
-                        user_ctrl.Paint(graphics_show, this);
+                        user_ctrl.Draw2PB(graphics_show, this);
                     }
                 }
 
                 if (null != Editing_Ctrl)
                 {
-                    TNUserCtrl_Rect editing_cttl = (TNUserCtrl_Rect)Editing_Ctrl;
+                    TNCustCtrl_Rect editing_cttl = (TNCustCtrl_Rect)Editing_Ctrl;
                     //using (Graphics g = Graphics.FromImage(pb_Image.Image))
                     //{
 
@@ -741,10 +750,26 @@ namespace TNControls
                         //CreateGraphics().DrawRectangle(pen, editing_cttl.Editing_Rect);
                         //graphics_show.DrawRectangle(pen_edit_ctrl, editing_cttl.Editing_Rect);
 
-                    editing_cttl.Paint(graphics_show, this);
+                    editing_cttl.Draw2PB(graphics_show, this);
                     //}
                 }
+
+                if (null != Cache_Ctrl && Cache_Ctrl.Count > 0)
+                {
+                    Pen pen_user_ctrl = new Pen(Color.White, 1);
+
+                    foreach (Control enu_ctrl in Cache_Ctrl)
+                    {
+                        TNCustCtrl_Points user_ctrl = (TNCustCtrl_Points)enu_ctrl;
+
+                        user_ctrl.Draw2PB(graphics_show, this);
+                    }
+                }
+
+                if (Image_Scale > 30)
+                    DrawGrayLevel2PB(graphics_show, this);
             }
+
             //_show_color_image.Save("d:\\temp\\testcolor.bmp");
             //if (null != Image)
             //    Image.Dispose();
@@ -756,6 +781,35 @@ namespace TNControls
 
             Bitmap tempBitmap = new Bitmap(Show_Color_Image);
             Image = tempBitmap;
+        }
+
+        public void DrawGrayLevel2PB(Graphics graphics_show, TNPictureBox pb)
+        {
+            System.Drawing.Imaging.BitmapData? bmp_data = null;
+            if (!Image_Buffer_Gray.GetBuffer((Bitmap)_image, ref bmp_data))
+                return;
+
+            Font draw_font = new Font("Arial", 8);
+            Brush brush_ctrl = new SolidBrush(Color.Gray);
+            Rectangle visible_rect = CalcShowRect();  // 要畫在UI上的Image區域
+            unsafe
+            {
+                for (int x = visible_rect.Left; x < visible_rect.Right; x++)
+                {
+                    for (int y = visible_rect.Top; y < visible_rect.Bottom; y++)
+                    {
+                        Point pt_draw = pb.GetPBPointFromImage(new Point(x, y));
+                        Rectangle rt = new Rectangle(pt_draw.X, pt_draw.Y, 1, 1);
+
+                        int gray_level = *(Image_Buffer_Gray.Get_Pointer(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
+                                                                        , x, y));
+                        graphics_show.DrawString($"{gray_level}", draw_font, brush_ctrl, pt_draw);
+                    }
+                }
+            }
+
+            if (null != bmp_data)
+                Image_Buffer_Gray.ReleaseBuffer((Bitmap)_image, ref bmp_data);
         }
 
         static public void DrawXORRectangle(Graphics graphics, Pen pen, Rectangle rectangle)

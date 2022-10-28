@@ -49,6 +49,7 @@
             this.btnFit = new System.Windows.Forms.Button();
             this.btn1X = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.btnSaveBinary = new System.Windows.Forms.Button();
             this.chkSubPixel = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.numMaxValidPixel = new System.Windows.Forms.NumericUpDown();
@@ -58,6 +59,9 @@
             this.btnDetect = new System.Windows.Forms.Button();
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnBmp2Array = new System.Windows.Forms.Button();
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.labelReason = new System.Windows.Forms.Label();
@@ -82,6 +86,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).BeginInit();
             this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlFooter.SuspendLayout();
             this.tabUser.SuspendLayout();
@@ -310,6 +315,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.btnSaveBinary);
             this.tabPage3.Controls.Add(this.chkSubPixel);
             this.tabPage3.Controls.Add(this.label7);
             this.tabPage3.Controls.Add(this.numMaxValidPixel);
@@ -325,6 +331,17 @@
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "過濾";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // btnSaveBinary
+            // 
+            this.btnSaveBinary.Location = new System.Drawing.Point(164, 18);
+            this.btnSaveBinary.Margin = new System.Windows.Forms.Padding(5);
+            this.btnSaveBinary.Name = "btnSaveBinary";
+            this.btnSaveBinary.Size = new System.Drawing.Size(112, 35);
+            this.btnSaveBinary.TabIndex = 18;
+            this.btnSaveBinary.Text = "SaveBinary";
+            this.btnSaveBinary.UseVisualStyleBackColor = true;
+            this.btnSaveBinary.Click += new System.EventHandler(this.btnSaveBinary_Click);
             // 
             // chkSubPixel
             // 
@@ -412,6 +429,9 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.numMinHysteresisThreshold);
+            this.tabPage4.Controls.Add(this.label2);
+            this.tabPage4.Controls.Add(this.btnCannyEdgeDetect);
             this.tabPage4.Controls.Add(this.btnBmp2Array);
             this.tabPage4.Location = new System.Drawing.Point(4, 32);
             this.tabPage4.Name = "tabPage4";
@@ -419,6 +439,42 @@
             this.tabPage4.TabIndex = 2;
             this.tabPage4.Text = "測試";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // numMinHysteresisThreshold
+            // 
+            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(58, 206);
+            this.numMinHysteresisThreshold.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numMinHysteresisThreshold.Name = "numMinHysteresisThreshold";
+            this.numMinHysteresisThreshold.Size = new System.Drawing.Size(135, 30);
+            this.numMinHysteresisThreshold.TabIndex = 3;
+            this.numMinHysteresisThreshold.Value = new decimal(new int[] {
+            80,
+            0,
+            0,
+            0});
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(58, 176);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(191, 23);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Min HysteresisThresh";
+            // 
+            // btnCannyEdgeDetect
+            // 
+            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(207, 202);
+            this.btnCannyEdgeDetect.Name = "btnCannyEdgeDetect";
+            this.btnCannyEdgeDetect.Size = new System.Drawing.Size(123, 34);
+            this.btnCannyEdgeDetect.TabIndex = 1;
+            this.btnCannyEdgeDetect.Text = "Canny Edge Degect";
+            this.btnCannyEdgeDetect.UseVisualStyleBackColor = true;
+            this.btnCannyEdgeDetect.Click += new System.EventHandler(this.btnCannyEdgeDetect_Click);
             // 
             // btnBmp2Array
             // 
@@ -564,6 +620,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).EndInit();
             this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).EndInit();
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.pnlFooter.ResumeLayout(false);
@@ -618,5 +676,9 @@
         private CheckBox chkSubPixel;
         private TabPage tabPage4;
         private Button btnBmp2Array;
+        private Button btnCannyEdgeDetect;
+        private Button btnSaveBinary;
+        private Label label2;
+        private NumericUpDown numMinHysteresisThreshold;
     }
 }

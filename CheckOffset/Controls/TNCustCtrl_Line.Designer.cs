@@ -1,6 +1,6 @@
 ﻿namespace TNControls
 {
-    public partial class TNUserCtrl_Rect
+    partial class TNCustCtrl_Line
     {
         /// <summary>
         /// 設計工具所需的變數。

@@ -15,9 +15,9 @@ using TN.Insp_Param;
 
 namespace TNControls
 {
-    public partial class TNUserCtrl_Rect : Control
+    public partial class TNCustCtrl_Rect : Control
     {
-        public TNUserCtrl_Rect()
+        public TNCustCtrl_Rect()
         {
             InitializeComponent();
         }
@@ -25,15 +25,23 @@ namespace TNControls
         /// <summary>
         /// properties.
         /// </summary>
+        public class Struct_Pos_Info
+        {
+            public Rectangle Editing_Rect;
+
+            public Struct_Pos_Info()
+            {
+                Editing_Rect = new Rectangle(0,0,0,0);
+            }
+        }
+
+        public Struct_Pos_Info Pos_Info = new Struct_Pos_Info();
+
+        //public Struct_Pos_Info Pos_Info { get => m_pos_info; set => m_pos_info = value; }
 
         /// <summary>
         /// Image 座標系位置 
         /// </summary>
-        public Rectangle Editing_Rect
-        {
-            get;
-            set;
-        }
 
         public bool Editing { get => _bEditing; set => _bEditing = value; }
 
@@ -65,106 +73,106 @@ namespace TNControls
             base.OnPaint(pe);
         }
 
-        public void Paint(Graphics graphics_show, TNPictureBox pb)
+        public void Draw2PB(Graphics graphics_show, TNPictureBox pb)
         {
             if (!Editing)
             {
                 Pen pen_ctrl = new Pen(Color.Blue, 1);
-                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Editing_Rect) );
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Pos_Info.Editing_Rect) );
             }
             else
             {
                 // 框本身
                 Pen pen_ctrl = new Pen(Color.Red, 1);
-                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Editing_Rect));
+                graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Pos_Info.Editing_Rect));
 
                 // 左上
-                Rectangle rt_left_top = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y - 5, 10, 10);
+                Rectangle rt_left_top = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_left_top));
 
                 // 左
-                Rectangle rt_left = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y + Editing_Rect.Height / 2 - 5, 10, 10);
+                Rectangle rt_left = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height / 2 - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_left));
 
                 // 左下
-                Rectangle rt_left_bottom = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
+                Rectangle rt_left_bottom = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_left_bottom));
 
                 // 上中
-                Rectangle rt_top = new Rectangle(Editing_Rect.X + Editing_Rect.Width / 2- 5, Editing_Rect.Y - 5, 10, 10);
+                Rectangle rt_top = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width / 2- 5, Pos_Info.Editing_Rect.Y - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_top));
 
                 // 下中
-                Rectangle rt_bottom = new Rectangle(Editing_Rect.X + Editing_Rect.Width / 2 - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
+                Rectangle rt_bottom = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width / 2 - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_bottom));
 
                 // 右上
-                Rectangle rt_right_top = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y - 5, 10, 10);
+                Rectangle rt_right_top = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width - 5, Pos_Info.Editing_Rect.Y - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right_top));
 
                 // 右
-                Rectangle rt_right = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y + Editing_Rect.Height / 2 - 5, 10, 10);
+                Rectangle rt_right = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height / 2 - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right));
 
                 // 右下
-                Rectangle rt_right_bottom = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
+                Rectangle rt_right_bottom = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height - 5, 10, 10);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right_bottom));
             }
 
             Font draw_font = new Font("Arial", 16);
             string draw_string = _insp_param.Draw_String() + "\r\n" + _insp_result.Draw_String();
             graphics_show.DrawString(_insp_param.Draw_String(), draw_font, new SolidBrush(Color.Green)
-                                , pb.GetPBRectFromImage(Editing_Rect).X
-                                , pb.GetPBRectFromImage(Editing_Rect).Y);
+                                , pb.GetPBRectFromImage(Pos_Info.Editing_Rect).X
+                                , pb.GetPBRectFromImage(Pos_Info.Editing_Rect).Y);
 
             _insp_result.Paint_Defect(graphics_show, pb);
         }
 
         public bool Contain(Point pt)
         {
-            return Editing_Rect.Contains(pt);
+            return Pos_Info.Editing_Rect.Contains(pt);
         }
 
         public HitTest_Result HitTest(Point pt)
         {
             // 左上
-            Rectangle rt_left_top = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y - 5, 10, 10);
+            Rectangle rt_left_top = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y - 5, 10, 10);
             if (rt_left_top.Contains(pt))
                 return HitTest_Result.HT_LT;
 
             // 左下
-            Rectangle rt_left_bottom = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
+            Rectangle rt_left_bottom = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height - 5, 10, 10);
             if (rt_left_bottom.Contains(pt))
                 return HitTest_Result.HT_LB;
 
             // 右上
-            Rectangle rt_right_top = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y - 5, 10, 10);
+            Rectangle rt_right_top = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width - 5, Pos_Info.Editing_Rect.Y - 5, 10, 10);
             if (rt_right_top.Contains(pt))
                 return HitTest_Result.HT_RT;
 
             // 右下
-            Rectangle rt_right_bottom = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y + Editing_Rect.Height - 5, 10, 10);
+            Rectangle rt_right_bottom = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height - 5, 10, 10);
             if (rt_right_bottom.Contains(pt))
                 return HitTest_Result.HT_RB;
 
             // 左
-            Rectangle rt_left = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y - 5, 10, Editing_Rect.Height + 10);
+            Rectangle rt_left = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y - 5, 10, Pos_Info.Editing_Rect.Height + 10);
             if (rt_left.Contains(pt))
                 return HitTest_Result.HT_Left;
 
             // 上中
-            Rectangle rt_top = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y - 5, Editing_Rect.Width + 10, 10);
+            Rectangle rt_top = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y - 5, Pos_Info.Editing_Rect.Width + 10, 10);
             if (rt_top.Contains(pt))
                 return HitTest_Result.HT_Top;
 
 
             // 下中
-            Rectangle rt_bottom = new Rectangle(Editing_Rect.X - 5, Editing_Rect.Y + Editing_Rect.Height - 5, Editing_Rect.Width + 10, 10);
+            Rectangle rt_bottom = new Rectangle(Pos_Info.Editing_Rect.X - 5, Pos_Info.Editing_Rect.Y + Pos_Info.Editing_Rect.Height - 5, Pos_Info.Editing_Rect.Width + 10, 10);
             if (rt_bottom.Contains(pt))
                 return HitTest_Result.HT_Bottom;
 
             // 右
-            Rectangle rt_right = new Rectangle(Editing_Rect.X + Editing_Rect.Width - 5, Editing_Rect.Y - 5, 10, Editing_Rect.Height + 10);
+            Rectangle rt_right = new Rectangle(Pos_Info.Editing_Rect.X + Pos_Info.Editing_Rect.Width - 5, Pos_Info.Editing_Rect.Y - 5, 10, Pos_Info.Editing_Rect.Height + 10);
             if (rt_right.Contains(pt))
                 return HitTest_Result.HT_Right;
 
@@ -178,7 +186,7 @@ namespace TNControls
         private void UserCtrl_Rect_Paint(object sender, PaintEventArgs e)
         {
             Pen pen = new Pen(Color.Red, 1);
-            e.Graphics.DrawRectangle(pen, Editing_Rect);
+            e.Graphics.DrawRectangle(pen, Pos_Info.Editing_Rect);
 
             if (_bEditing)
             {
@@ -189,7 +197,7 @@ namespace TNControls
         // HitTest + translation.
         public void Modify_Begin(Point pt_start)
         {
-            _Editing_Rect_Before_Modify = Editing_Rect;
+            _Editing_Rect_Before_Modify = Pos_Info.Editing_Rect;
             _Editing_LBtn_Down = pt_start;
         }
 
