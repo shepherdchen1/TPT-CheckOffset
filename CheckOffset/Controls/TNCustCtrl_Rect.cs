@@ -25,19 +25,19 @@ namespace TNControls
         /// <summary>
         /// properties.
         /// </summary>
-        public class Struct_Pos_Info
+        public class DS_Pos_Info
         {
             public Rectangle Editing_Rect;
 
-            public Struct_Pos_Info()
+            public DS_Pos_Info()
             {
                 Editing_Rect = new Rectangle(0,0,0,0);
             }
         }
 
-        public Struct_Pos_Info Pos_Info = new Struct_Pos_Info();
+        public DS_Pos_Info Pos_Info = new DS_Pos_Info();
 
-        //public Struct_Pos_Info Pos_Info { get => m_pos_info; set => m_pos_info = value; }
+        //public DS_Pos_Info Pos_Info { get => m_pos_info; set => m_pos_info = value; }
 
         /// <summary>
         /// Image 座標系位置 
@@ -46,8 +46,8 @@ namespace TNControls
         public bool Editing { get => _bEditing; set => _bEditing = value; }
 
         public HitTest_Result HitTest_Rresult { get => _HitTest_Rresult; set => _HitTest_Rresult = value; }
-        public Struct_Insp_Param Insp_param { get => _insp_param; set => _insp_param = value; }
-        public Struct_Insp_Result Insp_result { get => _insp_result; set => _insp_result = value; }
+        public DS_Insp_Param Insp_param { get => _insp_param; set => _insp_param = value; }
+        public DS_Insp_Result Insp_result { get => _insp_result; set => _insp_result = value; }
 
         /// <summary>
         /// data member
@@ -59,9 +59,9 @@ namespace TNControls
 
         private bool _bEditing = false;
 
-        private Struct_Insp_Param _insp_param = new Struct_Insp_Param();
+        private DS_Insp_Param _insp_param = new DS_Insp_Param();
 
-        private Struct_Insp_Result _insp_result = new Struct_Insp_Result();
+        private DS_Insp_Result _insp_result = new DS_Insp_Result();
 
 
         /// <summary>

@@ -322,7 +322,7 @@ namespace TN.Insp_Param
              , EN_Insp_Tol_Dir_RB45
     }
 
-    public struct Struct_Insp_Param
+    public class DS_Insp_Param
     {
         /// <summary>
         /// data member
@@ -334,7 +334,7 @@ namespace TN.Insp_Param
         /// </summary>
         public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
 
-        public Struct_Insp_Param()
+        public DS_Insp_Param()
         {
             _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
         }
@@ -351,13 +351,13 @@ namespace TN.Insp_Param
             , EN_Insp_Result_Success = 1
             , EN_Insp_Result_Failure = 2
     }
-    public struct Struct_Insp_Result
+    public class DS_Insp_Result
     {
         public EN_Insp_Result_Type Insp_Result_Type { get; set; }
 
         public Rectangle Defect_Pos { get; set; }
 
-        public Struct_Insp_Result()
+        public DS_Insp_Result()
         {
             Insp_Result_Type = EN_Insp_Result_Type.EN_Insp_Result_None;
             Defect_Pos = new Rectangle(0, 0, 0, 0);

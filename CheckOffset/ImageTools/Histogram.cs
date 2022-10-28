@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TN.Tools.Debug;
 
 namespace CheckOffset.ImageTools
 {
     public class Histogram
     {
-        public int[] Histogram_Result;
+        public int[]? Histogram_Result;
 
-        public int[] Histogram_Range; // 
+        public int[]? Histogram_Range; // 
 
         public int Max_Histogram_Val;
 
@@ -23,6 +25,13 @@ namespace CheckOffset.ImageTools
         {
             Reset();
             Init_Size(gray_levels);
+
+            if (null == Histogram_Result)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"Histogram_Result is null");
+                return false;
+            }
 
             for (int x = 0; x < gray_levels.GetLength(0); x++)
             {

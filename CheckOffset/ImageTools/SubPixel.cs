@@ -530,7 +530,7 @@ namespace TN.ImageTools
         //    catch (Exception ex)
         //    {
         //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //           , string.Format("Exception catched: error:{0}", ex.Message));
+        //           , $"Exception catched: error:{0}", ex.Message));
         //        // 儲存Exception到檔案
         //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
         //    }
@@ -553,7 +553,7 @@ namespace TN.ImageTools
         //    catch (Exception ex)
         //    {
         //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //           , string.Format("Exception catched: error:{0}", ex.Message));
+        //           , $"Exception catched: error:{0}", ex.Message));
         //        // 儲存Exception到檔案
         //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
         //    }

@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using TN.ImageTools;
 using TN.Tools.Debug;
 using System.Runtime.InteropServices;
+using System.Reflection;
 //using CheckOffset.Controls;
 
 //namespace CheckOffset.Controls
@@ -179,7 +180,7 @@ namespace TNControls
         private void pb_Image_MouseDown(object? sender, MouseEventArgs e)
         {
             _pt_LBtnDown = e.Location;
-            //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, 0, 0);
+            //ll_Test.Text = $"{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, 0, 0);
             if (null != Editing_Ctrl)
             {
                 TNCustCtrl_Rect editing_cttl = (TNCustCtrl_Rect)Editing_Ctrl;
@@ -222,7 +223,7 @@ namespace TNControls
                 //DrawXORRectangle
                 //_pt_Current = e.Location;
 
-                //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, _pt_Current.X, _pt_Current.Y);
+                //ll_Test.Text = $"{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, _pt_Current.X, _pt_Current.Y);
 
                 //if (null != Editing_Ctrl)
                 //{
@@ -249,7 +250,7 @@ namespace TNControls
                 //DrawXORRectangle
                 //_pt_Current = e.Location;
 
-                //ll_Test.Text = String.Format("{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, _pt_Current.X, _pt_Current.Y);
+                //ll_Test.Text = $"{0}, {1}, {2}, {3}", _pt_LBtnDown.X, _pt_LBtnDown.Y, _pt_Current.X, _pt_Current.Y);
 
                 //if (null != Editing_Ctrl)
                 //{
@@ -539,15 +540,19 @@ namespace TNControls
             System.Drawing.Rectangle show_rect = new Rectangle(0, 0, 0, 0);
             //System.Drawing.Rectangle show_rect = new Rectangle(_offset.X, _offset.Y, 0, 0);
 
-            if (null != Show_Image)
+            if (null == Image_Bmp)
             {
-                show_rect.Location = _offset;
-                show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
-                //show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
-                show_rect.Width = Math.Max(show_rect.Width, Image_Bmp.Width - _offset.X);
-                show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
-                show_rect.Height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y);
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"Image_Bmp is null");
+                return show_rect;
             }
+
+            show_rect.Location = _offset;
+            show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
+            //show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
+            show_rect.Width = Math.Max(show_rect.Width, Image_Bmp.Width - _offset.X);
+            show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
+            show_rect.Height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y); 
 
             return show_rect;
         }
@@ -579,6 +584,12 @@ namespace TNControls
 
                 // Create new bitmap
                 Show_Image = new Bitmap(ClientSize.Width, ClientSize.Height, _image.PixelFormat);
+                if (null == _show_image)
+                {
+                    Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                        , $"_show_image is null");
+                    return;
+                }
 
                 Rectangle lock_rect = CalcLockRect();  // 取得要Lock的影像範圍
                 Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
@@ -705,7 +716,7 @@ namespace TNControls
                         TNCustCtrl_Rect user_ctrl = (TNCustCtrl_Rect)enu_ctrl;
                         Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
                         Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
-                        TNCustCtrl_Rect.Struct_Pos_Info pos_info = user_ctrl.Pos_Info;
+                        TNCustCtrl_Rect.DS_Pos_Info pos_info = user_ctrl.Pos_Info;
                         Rectangle rt_draw = pos_info.Editing_Rect;
                         rt_draw.Offset(pt_offset);
                         Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
@@ -786,8 +797,15 @@ namespace TNControls
         public void DrawGrayLevel2PB(Graphics graphics_show, TNPictureBox pb)
         {
             System.Drawing.Imaging.BitmapData? bmp_data = null;
-            if (!Image_Buffer_Gray.GetBuffer((Bitmap)_image, ref bmp_data))
+            if (!Image_Buffer_Gray.GetBuffer((Bitmap?)_image, ref bmp_data))
                 return;
+
+            if (null == bmp_data)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"bmp_data is null");
+                return;
+            }
 
             Font draw_font = new Font("Arial", 8);
             Brush brush_ctrl = new SolidBrush(Color.Gray);
@@ -809,7 +827,7 @@ namespace TNControls
             }
 
             if (null != bmp_data)
-                Image_Buffer_Gray.ReleaseBuffer((Bitmap)_image, ref bmp_data);
+                Image_Buffer_Gray.ReleaseBuffer((Bitmap?)_image, ref bmp_data);
         }
 
         static public void DrawXORRectangle(Graphics graphics, Pen pen, Rectangle rectangle)

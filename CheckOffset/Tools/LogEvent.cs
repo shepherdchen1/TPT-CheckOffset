@@ -69,7 +69,7 @@ namespace TN.Tools
 				System.DateTime date_now = System.DateTime.Now;
 
 				// 建立資料夾
-				string log_path = PathLog + string.Format("\\{0:yyyyMMdd}\\Event", date_now);
+				string log_path = PathLog + $"\\{date_now:yyyyMMdd}\\Event";
 
 				try
 				{
@@ -89,11 +89,11 @@ namespace TN.Tools
 						Monitor.Enter(_event_log_locker);
 
 
-					string event_file = string.Format("{0}\\Event_{1:yyyyMMdd_HH}.log", log_path, date_now);
+					string event_file = $"{log_path}\\Event_{date_now:yyyyMMdd_HH}.log";
 					StreamWriter strea_writer = new StreamWriter(event_file, true);					
 					strea_writer.Write(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title + "\r\n\t");
 
-					string strEventLr = string.Format("{0}:", event_lv);
+					string strEventLr = $"{event_lv}:";
 					strea_writer.Write(strEventLr + ":" + context + "\r\n\r\n");
 					strea_writer.Close();
 				}
@@ -109,7 +109,7 @@ namespace TN.Tools
 				}
 
 				Trace.WriteLine(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title);
-				string strEventLr_2 = string.Format("{0}:", event_lv);
+				string strEventLr_2 = $"{event_lv}:";
 				Trace.WriteLine(strEventLr_2 + ":" + context);
 			}
 
@@ -129,7 +129,7 @@ namespace TN.Tools
 				System.DateTime date_now = System.DateTime.Now;
 
 				// 建立資料夾
-				string log_path = PathLog + string.Format("\\{0:yyyyMMdd}\\Step", date_now);
+				string log_path = PathLog + $"\\{date_now:yyyyMMdd}\\Step";
 
 				try
 				{
@@ -149,7 +149,7 @@ namespace TN.Tools
                         Monitor.Enter(_event_log_locker);
 
 
-					string event_file = string.Format("{0}\\Step_{1:yyyyMMdd_HH}.log", log_path, date_now);
+					string event_file = $"{log_path}\\Step_{date_now:yyyyMMdd_HH}.log";
 					StreamWriter strea_writer = new StreamWriter(event_file, true);
 					strea_writer.Write(date_now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + title + "\r\n\t");
 					strea_writer.Write(context + "\r\n");
@@ -176,12 +176,12 @@ namespace TN.Tools
 			{
 				System.DateTime date_now = System.DateTime.Now;
 
-				string log_path = PathLog + string.Format("\\{0:yyyyMMdd}", date_now);
+				string log_path = PathLog + $"\\{date_now:yyyyMMdd}";
 
 				if (Directory.Exists(log_path) == false)
 					Directory.CreateDirectory(log_path);
 
-				return log_path + string.Format("\\ExcDump_{0:yyyyMMdd}.exd", date_now);
+				return log_path + $"\\ExcDump_{date_now:yyyyMMdd}.exd";
 			}
 		}
 	}

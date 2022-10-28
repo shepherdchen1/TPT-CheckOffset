@@ -59,8 +59,9 @@
             this.btnDetect = new System.Windows.Forms.Button();
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
             this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnBmp2Array = new System.Windows.Forms.Button();
             this.pnlHeader = new System.Windows.Forms.Panel();
@@ -86,6 +87,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).BeginInit();
             this.tabPage4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlFooter.SuspendLayout();
@@ -429,9 +431,7 @@
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add(this.numMinHysteresisThreshold);
-            this.tabPage4.Controls.Add(this.label2);
-            this.tabPage4.Controls.Add(this.btnCannyEdgeDetect);
+            this.tabPage4.Controls.Add(this.groupBox5);
             this.tabPage4.Controls.Add(this.btnBmp2Array);
             this.tabPage4.Location = new System.Drawing.Point(4, 32);
             this.tabPage4.Name = "tabPage4";
@@ -440,9 +440,30 @@
             this.tabPage4.Text = "測試";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.label2);
+            this.groupBox5.Controls.Add(this.numMinHysteresisThreshold);
+            this.groupBox5.Controls.Add(this.btnCannyEdgeDetect);
+            this.groupBox5.Location = new System.Drawing.Point(17, 134);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(300, 113);
+            this.groupBox5.TabIndex = 4;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Edge Detect";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(18, 38);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(191, 23);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Min HysteresisThresh";
+            // 
             // numMinHysteresisThreshold
             // 
-            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(58, 206);
+            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(18, 68);
             this.numMinHysteresisThreshold.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -452,23 +473,14 @@
             this.numMinHysteresisThreshold.Size = new System.Drawing.Size(135, 30);
             this.numMinHysteresisThreshold.TabIndex = 3;
             this.numMinHysteresisThreshold.Value = new decimal(new int[] {
-            80,
+            55,
             0,
             0,
             0});
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(58, 176);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(191, 23);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Min HysteresisThresh";
-            // 
             // btnCannyEdgeDetect
             // 
-            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(207, 202);
+            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(167, 64);
             this.btnCannyEdgeDetect.Name = "btnCannyEdgeDetect";
             this.btnCannyEdgeDetect.Size = new System.Drawing.Size(123, 34);
             this.btnCannyEdgeDetect.TabIndex = 1;
@@ -620,7 +632,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).EndInit();
             this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).EndInit();
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
@@ -680,5 +693,6 @@
         private Button btnSaveBinary;
         private Label label2;
         private NumericUpDown numMinHysteresisThreshold;
+        private GroupBox groupBox5;
     }
 }

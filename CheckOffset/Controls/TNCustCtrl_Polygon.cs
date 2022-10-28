@@ -23,19 +23,19 @@ namespace TNControls
             base.OnPaint(pe);
         }
 
-        public class Struct_Pos_Info
+        public class DS_Pos_Info
         {
             public Point[]? Points;
 
-            public Struct_Pos_Info()
+            public DS_Pos_Info()
             {
                 Points = null;
             }
         }
 
-        public Struct_Pos_Info Pos_Info = new Struct_Pos_Info();
+        public DS_Pos_Info Pos_Info = new DS_Pos_Info();
 
-        //public Struct_Pos_Info Pos_Info { get => m_pos_info; set => m_pos_info = value; }
+        //public DS_Pos_Info Pos_Info { get => m_pos_info; set => m_pos_info = value; }
 
         /// <summary>
         /// Image 座標系位置 

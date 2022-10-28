@@ -16,10 +16,17 @@ namespace TN.ImageTools
 {
     internal class Image_Buffer_Gray
     {
-        public static bool GetBuffer(Bitmap bmp, ref System.Drawing.Imaging.BitmapData? bmpData)
+        public static bool GetBuffer(Bitmap? bmp, ref System.Drawing.Imaging.BitmapData? bmpData)
         {
             try
             {
+                if ( null == bmp)
+                {
+                    Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                        , $"bmp is null");
+                    return false;
+                }
+
                 Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
                 bmpData = bmp.LockBits(rect
                                 , System.Drawing.Imaging.ImageLockMode.ReadOnly
@@ -62,8 +69,15 @@ namespace TN.ImageTools
             return false;
         }
 
-        public static unsafe byte* Get_Pointer(BitmapData bmpdata, byte *ptr_buffer, int x, int y)
+        public static unsafe byte* Get_Pointer(BitmapData? bmpdata, byte *ptr_buffer, int x, int y)
         {
+            if (bmpdata == null)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                         , $"bmpdata is null");
+                return null;
+            }
+
             return ptr_buffer + y * bmpdata.Stride + x;
         }
 

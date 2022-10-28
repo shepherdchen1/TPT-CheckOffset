@@ -111,9 +111,9 @@ namespace CheckOffset
             return item;
         }
 
-        public static Struct_Setting_Info Setting = new Struct_Setting_Info();
+        public static DS_Setting_Info Setting = new DS_Setting_Info();
 
-        public static List<Struct_Detect_Info> Detect_Infos = new List<Struct_Detect_Info>();
+        public static List<DS_Detect_Info>? Detect_Infos = new List<DS_Detect_Info>();
 
         // change to public for update progress
         public static BackgroundWorker BKWorker_Delete_Log = new BackgroundWorker();
@@ -183,7 +183,7 @@ namespace CheckOffset
             DoWorkEventArgs e)
         {
             Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                , string.Format("BKWorker_Delete_Log_DoWork start"));
+                                                , $"BKWorker_Delete_Log_DoWork start");
 
             // Get the BackgroundWorker that raised this event.
             BackgroundWorker? worker = sender as BackgroundWorker;
@@ -196,7 +196,7 @@ namespace CheckOffset
                 {
                     // 一天刪一次Log
                     System.Threading.Thread.Sleep(86400 * 1000);
-                    //                    string log_path = Log_Utl.PathLog + string.Format("\\{0:yyyyMMdd}\\Step", date_now);
+                    //                    string log_path = Log_Utl.PathLog + $"\\{0:yyyyMMdd}\\Step", date_now);
 
                     try
                     {
@@ -220,7 +220,7 @@ namespace CheckOffset
                 }
 
                 Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                   , string.Format("BKWorker_Delete_Log_DoWork quit"));
+                                                   , $"BKWorker_Delete_Log_DoWork quit");
 
             }
             catch (Exception ex)
@@ -248,7 +248,7 @@ namespace CheckOffset
                 if (PathLog.Length <= 4)
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                       , string.Format("Prevent from delete root folder: PathLog:", PathLog));
+                                                       , $"Prevent from delete root folder: PathLog:{PathLog}");
                     return false;
                 }
 
@@ -310,7 +310,7 @@ namespace CheckOffset
                 }
 
                 Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                   , string.Format("BKWorker_Delete_Log_DoWork quit"));
+                                                   , $"BKWorker_Delete_Log_DoWork quit");
                 return true;
             }
             catch (Exception ex)
@@ -337,7 +337,7 @@ namespace CheckOffset
                 if (PathLog.Length <= 4)
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                       , string.Format("Prevent from delete root folder: PathLog:", PathLog));
+                                                       , $"Prevent from delete root folder: PathLog:{PathLog}");
                     return false;
                 }
 
@@ -400,7 +400,7 @@ namespace CheckOffset
                 //    Program.For_Main.Message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "\t" + (string)e.UserState;
 
                 //Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                //                                   , string.Format("BKWorker_Job quit"));
+                //                                   , $"BKWorker_Job quit"));
 
             }
             catch (Exception ex)
@@ -421,7 +421,7 @@ namespace CheckOffset
             object? sender, RunWorkerCompletedEventArgs e)
         {
             Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                                , string.Format("BKWorker_DoWork End"));
+                                                , $"BKWorker_DoWork End");
 
             // First, handle the case where an exception was thrown.
             if (e.Error != null)
@@ -441,29 +441,29 @@ namespace CheckOffset
     /// <summary>
     /// 環境設定
     /// </summary>
-    public struct Struct_Setting_Info
+    public class DS_Setting_Info
     {
         public bool EnableLogStep = true;              // 是否輸出Log\Step.
 
-        public Struct_Setting_Info()
+        public DS_Setting_Info()
         {
             EnableLogStep = true;
         }
     }
 
-    public class Struct_Detect_Info
+    public class DS_Detect_Info
     {
         public Rectangle Detect_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
 
-        public Struct_Insp_Param Detect_Insp_param = new Struct_Insp_Param();
+        public DS_Insp_Param Detect_Insp_param = new DS_Insp_Param();
 
-        public Struct_Insp_Result Detect_Insp_Result = new Struct_Insp_Result();
+        public DS_Insp_Result Detect_Insp_Result = new DS_Insp_Result();
 
-        public Struct_Detect_Info()
+        public DS_Detect_Info()
         {
             Detect_Rect = new Rectangle(0, 0, 0, 0);
-            Detect_Insp_param = new Struct_Insp_Param();
-            Detect_Insp_Result = new Struct_Insp_Result();
+            Detect_Insp_param = new DS_Insp_Param();
+            Detect_Insp_Result = new DS_Insp_Result();
         }
     }
 } // end of namespace CheckOffset

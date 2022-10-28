@@ -58,6 +58,7 @@ namespace CheckOffset
             _userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
             _userctrl_image.Editing_Ctrl = null;
             _userctrl_image.User_Ctrls.Clear();
+            _userctrl_image.Cache_Ctrl.Clear();
             _userctrl_image.pb_Image.ZoomFit();
 
             _userctrl_image.ll_Test.Text = tbImgFile.Text;
@@ -78,7 +79,7 @@ namespace CheckOffset
                 if (null != _userctrl_image.User_Ctrls)
                 {
                     _userctrl_image.User_Ctrls.Clear();
-                    foreach (Struct_Detect_Info cur_detect_infos in tnGlobal.Detect_Infos)
+                    foreach (DS_Detect_Info cur_detect_infos in tnGlobal.Detect_Infos)
                     {
                         TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                         TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
@@ -94,7 +95,7 @@ namespace CheckOffset
                 _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rectangle(0, 0, 100, 100);
-                Struct_Insp_Param new_insp_param = new Struct_Insp_Param();
+                DS_Insp_Param new_insp_param = new DS_Insp_Param();
                 new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                 new_added_rect.Insp_param = new_insp_param;
             }
@@ -105,14 +106,14 @@ namespace CheckOffset
                 {
                     TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
 
-                    Struct_Insp_Param new_insp_param = new Struct_Insp_Param();
+                    DS_Insp_Param new_insp_param = new DS_Insp_Param();
                     new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                     editing_rect.Insp_param = new_insp_param;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
                     {
-                        Struct_Detect_Info new_defect_info = new Struct_Detect_Info();
+                        DS_Detect_Info new_defect_info = new DS_Detect_Info();
                         new_defect_info.Detect_Rect = editing_rect.Pos_Info.Editing_Rect;
                         new_defect_info.Detect_Insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                         tnGlobal.Detect_Infos.Add(new_defect_info);
@@ -139,7 +140,7 @@ namespace CheckOffset
                 return;
 
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
-            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Struct_Detect_Info>>(jsonString);
+            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Info>>(jsonString);
 
             _userctrl_image.Apply_GlobalSetting_To_Ctrls();
             _userctrl_image.Refresh();
@@ -153,7 +154,7 @@ namespace CheckOffset
             if (null == tnGlobal.Detect_Infos)
                 return;
 
-            string jsonString = System.Text.Json.JsonSerializer.Serialize<List<Struct_Detect_Info>>(tnGlobal.Detect_Infos); // tnGlobal.Setting);
+            string jsonString = System.Text.Json.JsonSerializer.Serialize<List<DS_Detect_Info>>(tnGlobal.Detect_Infos); // tnGlobal.Setting);
 
 
             jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(tnGlobal.Detect_Infos);
@@ -178,6 +179,8 @@ namespace CheckOffset
             {
                 Bitmap bmp = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
 
+                _userctrl_image.Cache_Ctrl.Clear();
+
                 bool check_res = true;
                 if (null != tnGlobal.Detect_Infos)
                 {
@@ -186,8 +189,8 @@ namespace CheckOffset
                     foreach (Control ctrl_defect_info in _userctrl_image.User_Ctrls)
                     {
                         TNCustCtrl_Rect rect_user_ctrl = (TNCustCtrl_Rect)ctrl_defect_info;
-                        Struct_Insp_Param chk_insp_param = rect_user_ctrl.Insp_param;
-                        Struct_Insp_Result chk_insp_result = rect_user_ctrl.Insp_result;
+                        DS_Insp_Param chk_insp_param = rect_user_ctrl.Insp_param;
+                        DS_Insp_Result chk_insp_result = rect_user_ctrl.Insp_result;
 
                         //////////////////////////////////
                         // check X dir.

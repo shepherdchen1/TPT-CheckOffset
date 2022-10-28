@@ -22,20 +22,20 @@ namespace TNControls
 
         private void Init_Data()
         {
-            Pos_Info = new Struct_Pos_Info();
+            Pos_Info = new DS_Pos_Info();
         }
 
-        public class Struct_Pos_Info
+        public class DS_Pos_Info
         {
             public Point[]? Points;
 
-            public Struct_Pos_Info()
+            public DS_Pos_Info()
             {
                 Points = null;
             }
         }
 
-        public Struct_Pos_Info Pos_Info = new Struct_Pos_Info();
+        public DS_Pos_Info Pos_Info = new DS_Pos_Info();
 
         public bool Editing { get; set; }
 

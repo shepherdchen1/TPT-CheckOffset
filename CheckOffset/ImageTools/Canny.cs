@@ -7,6 +7,9 @@ using System.Drawing;
 using System.IO;
 
 using CheckOffset.ImageTools;
+using System.Reflection;
+using TN.Tools.Debug;
+using System.Diagnostics.Metrics;
 
 // FROM https://www.codeproject.com/KB/cs/Canny_Edge_Detection/canny_edge_detection_c_.zip
 
@@ -18,9 +21,9 @@ namespace OpenSource
     {
         public int Width, Height;
         public Bitmap Obj;
-        public int[,] GreyImage;    
+        public int[,]? GreyImage;    
         //Gaussian Kernel Data
-        int [,] GaussianKernel;
+        int [,]? GaussianKernel;
         int KernelWeight ;
         //int KernelSize =5;
         //float Sigma = 1;   // for N=2 Sigma =0.85  N=5 Sigma =1, N=9 Sigma = 2    2*Sigma = (int)N/2
@@ -28,15 +31,15 @@ namespace OpenSource
         float Sigma = 0.85f;   // for N=2 Sigma =0.85  N=5 Sigma =1, N=9 Sigma = 2    2*Sigma = (int)N/2
         //Canny Edge Detection Parameters
         float MaxHysteresisThresh, MinHysteresisThresh;
-        public float[,] DerivativeX;
-        public float[,] DerivativeY;
-        public int[,] FilteredImage;
-        public float[,] Gradient;
-        public float[,] NonMax;
-        public int[,] PostHysteresis;
-        int[,] EdgePoints;
-        public float[,] GNH;
-        public float[,] GNL;
+        public float[,]? DerivativeX;
+        public float[,]? DerivativeY;
+        public int[,]? FilteredImage;
+        public float[,]? Gradient;
+        public float[,]? NonMax;
+        public int[,]? PostHysteresis;
+        int[,]? EdgePoints;
+        public float[,]? GNH;
+        public float[,]? GNL;
         public int[,] EdgeMap;
         public int[,] VisitedMap;
 
@@ -101,6 +104,13 @@ namespace OpenSource
 
         public Bitmap DisplayImage()
         {
+            if (null == GreyImage)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"GreyImage is null");
+                return new Bitmap(0, 0);
+            }
+
             int i, j;
             Bitmap image = new Bitmap(Obj.Width, Obj.Height);
             BitmapData bitmapData1 = image.LockBits(new Rectangle(0, 0, Obj.Width, Obj.Height),
@@ -295,9 +305,21 @@ namespace OpenSource
          return;
         }
 
-        private int[,] GaussianFilter(int[,] Data)
+        private int[,] GaussianFilter(int[,]? Data)
         {
+            if (null == Data)
+            {
+                return new int[0,0];
+            }
+
             GenerateGaussianKernel(KernelSize, Sigma,out KernelWeight);
+
+            if (null == GaussianKernel)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"GaussianKernel is null");
+                return new int[0, 0];
+            }
 
             int[,] Output = new int[Width, Height];
             int i, j,k,l;
@@ -498,6 +520,12 @@ namespace OpenSource
             /// add theshold by histogram.
             Histogram histogram = new Histogram();
             histogram.Calc_Histogram(PostHysteresis);
+            if (null == histogram.Histogram_Result)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"Histogram_Result is null");
+                return;
+            }
 
             //MaxHysteresisThresh = histogram.Histogram_Range[0];
             //MinHysteresisThresh = histogram.Histogram_Range[10];
@@ -606,7 +634,12 @@ namespace OpenSource
 
         private void Travers(int X, int Y)
         {
-            
+            if (null == EdgePoints)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, MethodBase.GetCurrentMethod()?.Name
+                    , $"EdgePoints is null");
+                return;
+            }
 
             if (VisitedMap[X, Y] == 1)
             {

@@ -206,7 +206,7 @@ namespace TN.Tools
 			//=================================================================================================
 			static string GetTimeStampFile()
 			{
-				return string.Format("ExcDump_{0:yyyyMMdd_HHmmss}.exd", System.DateTime.Now);
+				return $"ExcDump_{System.DateTime.Now:yyyyMMdd_HHmmss}.exd";
 			}
 
 
@@ -223,7 +223,7 @@ namespace TN.Tools
 			//=================================================================================================
 			static string GetDateStampFile()
 			{
-				return string.Format("ExcDump_{0:yyyyMMdd}.exd", System.DateTime.Now);
+				return $"ExcDump_{System.DateTime.Now:yyyyMMdd}.exd";
 			}
 
 		};
