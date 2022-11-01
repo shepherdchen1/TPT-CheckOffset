@@ -13,6 +13,8 @@ using TNControls;
 using TN.Insp_Param;
 
 using OpenSource;
+using CheckOffset.ImageTools;
+using System;
 
 namespace CheckOffset
 {
@@ -495,6 +497,53 @@ namespace CheckOffset
         private void btnSaveBinary_Click(object sender, EventArgs e)
         {
             _userctrl_image.pb_Image.Image.Save($"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
+            _userctrl_image.Image.Save($"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
+        }
+
+        private void btnDetectPins_Click(object sender, EventArgs e)
+        {
+            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            byte[,] buffer = (byte[,]) Image_Buffer_Gray.Clone_Bmp_2_2DArray(bmp);
+            IT_Detect iT_Detect = new IT_Detect(buffer);
+            iT_Detect.Detect_Pin();
+
+            for (int y = 0; y < iT_Detect.Pins.GetLength(0); y++)
+            {
+                for (int x = 0; x < iT_Detect.Pins.GetLength(1); x++)
+                {
+                    if (iT_Detect.Pins[y, x] <= 0)
+                        continue;
+                    else if (iT_Detect.Pins[y, x] == 1)
+                    {
+                        TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
+                        ctrl_string.Pos_Info.Points = new Point[1];
+                        ctrl_string.Pos_Info.Points[0].X = x;
+                        ctrl_string.Pos_Info.Points[0].Y = y;
+                        ctrl_string.Display_Color = Color.Blue;
+
+                        _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+
+                        //TNCustCtrl_String ctrl_string = new TNCustCtrl_String();
+                        //ctrl_string.Pos_Info.Point_LT.X = x;
+                        //ctrl_string.Pos_Info.Point_LT.Y = y;
+                        //ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}";
+                        ////ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._v_weight[y, x]}";
+                        //ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._h_weight[y, x]}";
+                        //ctrl_string.Display_Font_Size = 8;
+                        //_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+                    }
+                    else if (iT_Detect.Pins[y, x] >= 2)
+                    {
+                        TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
+                        ctrl_string.Pos_Info.Points = new Point[1];
+                        ctrl_string.Pos_Info.Points[0].X = x;
+                        ctrl_string.Pos_Info.Points[0].Y = y;
+                        ctrl_string.Display_Color = Color.Green;
+
+                        _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+                    }
+                }
+            }
         }
     } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

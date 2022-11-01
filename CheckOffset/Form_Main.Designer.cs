@@ -76,6 +76,7 @@
             this.openFileDialog_Img = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_Setting = new System.Windows.Forms.OpenFileDialog();
+            this.btnDetectPins = new System.Windows.Forms.Button();
             this.pnlSetting.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -431,6 +432,7 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.btnDetectPins);
             this.tabPage4.Controls.Add(this.groupBox5);
             this.tabPage4.Controls.Add(this.btnBmp2Array);
             this.tabPage4.Location = new System.Drawing.Point(4, 32);
@@ -607,6 +609,16 @@
             this.openFileDialog_Setting.FileName = "openFileDialog1";
             this.openFileDialog_Setting.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
             // 
+            // btnDetectPins
+            // 
+            this.btnDetectPins.Location = new System.Drawing.Point(35, 303);
+            this.btnDetectPins.Name = "btnDetectPins";
+            this.btnDetectPins.Size = new System.Drawing.Size(123, 34);
+            this.btnDetectPins.TabIndex = 4;
+            this.btnDetectPins.Text = "Detect Pins";
+            this.btnDetectPins.UseVisualStyleBackColor = true;
+            this.btnDetectPins.Click += new System.EventHandler(this.btnDetectPins_Click);
+            // 
             // For_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
@@ -694,5 +706,6 @@
         private Label label2;
         private NumericUpDown numMinHysteresisThreshold;
         private GroupBox groupBox5;
+        private Button btnDetectPins;
     }
 }

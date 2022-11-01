@@ -771,9 +771,18 @@ namespace TNControls
 
                     foreach (Control enu_ctrl in Cache_Ctrl)
                     {
-                        TNCustCtrl_Points user_ctrl = (TNCustCtrl_Points)enu_ctrl;
+                        if ( enu_ctrl.GetType() == typeof(TNCustCtrl_Points) )
+                        {
+                            TNCustCtrl_Points user_ctrl = (TNCustCtrl_Points)enu_ctrl;
 
-                        user_ctrl.Draw2PB(graphics_show, this);
+                            user_ctrl.Draw2PB(graphics_show, this);
+                        }
+                        else if (enu_ctrl.GetType() == typeof(TNCustCtrl_String))
+                        {
+                            TNCustCtrl_String user_ctrl = (TNCustCtrl_String)enu_ctrl;
+
+                            user_ctrl.Draw2PB(graphics_show, this);
+                        }
                     }
                 }
 
@@ -821,7 +830,7 @@ namespace TNControls
 
                         int gray_level = *(Image_Buffer_Gray.Get_Pointer(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
                                                                         , x, y));
-                        graphics_show.DrawString($"{gray_level}", draw_font, brush_ctrl, pt_draw);
+                        //graphics_show.DrawString($"{gray_level}", draw_font, brush_ctrl, pt_draw);
                     }
                 }
             }
