@@ -82,6 +82,19 @@ namespace TN.ImageTools
             return ptr_buffer + y * bmpdata.Stride + x * pixel_size;
         }
 
+        public static unsafe byte Get_Pixel(BitmapData? bmpdata, byte* ptr_buffer, int x, int y)
+        {
+            if (bmpdata == null)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                         , $"bmpdata is null");
+                return 0;
+            }
+
+            int pixel_size = bmpdata.Stride / bmpdata.Width;
+            return ptr_buffer[y * bmpdata.Stride + x * pixel_size];
+        }
+
         public static unsafe byte* Get_Pointer(BitmapData bmpdata, IntPtr ptr_buffer, int x, int y)
         {
             byte * ptr = (byte*) ptr_buffer.ToPointer();
@@ -147,6 +160,71 @@ namespace TN.ImageTools
 
                 Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                     , $"pixelformat:{bmp.PixelFormat} not support" );
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                               , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+
+            return null;
+        }
+
+        public static object? Clone_Bmp_2_Buffer(Bitmap bmp)
+        {
+            try
+            {
+                if (null == bmp || bmp.Width <= 0 || bmp.Height <= 0)
+                {
+                    return null;
+                }
+
+                if (PixelFormat.Format8bppIndexed == bmp.PixelFormat)
+                {
+                    BitmapData? bmp_data = null;
+                    Image_Buffer_Gray.GetBuffer(bmp, ref bmp_data);
+                    if (bmp_data == null)
+                        return null;
+
+                    byte[] bytes = new byte[bmp_data.Height * bmp_data.Stride];
+                    Marshal.Copy(bmp_data.Scan0, bytes, 0, bytes.Length);
+
+                    Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
+                    return bytes;
+                }
+                else if (PixelFormat.Format32bppArgb == bmp.PixelFormat)
+                {
+                    BitmapData? bmp_data = null;
+                    Image_Buffer_Gray.GetBuffer(bmp, ref bmp_data);
+                    if (bmp_data == null)
+                        return null;
+
+                    byte[] bytes = new byte[bmp_data.Height * bmp_data.Stride];
+                    Marshal.Copy(bmp_data.Scan0, bytes, 0, bytes.Length);
+
+                    int pixel_size = bmp_data.Stride / bmp_data.Width;
+                    unsafe
+                    {
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            IntPtr row = (IntPtr)(bmp_data.Scan0);
+                            row += y * bmp_data.Stride;
+                            for (int x = 0; x < bmp.Width; x++)
+                            {
+                                bytes[y*pixel_size + x] = (*(byte*)(row + x * pixel_size));
+                            }
+                        }
+                    }
+
+                    Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
+                    return bytes;
+                }
+
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                    , $"pixelformat:{bmp.PixelFormat} not support");
                 return null;
             }
             catch (Exception ex)

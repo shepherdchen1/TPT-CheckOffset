@@ -33,6 +33,8 @@ namespace TN.ImageTools
                 if (null == dest_bmp_data)
                     return false;
 
+                int pixel_size_src  = src_bmp_data.Stride / src_bmp_data.Width;
+                int pixel_size_dest = dest_bmp_data.Stride / dest_bmp_data.Width;
                 unsafe
                 {
                     for (int y = 0; y < src_bmp_data.Height; y++)
@@ -44,10 +46,10 @@ namespace TN.ImageTools
 
                         for (int x = 0; x < src_bmp_data.Width; x++)
                         {
-                            if (*(src_buf + x) > threshold)
-                                dest_buf[x] = 255;
+                            if ( src_buf[x * pixel_size_src] > threshold)
+                                dest_buf[x * pixel_size_dest] = 255;
                             else
-                                dest_buf[x] = 0;
+                                dest_buf[x * pixel_size_dest] = 0;
                         }
                     }
                 }

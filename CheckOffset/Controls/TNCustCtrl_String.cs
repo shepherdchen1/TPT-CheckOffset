@@ -41,9 +41,13 @@ namespace TNControls
 
         public bool Editing { get; set; }
 
-        public Color Display_Color { get; set; }
+        private Color _display_color = Color.Blue;
 
-        public string Display_Str { get; set; }
+        public Color Display_Color { get => _display_color; set => _display_color = value; }
+
+        private string _display_string = "";
+        public string Display_Str { get => _display_string; set => _display_string = value; }
+
         public int Display_Font_Size 
         {
             get => _display_font_size;

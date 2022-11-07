@@ -366,7 +366,8 @@ namespace TNControls
                 unsafe
                 {
                     byte* ptr = (byte*)ptr_buffer.ToPointer();
-                    gray_level = (int)*(ptr + pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size);
+                    //gray_level = (int)*(ptr + pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size);
+                    gray_level = (int)(ptr[pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size]);
                 }
 
                 //Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, bmp_data);
@@ -828,9 +829,11 @@ namespace TNControls
                         Point pt_draw = pb.GetPBPointFromImage(new Point(x, y));
                         Rectangle rt = new Rectangle(pt_draw.X, pt_draw.Y, 1, 1);
 
-                        int gray_level = *(Image_Buffer_Gray.Get_Pointer(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
-                                                                        , x, y));
-                        //graphics_show.DrawString($"{gray_level}", draw_font, brush_ctrl, pt_draw);
+                        //int gray_level = *(Image_Buffer_Gray.Get_Pointer(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
+                        //                                                , x, y));
+                        int gray_level = Image_Buffer_Gray.Get_Pixel(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
+                                                                        , x, y);
+                        graphics_show.DrawString($"{gray_level}", draw_font, brush_ctrl, pt_draw);
                     }
                 }
             }

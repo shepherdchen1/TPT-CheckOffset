@@ -1,4 +1,5 @@
 ﻿using CheckOffset;
+using CheckOffset.ProjectInspInfo;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -115,6 +116,8 @@ namespace CheckOffset
 
         public static List<DS_Detect_Info>? Detect_Infos = new List<DS_Detect_Info>();
 
+        public static DS_Defect_Pin_Info? Detect_Pins = null;
+
         // change to public for update progress
         public static BackgroundWorker BKWorker_Delete_Log = new BackgroundWorker();
 
@@ -194,10 +197,6 @@ namespace CheckOffset
             {
                 while (!worker.CancellationPending)
                 {
-                    // 一天刪一次Log
-                    System.Threading.Thread.Sleep(86400 * 1000);
-                    //                    string log_path = Log_Utl.PathLog + $"\\{0:yyyyMMdd}\\Step", date_now);
-
                     try
                     {
                         // delete d:\log\date_ path.
@@ -205,18 +204,16 @@ namespace CheckOffset
 
                         // delete d:\log\date_ path.
                         Delete_Log_Dir(Log_Utl.PathLog);
-
-                        // delete nodejs log d:\log\date_ path.
-                        Delete_Log_File("d:\\log\\node");
-
-                        // delete nodejs log d:\log\date_ path.
-                        Delete_Log_Dir("d:\\log\\node");
                     }
                     catch (Exception ex_dir)
                     {
                         // 儲存Exception到檔案
                         TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex_dir);
                     }
+
+                    // 一天刪一次Log
+                    System.Threading.Thread.Sleep(86400 * 1000);
+                    //                    string log_path = Log_Utl.PathLog + $"\\{0:yyyyMMdd}\\Step", date_now);
                 }
 
                 Log_Utl.Log_Event(Event_Level.Normal, System.Reflection.MethodBase.GetCurrentMethod()?.Name

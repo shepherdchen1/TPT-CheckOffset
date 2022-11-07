@@ -70,8 +70,8 @@ namespace TN.ImageTools
                         for (int y = 0; y < bmp_src.Height; y++)
                         {
                             buffer[y * subpixel_num + subpixel_num / 2, x * subpixel_num + subpixel_num / 2]
-                                        = *(Image_Buffer_Gray.Get_Pointer(bmp_data_src, (byte*)ptr_buffer_src.ToPointer()
-                                                                    , x, y));
+                                        = Image_Buffer_Gray.Get_Pixel(bmp_data_src, (byte*)ptr_buffer_src.ToPointer()
+                                                                    , x, y);
                         }
                     }
                 }

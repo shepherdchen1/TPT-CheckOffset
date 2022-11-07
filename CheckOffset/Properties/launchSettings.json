@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CheckOffset": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
