@@ -621,11 +621,18 @@ namespace CheckOffset
 
                 Image_Tools.Compute(img_tool_clr, bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
 
-                Blob_Info[] blob_res = new Blob_Info[100];
-                //Image_Tools.Get_Blob_Res(img_tool_clr, ref Blob_Info[] blob_res);
+                int blob_size = 0;
+                Image_Tools.Get_Blob_Size(img_tool_clr, ref blob_size);
+
+                Blob_Info[] blob_res = new Blob_Info[blob_size];
+                for(int i = 0; i < blob_size; i++)
+                    blob_res[i] = new Blob_Info();
+                //IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Blob_Info_Base));
+
+                    //Image_Tools.Get_Blob_Res(img_tool_clr, ref Blob_Info[] blob_res);
                 Image_Tools.Get_Blob_Res(img_tool_clr, ref blob_res);
 
-
+                Image_Tools.DisposeImageToolsCLRClass(img_tool_clr);
 
                 _userctrl_image.pb_Image.Repaint();
             }
@@ -698,21 +705,28 @@ namespace CheckOffset
         {
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct Marshal_Buffer
+            public class Marshal_Buffer
             {
                 public IntPtr   _buffer;
             }
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct Blob_Info
+            public class Blob_Info
             {
                 public Blob_Info_Base _blob_info;
 
-                //public Blob_Info_Contour _contour;
+                public Blob_Info_Contour _contour;
+
+                public Blob_Info()
+                {
+                    _blob_info = new Blob_Info_Base();
+
+                    _contour = new Blob_Info_Contour();
+                }
             }
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct Blob_Info_Base
+            public class Blob_Info_Base
             {
                 // Sample like : void New3([MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VT_BSTR)]
                 //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
@@ -724,18 +738,35 @@ namespace CheckOffset
 
                 public double _centeriod_x;
                 public double _centeriod_y;
+
+                public Blob_Info_Base()
+                {
+                    _id = 0;
+                    _rect_x = 0;
+                    _rect_y = 0;
+                    _rect_width = 0;
+                    _rect_height = 0;
+
+                    _centeriod_x = 0.0;
+                    _centeriod_y = 0.0;
+            }
             }
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct Blob_Info_Contour
+            public class Blob_Info_Contour
             {
                 //[MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VaEnum)]
                 [MarshalAs(UnmanagedType.SafeArray)]
                 public Blob_Info_Contour_calPoint[] _blob_points;
+
+                public Blob_Info_Contour()
+                {
+                    _blob_points = new Blob_Info_Contour_calPoint[0];
+                }
             }
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct Blob_Info_Contour_calPoint
+            public class Blob_Info_Contour_calPoint
             {
                 public double d_x;
                 public double d_y;
@@ -749,7 +780,7 @@ namespace CheckOffset
             //VT_PTR
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct Blob_Infos
+            public class Blob_Infos
             {
                 [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_USERDEFINED)]
                 public Blob_Info[]? blob_Infos;
@@ -768,7 +799,13 @@ namespace CheckOffset
             public static extern Image_Tools_CLR CreateImageToolsCLRClass();
 
             [DllImport("Dll_Adapter.dll")]
+            public static extern void DisposeImageToolsCLRClass(Image_Tools_CLR img_tool_clr);
+
+            [DllImport("Dll_Adapter.dll")]
             public static extern bool Compute(Image_Tools_CLR img_tool_clr, IntPtr buffer, int stride, int height);
+
+            [DllImport("Dll_Adapter.dll")]
+            public static extern bool Get_Blob_Size(Image_Tools_CLR img_tool_clr, ref int blob_size);
 
             [DllImport("Dll_Adapter.dll")]
             //public static extern IntPtr Get_Blob_Res(
