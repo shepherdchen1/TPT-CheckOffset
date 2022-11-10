@@ -19,7 +19,7 @@ using CheckOffset.ProjectInspInfo;
 
 //using TNFullImageTools;
 using System.Runtime.InteropServices;
-using Export_Dll;
+using Dll_Bridge;
 using System.Drawing.Imaging;
 using static CheckOffset.For_Main.Image_Tools;
 using CheckOffset.CSharp2Cpp;
@@ -617,24 +617,38 @@ namespace CheckOffset
 
                 //}
 
-                Image_Tools_CLR img_tool_clr = Image_Tools.CreateImageToolsCLRClass();
+                /////////////////////////////
+                // remove for can't work
+                //Image_Tools_CLR img_tool_clr = Image_Tools.CreateImageToolsCLRClass();
 
-                Image_Tools.Compute(img_tool_clr, bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+                //Image_Tools.Compute(img_tool_clr, bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
 
-                int blob_size = 0;
-                Image_Tools.Get_Blob_Size(img_tool_clr, ref blob_size);
+                //int blob_size = 0;
+                //Image_Tools.Get_Blob_Size(img_tool_clr, ref blob_size);
 
-                Blob_Info[] blob_res = new Blob_Info[blob_size];
-                for(int i = 0; i < blob_size; i++)
-                    blob_res[i] = new Blob_Info();
-                //IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Blob_Info_Base));
+                //Blob_Info_Base[] blob_res = new Blob_Info_Base[blob_size];
+                //for(int i = 0; i < blob_size; i++)
+                //    blob_res[i] = new Blob_Info_Base();
+                ////IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Blob_Info_Base));
 
-                    //Image_Tools.Get_Blob_Res(img_tool_clr, ref Blob_Info[] blob_res);
-                Image_Tools.Get_Blob_Res(img_tool_clr, ref blob_res);
+                //    //Image_Tools.Get_Blob_Res(img_tool_clr, ref Blob_Info[] blob_res);
+                //Image_Tools.Get_Blob_Res(img_tool_clr, ref blob_res);
 
-                Image_Tools.DisposeImageToolsCLRClass(img_tool_clr);
+                //Image_Tools.DisposeImageToolsCLRClass(img_tool_clr);
 
-                _userctrl_image.pb_Image.Repaint();
+                //_userctrl_image.pb_Image.Repaint();
+
+
+
+                CImgTools_Bridge img_tool_bridge = new CImgTools_Bridge();
+
+                unsafe
+                {
+                    img_tool_bridge.compute((byte*)bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+                }
+
+                Managed_Blob_Info_Base[] blob_infos = new Managed_Blob_Info_Base[2];
+                img_tool_bridge.Get_Blob_Res_Bridge(img_tool_bridge,  ref blob_infos);
             }
             catch (Exception ex)
             {
@@ -653,7 +667,7 @@ namespace CheckOffset
             int test = 0;
             //Blob_Analyze_Adapter blob_adapter = new Blob_Analyze_Adapter();
 
-            Image_Tools_CLR fast_blob = new Image_Tools_CLR();
+            //Image_Tools_CLR fast_blob = new Image_Tools_CLR();
         }
 
         private void btnDetectBlobOld_Click(object sender, EventArgs e)
@@ -793,27 +807,36 @@ namespace CheckOffset
 
                 //[MarshalAs(UnmanagedType.ByValArray)]
 
-                string dll_file = "D:\\Source\\CheckOffset\\x64\\Debug\\Dll_Adapter.dll";
+            //    string dll_file = "D:\\Source\\CheckOffset\\x64\\Debug\\Dll_Adapter.dll";
 
-            [DllImport("Dll_Adapter.dll")]
-            public static extern Image_Tools_CLR CreateImageToolsCLRClass();
+            //[DllImport("Dll_Adapter.dll")]
+            //public static extern Image_Tools_CLR CreateImageToolsCLRClass();
 
-            [DllImport("Dll_Adapter.dll")]
-            public static extern void DisposeImageToolsCLRClass(Image_Tools_CLR img_tool_clr);
+            //[DllImport("Dll_Adapter.dll")]
+            //public static extern void DisposeImageToolsCLRClass(Image_Tools_CLR img_tool_clr);
 
-            [DllImport("Dll_Adapter.dll")]
-            public static extern bool Compute(Image_Tools_CLR img_tool_clr, IntPtr buffer, int stride, int height);
+            //[DllImport("Dll_Adapter.dll")]
+            //public static extern bool Compute(Image_Tools_CLR img_tool_clr, IntPtr buffer, int stride, int height);
 
-            [DllImport("Dll_Adapter.dll")]
-            public static extern bool Get_Blob_Size(Image_Tools_CLR img_tool_clr, ref int blob_size);
+            //[DllImport("Dll_Adapter.dll")]
+            //public static extern bool Get_Blob_Size(Image_Tools_CLR img_tool_clr, ref int blob_size);
 
-            [DllImport("Dll_Adapter.dll")]
-            //public static extern IntPtr Get_Blob_Res(
-            //        Image_Tools_CLR img_tool_clr);
-            public static extern bool Get_Blob_Res(
-                    Image_Tools_CLR img_tool_clr
-                ,   [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BlobAnalyzeMarshaler))]
-                    ref Blob_Info[] blob_res);
+            //[DllImport("Dll_Adapter.dll")]
+            ////public static extern IntPtr Get_Blob_Res(
+            ////        Image_Tools_CLR img_tool_clr);
+            //public static extern bool Get_Blob_Res(
+            //        Image_Tools_CLR img_tool_clr
+            //    ,   [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BlobAnalyzeMarshaler_Base))]
+            //        ref Blob_Info_Base[] blob_res);
+
+            //[DllImport("Dll_Adapter.dll")]
+            ////public static extern IntPtr Get_Blob_Res(
+            ////        Image_Tools_CLR img_tool_clr);
+            //public static extern bool Get_Blob_Contour(
+            //        Image_Tools_CLR img_tool_clr
+            //        , int blob_id  // 0-base.
+            //        , [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BlobAnalyzeMarshaler_Contour))]
+            //        ref Blob_Info_Contour_calPoint[] blob_contour);
 
         }
 
