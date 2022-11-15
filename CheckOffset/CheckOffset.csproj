@@ -30,6 +30,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="OpenCvSharp">
+      <HintPath>C:\opencvsharp-master\Build\Debug\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.DebuggerVisualizers">
+      <HintPath>C:\opencvsharp-master\Build\Debug\OpenCvSharp.DebuggerVisualizers.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions">
+      <HintPath>C:\opencvsharp-master\Build\Debug\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>

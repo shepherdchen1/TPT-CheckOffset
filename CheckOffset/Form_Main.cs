@@ -24,6 +24,17 @@ using System.Drawing.Imaging;
 using static CheckOffset.For_Main.Image_Tools;
 using CheckOffset.CSharp2Cpp;
 
+//#include <opencv2/core.hpp>
+//#include <opencv2/imgproc.hpp>
+//#include <opencv2/opencv.hpp>
+
+//#include "opencv2/opencv.hpp"
+
+//using cv;
+using OpenCvSharp.DebuggerVisualizers;
+using OpenCvSharp;
+using System.ComponentModel;
+
 namespace CheckOffset
 {
     public partial class For_Main : Form
@@ -36,7 +47,8 @@ namespace CheckOffset
         }
 
 
-        private UserCtrl_Image _userctrl_image = new UserCtrl_Image(); 
+        private UserCtrl_Image  _userctrl_image = new UserCtrl_Image();
+        //private MatProxy        _mat_proxy      = new MatProxy();
 
         private void Init_Data()
         {
@@ -397,7 +409,7 @@ namespace CheckOffset
 
             _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
             _userctrl_image.Image_Scale = 1.0f;
-            _userctrl_image.Offset = new Point(0, 0);
+            _userctrl_image.Offset = new System.Drawing.Point(0, 0);
 
             _userctrl_image.Refresh();
         }
@@ -478,7 +490,7 @@ namespace CheckOffset
 
             Canny edge_detect = new Canny(bmp, 1000, (float) numMinHysteresisThreshold.Value);
 
-            List<Point> detected_edge_points = new List<Point>();
+            List<System.Drawing.Point> detected_edge_points = new List<System.Drawing.Point>();
             // NOTE: edge_detect.EdgeMap is [width, height]
             for ( int y = 0; y < edge_detect.EdgeMap.GetLength(1); y++ )
             {
@@ -487,7 +499,7 @@ namespace CheckOffset
                     if (edge_detect.EdgeMap[x, y] < 128)
                         continue;
 
-                    detected_edge_points.Add(new Point(x, y));
+                    detected_edge_points.Add(new System.Drawing.Point(x, y));
                 }
             }
 
@@ -533,7 +545,7 @@ namespace CheckOffset
                     else if (iT_Detect.Pins[y, x] == 1)
                     {
                         TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
-                        ctrl_string.Pos_Info.Points = new Point[1];
+                        ctrl_string.Pos_Info.Points = new System.Drawing.Point[1];
                         ctrl_string.Pos_Info.Points[0].X = x;
                         ctrl_string.Pos_Info.Points[0].Y = y;
                         ctrl_string.Display_Color = Color.Blue;
@@ -552,7 +564,7 @@ namespace CheckOffset
                     else if (iT_Detect.Pins[y, x] >= 2)
                     {
                         TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
-                        ctrl_string.Pos_Info.Points = new Point[1];
+                        ctrl_string.Pos_Info.Points = new System.Drawing.Point[1];
                         ctrl_string.Pos_Info.Points[0].X = x;
                         ctrl_string.Pos_Info.Points[0].Y = y;
                         ctrl_string.Display_Color = Color.BlueViolet;
@@ -586,69 +598,165 @@ namespace CheckOffset
             _userctrl_image.Cache_Ctrl.Clear();
         }
 
+        //private void btnDetectBlob_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+        //        BitmapData? bmp_data = null;
+        //        Image_Buffer_Gray.GetBuffer(bmp, ref bmp_data);
+
+        //        byte[]? buffer = (byte[]?)Image_Buffer_Gray.Transfer_Bmp_2_Gray_1DArray(bmp);
+        //        if (null == bmp_data)
+        //        {
+        //            Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+        //                                , $"bmp_data is null");
+        //            return;
+        //        }
+
+        //        //Image_Tools_CLR fast_blob = new Image_Tools_CLR();
+        //        //btnDetectBlob.Text = String.Format("{0}", fast_blob.test());
+
+        //        //ImageTool_Buffer img_buf = new ImageTool_Buffer(bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+        //        //ImageTool_Buffer img_buf = new ImageTool_Buffer(); // bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+        //        //img_buf.Data = bmp_data.Scan0;
+        //        //img_buf.Stride = bmp.Width;
+        //        //img_buf.Height = bmp.Height;
+        //        //unsafe
+        //        //{
+        //        //    fast_blob.compute( (byte*) bmp_data.Scan0.ToPointer(), bmp.Width, bmp.Height);
+
+        //        //    Image_Tools.Blob_Info output = new Image_Tools.Blob_Info();
+        //        //    fast_blob.blobInfo(output);
+
+        //        //}
+
+        //        /////////////////////////////
+        //        // remove for can't work
+        //        //Image_Tools_CLR img_tool_clr = Image_Tools.CreateImageToolsCLRClass();
+
+        //        //Image_Tools.Compute(img_tool_clr, bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+
+        //        //int blob_size = 0;
+        //        //Image_Tools.Get_Blob_Size(img_tool_clr, ref blob_size);
+
+        //        //Blob_Info_Base[] blob_res = new Blob_Info_Base[blob_size];
+        //        //for(int i = 0; i < blob_size; i++)
+        //        //    blob_res[i] = new Blob_Info_Base();
+        //        ////IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Blob_Info_Base));
+
+        //        //    //Image_Tools.Get_Blob_Res(img_tool_clr, ref Blob_Info[] blob_res);
+        //        //Image_Tools.Get_Blob_Res(img_tool_clr, ref blob_res);
+
+        //        //Image_Tools.DisposeImageToolsCLRClass(img_tool_clr);
+
+        //        //_userctrl_image.pb_Image.Repaint();
+
+
+
+        //        CImgTools_Bridge img_tool_bridge = new CImgTools_Bridge();
+
+        //        unsafe
+        //        {
+        //            img_tool_bridge.compute((byte*)bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+        //        }
+
+        //        //Managed_Blob_Info_Base[] blob_info_bases = new Managed_Blob_Info_Base[0];
+        //        //img_tool_bridge.Get_Blob_Res_Bridge(img_tool_bridge,  ref blob_info_bases);
+
+        //        Managed_Blob_Info[] blob_infos = new Managed_Blob_Info[0];
+        //        img_tool_bridge.Get_Blob_Res(ref blob_infos);
+
+        //        for (int blob_id = 0; blob_id < blob_infos.Length; blob_id++)
+        //        {
+        //            if (blob_infos[blob_id]._blob_points.Length <= 0 )
+        //            {
+        //                Log_Utl.Log_Step("AAA"
+        //                                , "_blob_points <= 0");
+        //                continue;
+        //            }
+
+        //            TNCustCtrl_Points cust_ctrl = new TNCustCtrl_Points();
+        //            cust_ctrl.Pos_Info.Points = new Point[blob_infos[blob_id]._blob_points.Length];
+        //            cust_ctrl.Display_Color = Color.Blue;
+        //            for (int pt_id = 0; pt_id < blob_infos[blob_id]._blob_points.Length; pt_id++)
+        //            {
+        //                cust_ctrl.Pos_Info.Points[pt_id].X = (int) blob_infos[blob_id]._blob_points[pt_id].x;
+        //                cust_ctrl.Pos_Info.Points[pt_id].Y = (int) blob_infos[blob_id]._blob_points[pt_id].y;
+        //            }
+
+        //            _userctrl_image.pb_Image.Cache_Ctrl.Add(cust_ctrl);
+        //        }
+
+        //        _userctrl_image.pb_Image.Repaint();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+        //           , $"Exception catched: error:{ex.Message}");
+        //        // 儲存Exception到檔案
+        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+        //    }
+        //}
+
         private void btnDetectBlob_Click(object sender, EventArgs e)
         {
             try
             {
                 Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-                BitmapData? bmp_data = null;
-                Image_Buffer_Gray.GetBuffer(bmp, ref bmp_data);
-                if (null == bmp_data)
+
+                byte[] buffer = (byte[])Image_Buffer_Gray.Transfer_Bmp_2_Gray_1DArray(bmp);
+                if (null == buffer)
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                                         , $"bmp_data is null");
                     return;
                 }
 
-                //Image_Tools_CLR fast_blob = new Image_Tools_CLR();
-                //btnDetectBlob.Text = String.Format("{0}", fast_blob.test());
-
-                //ImageTool_Buffer img_buf = new ImageTool_Buffer(bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
-                //ImageTool_Buffer img_buf = new ImageTool_Buffer(); // bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
-                //img_buf.Data = bmp_data.Scan0;
-                //img_buf.Stride = bmp.Width;
-                //img_buf.Height = bmp.Height;
-                //unsafe
-                //{
-                //    fast_blob.compute( (byte*) bmp_data.Scan0.ToPointer(), bmp.Width, bmp.Height);
-
-                //    Image_Tools.Blob_Info output = new Image_Tools.Blob_Info();
-                //    fast_blob.blobInfo(output);
-
-                //}
-
-                /////////////////////////////
-                // remove for can't work
-                //Image_Tools_CLR img_tool_clr = Image_Tools.CreateImageToolsCLRClass();
-
-                //Image_Tools.Compute(img_tool_clr, bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
-
-                //int blob_size = 0;
-                //Image_Tools.Get_Blob_Size(img_tool_clr, ref blob_size);
-
-                //Blob_Info_Base[] blob_res = new Blob_Info_Base[blob_size];
-                //for(int i = 0; i < blob_size; i++)
-                //    blob_res[i] = new Blob_Info_Base();
-                ////IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Blob_Info_Base));
-
-                //    //Image_Tools.Get_Blob_Res(img_tool_clr, ref Blob_Info[] blob_res);
-                //Image_Tools.Get_Blob_Res(img_tool_clr, ref blob_res);
-
-                //Image_Tools.DisposeImageToolsCLRClass(img_tool_clr);
-
-                //_userctrl_image.pb_Image.Repaint();
-
-
-
                 CImgTools_Bridge img_tool_bridge = new CImgTools_Bridge();
 
                 unsafe
                 {
-                    img_tool_bridge.compute((byte*)bmp_data.Scan0, bmp_data.Stride, bmp_data.Height);
+                    // transfer to un managed buffer for fast.blob.
+                    fixed (byte *p_buffer = buffer)
+                    {
+                        img_tool_bridge.compute((byte*) (IntPtr)  p_buffer, bmp.Width, bmp.Height);
+                    }
                 }
 
-                Managed_Blob_Info_Base[] blob_infos = new Managed_Blob_Info_Base[2];
-                img_tool_bridge.Get_Blob_Res_Bridge(img_tool_bridge,  ref blob_infos);
+                Managed_Blob_Info[] blob_infos = new Managed_Blob_Info[0];
+                img_tool_bridge.Get_Blob_Res(ref blob_infos);
+
+                for (int blob_id = 0; blob_id < blob_infos.Length; blob_id++)
+                {
+                    if (blob_infos[blob_id]._blob_points.Length <= 0)
+                    {
+                        Log_Utl.Log_Step("AAA"
+                                        , "_blob_points <= 0");
+                        continue;
+                    }
+
+                    TNCustCtrl_Lines cust_ctrl = new TNCustCtrl_Lines();
+                    cust_ctrl.Pos_Info.Points = new System.Drawing.Point[blob_infos[blob_id]._blob_points.Length];
+                    int color_id = blob_id % 4;
+                    switch ( color_id )
+                    {
+                        case 0: cust_ctrl.Display_Color = Color.Blue;  break;
+                        case 1: cust_ctrl.Display_Color = Color.Green; break;
+                        case 2: cust_ctrl.Display_Color = Color.Yellow; break;
+                        case 3: cust_ctrl.Display_Color = Color.Purple; break;
+                    }
+
+                    for (int pt_id = 0; pt_id < blob_infos[blob_id]._blob_points.Length; pt_id++)
+                    {
+                        cust_ctrl.Pos_Info.Points[pt_id].X = (int)blob_infos[blob_id]._blob_points[pt_id].x;
+                        cust_ctrl.Pos_Info.Points[pt_id].Y = (int)blob_infos[blob_id]._blob_points[pt_id].y;
+                    }
+
+                    _userctrl_image.pb_Image.Cache_Ctrl.Add(cust_ctrl);
+                }
+
+                _userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {
@@ -805,7 +913,7 @@ namespace CheckOffset
                 }
             }
 
-                //[MarshalAs(UnmanagedType.ByValArray)]
+            //[MarshalAs(UnmanagedType.ByValArray)]
 
             //    string dll_file = "D:\\Source\\CheckOffset\\x64\\Debug\\Dll_Adapter.dll";
 
@@ -838,7 +946,61 @@ namespace CheckOffset
             //        , [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(BlobAnalyzeMarshaler_Contour))]
             //        ref Blob_Info_Contour_calPoint[] blob_contour);
 
+            //[DllImport("opencv_world460d.dll")]
+            //public static extern Mat imread(String filename, int flags);
         }
 
+
+        private void btnLoadInspPins_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveInspPins_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnOpenCV_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //OpenCV_Bridge.OpenCB_1();
+                //Mat image = imread("D:\\test\\blobSource_24.bmp", 0);
+
+                var img = @"D:\test\blobSource_24.bmp";
+                //Mat image = new Mat(@"D:\test\blobSource_24.bmp");
+                Mat image = Cv2.ImRead(@"D:\\test\\blobSource_opencv_8.bmp", ImreadModes.Unchanged); // ImreadModes.GrayScale);
+                //var mainForm = new ImageViewer(img);
+
+                //using (var src = new Mat(@"D:\test\blobSource_24.bmp", ImreadModes.Unchanged))
+                //{
+                    //using (var window = new Window("window", image: src, flags: WindowMode.AutoSize))
+                    //{
+                    //    Cv2.WaitKey();
+                    //}
+                //}
+
+                //mainForm.FormBorderStyle = FormBorderStyle.None;
+                _userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
+                //mainForm.Owner = (Form) _userctrl_image;
+                //mainForm.ShowDialog();
+
+                //imshow("Grayscale image", image);
+
+                //// Save grayscale image
+                //imwrite("boyGray.jpg", image);
+
+                //imshow("Grayscale image", image);
+                //waitKey(0);
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                            , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+        }
     } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

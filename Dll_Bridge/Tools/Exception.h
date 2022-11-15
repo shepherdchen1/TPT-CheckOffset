@@ -18,7 +18,6 @@ namespace TN
 			{
 			private:
 				static Object ^Log_File_Monitor = gcnew Object();
-				static String ^_dump_path = "D:\\Log";
 
 			public:
 				static String ^DateFileName;
@@ -35,6 +34,8 @@ namespace TN
 				// Purpose:		¹w³]ªºDumpPath
 				// Access:		READ, WRITE
 				static String^ DefaultDumpPath();
+
+				static String^ _dump_path = "D:\\Log";
 
 
 				// Property:	DefaultDumpPath

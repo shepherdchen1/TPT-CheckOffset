@@ -18,7 +18,7 @@ Boolean FS::DeleteFile(String ^file)
 			File::Delete(file);
 			break;
 		}
-		catch (Exception ^e)
+		catch (Exception ^)
 		{
 			if (retry_count == 0)
 				return false;
@@ -46,7 +46,7 @@ Boolean FS::RenameFile(String ^srcFile, String ^destFile, Boolean overwrite)
 
 		File::Move(srcFile, destFile);
 	}
-	catch (Exception ^e)
+	catch (Exception ^)
 	{
 		return false;
 	}
@@ -65,7 +65,7 @@ Boolean FS::CreateFileParentPath(String ^file)
 		if (!Directory::Exists(file_info->DirectoryName))
 			Directory::CreateDirectory(file_info->DirectoryName);
 	}
-	catch (Exception ^e)
+	catch (Exception ^)
 	{
 		return false;
 	}
@@ -104,7 +104,7 @@ Boolean FS::CopyFile(String ^srcFile, String ^destFile, Boolean overwrite)
 				File::Copy(srcFile, destFile);
 				break;
 			}
-			catch (Exception ^e)
+			catch (Exception ^)
 			{
 				if (retry_count == 0)
 					return false;
@@ -116,7 +116,7 @@ Boolean FS::CopyFile(String ^srcFile, String ^destFile, Boolean overwrite)
 		}
 				
 	}
-	catch (Exception ^e)
+	catch (Exception ^)
 	{
 		return false;
 	}
@@ -171,7 +171,7 @@ Boolean FS::DeleteDirectory(String ^path)
 			Directory::Delete(path, true);
 			break;
 		}
-		catch (Exception ^e)
+		catch (Exception ^)
 		{
 			if (retry_count == 0)
 				return false;
@@ -192,7 +192,7 @@ Boolean FS::SafeMoveDirectory(String ^src_path, String ^dest_path)
 	{
 		CopyDirectory(src_path, dest_path);
 	}
-	catch (Exception ^e)
+	catch (Exception ^)
 	{
 		return false;
 	}

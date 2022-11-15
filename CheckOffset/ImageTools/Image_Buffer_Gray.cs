@@ -173,6 +173,76 @@ namespace TN.ImageTools
             return null;
         }
 
+        public static object? Transfer_Bmp_2_Gray_1DArray(Bitmap bmp)
+        {
+            try
+            {
+                if (null == bmp || bmp.Width <= 0 || bmp.Height <= 0)
+                {
+                    return null;
+                }
+
+                if (PixelFormat.Format8bppIndexed == bmp.PixelFormat)
+                {
+                    BitmapData? bmp_data = null;
+                    Image_Buffer_Gray.GetBuffer(bmp, ref bmp_data);
+                    if (bmp_data == null)
+                        return null;
+
+                    byte[] bytes = new byte[bmp_data.Height * bmp_data.Stride];
+                    Marshal.Copy(bmp_data.Scan0, bytes, 0, bytes.Length);
+
+                    byte[,] buffer = new byte[bmp.Height, bmp.Width];
+                    for (int y = 0; y < bmp.Height; y++)
+                        Buffer.BlockCopy(bytes, y * bmp_data.Stride, buffer, y * bmp_data.Stride, bmp_data.Stride);
+
+                    Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
+                    return buffer;
+                }
+                else if (PixelFormat.Format32bppArgb == bmp.PixelFormat)
+                {
+                    BitmapData? bmp_data = null;
+                    Image_Buffer_Gray.GetBuffer(bmp, ref bmp_data);
+                    if (bmp_data == null)
+                        return null;
+
+                    byte[] bytes = new byte[bmp_data.Height * bmp_data.Width]; 
+                    unsafe
+                    {
+                        int pixel_size = bmp_data.Stride / bmp_data.Width;
+
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            IntPtr row = (IntPtr)(bmp_data.Scan0);
+                            row += y * bmp_data.Stride;
+                            for (int x = 0; x < bmp.Width; x++)
+                            {
+                                byte clr = (*(byte*)(row + x * pixel_size));
+                                bytes[y * bmp_data.Width + x] = *((byte*)(row + x * pixel_size));
+                            }
+                        }
+                    }
+                    //Buffer.BlockCopy(bytes, y * bmp_data.Stride, buffer, y * bmp_data.Stride, bmp_data.Stride);
+
+                    Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);
+                    return bytes;
+                }
+
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                    , $"pixelformat:{bmp.PixelFormat} not support");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                               , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+
+            return null;
+        }
+
         public static object? Clone_Bmp_2_Buffer(Bitmap bmp)
         {
             try

@@ -61,6 +61,9 @@
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.btnLoadInspPins = new System.Windows.Forms.Button();
+            this.btnSaveInspPins = new System.Windows.Forms.Button();
+            this.btnDetectBlobOld = new System.Windows.Forms.Button();
             this.btnDetectBlob = new System.Windows.Forms.Button();
             this.btnClearCacheItems = new System.Windows.Forms.Button();
             this.btnDetectPins = new System.Windows.Forms.Button();
@@ -89,7 +92,7 @@
             this.openFileDialog_Img = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_Setting = new System.Windows.Forms.OpenFileDialog();
-            this.btnDetectBlobOld = new System.Windows.Forms.Button();
+            this.btnOpenCV = new System.Windows.Forms.Button();
             this.pnlSetting.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -461,6 +464,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.btnOpenCV);
             this.tabPage3.Controls.Add(this.groupBox8);
             this.tabPage3.Controls.Add(this.btnClearCacheItems);
             this.tabPage3.Controls.Add(this.btnDetectPins);
@@ -475,14 +479,46 @@
             // 
             // groupBox8
             // 
+            this.groupBox8.Controls.Add(this.btnLoadInspPins);
+            this.groupBox8.Controls.Add(this.btnSaveInspPins);
             this.groupBox8.Controls.Add(this.btnDetectBlobOld);
             this.groupBox8.Controls.Add(this.btnDetectBlob);
             this.groupBox8.Location = new System.Drawing.Point(17, 364);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(300, 150);
+            this.groupBox8.Size = new System.Drawing.Size(300, 208);
             this.groupBox8.TabIndex = 6;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Blob";
+            // 
+            // btnLoadInspPins
+            // 
+            this.btnLoadInspPins.Location = new System.Drawing.Point(129, 91);
+            this.btnLoadInspPins.Name = "btnLoadInspPins";
+            this.btnLoadInspPins.Size = new System.Drawing.Size(171, 34);
+            this.btnLoadInspPins.TabIndex = 8;
+            this.btnLoadInspPins.Text = "Load Pin Positions";
+            this.btnLoadInspPins.UseVisualStyleBackColor = true;
+            this.btnLoadInspPins.Click += new System.EventHandler(this.btnLoadInspPins_Click);
+            // 
+            // btnSaveInspPins
+            // 
+            this.btnSaveInspPins.Location = new System.Drawing.Point(129, 144);
+            this.btnSaveInspPins.Name = "btnSaveInspPins";
+            this.btnSaveInspPins.Size = new System.Drawing.Size(171, 34);
+            this.btnSaveInspPins.TabIndex = 7;
+            this.btnSaveInspPins.Text = "Save Pin Positions";
+            this.btnSaveInspPins.UseVisualStyleBackColor = true;
+            this.btnSaveInspPins.Click += new System.EventHandler(this.btnSaveInspPins_Click);
+            // 
+            // btnDetectBlobOld
+            // 
+            this.btnDetectBlobOld.Location = new System.Drawing.Point(177, 41);
+            this.btnDetectBlobOld.Name = "btnDetectBlobOld";
+            this.btnDetectBlobOld.Size = new System.Drawing.Size(123, 34);
+            this.btnDetectBlobOld.TabIndex = 6;
+            this.btnDetectBlobOld.Text = "Detect Blob";
+            this.btnDetectBlobOld.UseVisualStyleBackColor = true;
+            this.btnDetectBlobOld.Click += new System.EventHandler(this.btnDetectBlobOld_Click);
             // 
             // btnDetectBlob
             // 
@@ -762,15 +798,15 @@
             this.openFileDialog_Setting.FileName = "openFileDialog1";
             this.openFileDialog_Setting.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
             // 
-            // btnDetectBlobOld
+            // btnOpenCV
             // 
-            this.btnDetectBlobOld.Location = new System.Drawing.Point(177, 41);
-            this.btnDetectBlobOld.Name = "btnDetectBlobOld";
-            this.btnDetectBlobOld.Size = new System.Drawing.Size(123, 34);
-            this.btnDetectBlobOld.TabIndex = 6;
-            this.btnDetectBlobOld.Text = "Detect Blob";
-            this.btnDetectBlobOld.UseVisualStyleBackColor = true;
-            this.btnDetectBlobOld.Click += new System.EventHandler(this.btnDetectBlobOld_Click);
+            this.btnOpenCV.Location = new System.Drawing.Point(47, 630);
+            this.btnOpenCV.Name = "btnOpenCV";
+            this.btnOpenCV.Size = new System.Drawing.Size(123, 34);
+            this.btnOpenCV.TabIndex = 9;
+            this.btnOpenCV.Text = "OpenCV-1";
+            this.btnOpenCV.UseVisualStyleBackColor = true;
+            this.btnOpenCV.Click += new System.EventHandler(this.btnOpenCV_Click);
             // 
             // For_Main
             // 
@@ -877,5 +913,8 @@
         private Button btnDetectBlob;
         private Button button3;
         private Button btnDetectBlobOld;
+        private Button btnSaveInspPins;
+        private Button btnLoadInspPins;
+        private Button btnOpenCV;
     }
 }

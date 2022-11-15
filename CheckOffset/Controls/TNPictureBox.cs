@@ -784,6 +784,12 @@ namespace TNControls
 
                             user_ctrl.Draw2PB(graphics_show, this);
                         }
+                        else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Lines))
+                        {
+                            TNCustCtrl_Lines user_ctrl = (TNCustCtrl_Lines)enu_ctrl;
+
+                            user_ctrl.Draw2PB(graphics_show, this);
+                        }
                     }
                 }
 

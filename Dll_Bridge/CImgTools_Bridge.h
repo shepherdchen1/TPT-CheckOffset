@@ -15,6 +15,18 @@ namespace Dll_Bridge
             x = 0;
             y = 0;
         };
+
+        //Manaaged_calPoint^ operator=(Manaaged_calPoint ^src) {
+        //    x = src->x;
+        //    y = src->y;
+        //}
+
+        void Assign_Value(const fast::calPoint &src) {
+
+            this->x = src.x;
+            this->y = src.y;
+        }
+
     };
 
     public ref class Managed_Blob_Info_Base {
@@ -52,6 +64,30 @@ namespace Dll_Bridge
 
             this->_centeriod_x = 0;
             this->_centeriod_y = 0;
+        }
+
+        void operator=(const Managed_Blob_Info_Base ^src) {
+
+            this->_id = src->_id;
+            this->_rect_x = src->_rect_x;
+            this->_rect_y = src->_rect_y;
+            this->_rect_width = src->_rect_width;
+            this->_rect_height = src->_rect_height;
+
+            this->_centeriod_x = src->_centeriod_x;
+            this->_centeriod_y = src->_centeriod_y;
+        }
+
+        void Assign_Value(const fast::blobInfo& src) {
+
+            this->_id = src._id;
+            this->_rect_x = src._rect_x;
+            this->_rect_y = src._rect_y;
+            this->_rect_width = src._rect_width;
+            this->_rect_height = src._rect_height;
+
+            this->_centeriod_x = src._centeriod_x;
+            this->_centeriod_y = src._centeriod_y;
         }
 
         int id() {
