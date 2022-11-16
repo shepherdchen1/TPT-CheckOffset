@@ -45,6 +45,8 @@ namespace TNControls
 
         public bool Editing { get => _bEditing; set => _bEditing = value; }
 
+        public Color Display_Color { get; set; }
+
         public HitTest_Result HitTest_Rresult { get => _HitTest_Rresult; set => _HitTest_Rresult = value; }
         public DS_Insp_Param_Pin Insp_param { get => _insp_param; set => _insp_param = value; }
         public DS_Insp_Result Insp_result { get => _insp_result; set => _insp_result = value; }
@@ -77,7 +79,7 @@ namespace TNControls
         {
             if (!Editing)
             {
-                Pen pen_ctrl = new Pen(Color.Blue, 1);
+                Pen pen_ctrl = new Pen(Display_Color, 1);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Pos_Info.Editing_Rect) );
             }
             else

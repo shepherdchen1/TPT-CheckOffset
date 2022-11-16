@@ -349,7 +349,7 @@ namespace TN.Insp_Param
         /// 
         private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
 
-        private int _Min_Pin_WH = 10;
+        private int _Min_Pin_WH = 5;
 
         /// <summary>
         /// member function

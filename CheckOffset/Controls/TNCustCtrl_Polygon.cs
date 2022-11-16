@@ -43,15 +43,27 @@ namespace TNControls
 
         public bool Editing { get; set; }
 
+        public Color Display_Color { get; set; }
+
         public void Draw2PB(Graphics graphics_show, TNPictureBox pb)
         {
             if (null == Pos_Info.Points)
                 return;
 
+            if (Pos_Info.Points.Length <= 1)
+                return;
+
             if (!Editing)
             {
-                Pen pen_ctrl = new Pen(Color.Blue, 1);
-                graphics_show.DrawPolygon(pen_ctrl, Pos_Info.Points);
+                Pen pen_ctrl = new Pen(Display_Color, 1);
+
+                Point[] draw_pts = new Point[Pos_Info.Points.Length]; 
+                for(int pt_id = 0; pt_id < draw_pts.Length; pt_id++)
+                {
+                    draw_pts[pt_id] = pb.GetPBPointFromImage(Pos_Info.Points[pt_id]);
+                }
+
+                graphics_show.DrawPolygon(pen_ctrl, draw_pts);
             }
             else
             {

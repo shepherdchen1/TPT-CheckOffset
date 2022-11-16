@@ -1037,7 +1037,32 @@ namespace CheckOffset
             FindPinPosition pin_finder = new FindPinPosition();
             pin_finder.Find_Pin_Position(tnGlobal._IT_Detect);
 
+            _userctrl_image.pb_Image.Cache_Ctrl.Clear();
+
+            for (int contour_id = 0; contour_id < pin_finder.Found_Contours.GetLength(0); contour_id++)
+            {
+                TNCustCtrl_Polygon exist_added_pgn = new TNCustCtrl_Polygon();
+                exist_added_pgn.Pos_Info.Points = new System.Drawing.Point[ pin_finder.Found_Contours[contour_id].Length ];
+                for (int pt_id = 0; pt_id < pin_finder.Found_Contours[contour_id].Length; pt_id++)
+                {
+                    exist_added_pgn.Pos_Info.Points[pt_id].X = pin_finder.Found_Contours[contour_id][pt_id].X;
+                    exist_added_pgn.Pos_Info.Points[pt_id].Y = pin_finder.Found_Contours[contour_id][pt_id].Y;
+                }
+                //for (int pt_id = 0; pt_id < pin_finder.Found_Contours[contour_id].Length; pt_id++)
+                //{
+                //    exist_added_pts.Pos_Info.Points[pt_id]. = insp_pin.Detect_Rect;
+                //    //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                //    exist_added_rect.Display_Color = Color.Green;
+                //    _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                //}
+                //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                exist_added_pgn.Display_Color = Color.Purple;
+                _userctrl_image.Cache_Ctrl.Add(exist_added_pgn);
+            }
+
             Paint_Pin_Pos();
+
+            labelCheckResult.Text = $"Found blob:{tnGlobal.Detect_Infos.Count}";
     }
 
         private void numPinMinWH_ValueChanged(object sender, EventArgs e)
@@ -1049,15 +1074,14 @@ namespace CheckOffset
         {
             try
             {
-                _userctrl_image.pb_Image.Cache_Ctrl.Clear();
-
                 foreach ( DS_Detect_Pin_Info insp_pin in tnGlobal.Detect_Infos )
                 {
                     TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                     TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
                     exist_added_rect.Pos_Info.Editing_Rect = insp_pin.Detect_Rect;
                     //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
-                    _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                    exist_added_rect.Display_Color = Color.Green;
+                    _userctrl_image.Cache_Ctrl.Add(exist_added_rect);
                 }
 
                 _userctrl_image.pb_Image.Repaint();

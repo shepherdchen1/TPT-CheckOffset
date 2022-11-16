@@ -695,7 +695,7 @@
             this.numPinMinWH.Size = new System.Drawing.Size(187, 30);
             this.numPinMinWH.TabIndex = 1;
             this.numPinMinWH.Value = new decimal(new int[] {
-            10,
+            5,
             0,
             0,
             0});

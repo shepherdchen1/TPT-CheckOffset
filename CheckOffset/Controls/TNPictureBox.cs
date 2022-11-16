@@ -714,18 +714,18 @@ namespace TNControls
 
                     foreach (Control enu_ctrl in User_Ctrls)
                     {
-                        TNCustCtrl_Rect user_ctrl = (TNCustCtrl_Rect)enu_ctrl;
-                        Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
-                        Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
-                        TNCustCtrl_Rect.DS_Pos_Info pos_info = user_ctrl.Pos_Info;
-                        Rectangle rt_draw = pos_info.Editing_Rect;
-                        rt_draw.Offset(pt_offset);
-                        Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
-                                                                , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
-                        //CreateGraphics().DrawRectangle(pen, rt_final_draw);
-                        //graphics_show.DrawRectangle(pen_user_ctrl, rt_final_draw);
+                        Redraw_Ctrl(enu_ctrl, graphics_show);
 
-                        user_ctrl.Draw2PB(graphics_show, this);
+                        //TNCustCtrl_Rect user_ctrl = (TNCustCtrl_Rect)enu_ctrl;
+                        //Rectangle show_rect = CalcShowRect();  // 要畫在UI上的Image區域
+                        //Point pt_offset = new Point(-show_rect.X, -show_rect.Y);
+                        //TNCustCtrl_Rect.DS_Pos_Info pos_info = user_ctrl.Pos_Info;
+                        //Rectangle rt_draw = pos_info.Editing_Rect;
+                        //rt_draw.Offset(pt_offset);
+                        //Rectangle rt_final_draw = new Rectangle((int)(rt_draw.Left * _scale), (int)(rt_draw.Top * _scale)
+                        //                                        , (int)(rt_draw.Width * _scale), (int)(rt_draw.Height * _scale));
+
+                        //user_ctrl.Draw2PB(graphics_show, this);
                     }
                 }
 
@@ -772,24 +772,7 @@ namespace TNControls
 
                     foreach (Control enu_ctrl in Cache_Ctrl)
                     {
-                        if ( enu_ctrl.GetType() == typeof(TNCustCtrl_Points) )
-                        {
-                            TNCustCtrl_Points user_ctrl = (TNCustCtrl_Points)enu_ctrl;
-
-                            user_ctrl.Draw2PB(graphics_show, this);
-                        }
-                        else if (enu_ctrl.GetType() == typeof(TNCustCtrl_String))
-                        {
-                            TNCustCtrl_String user_ctrl = (TNCustCtrl_String)enu_ctrl;
-
-                            user_ctrl.Draw2PB(graphics_show, this);
-                        }
-                        else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Lines))
-                        {
-                            TNCustCtrl_Lines user_ctrl = (TNCustCtrl_Lines)enu_ctrl;
-
-                            user_ctrl.Draw2PB(graphics_show, this);
-                        }
+                        Redraw_Ctrl(enu_ctrl, graphics_show);         
                     }
                 }
 
@@ -808,6 +791,45 @@ namespace TNControls
 
             Bitmap tempBitmap = new Bitmap(Show_Color_Image);
             Image = tempBitmap;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="graphics_show"></param>
+        /// <param name="pb"></param>
+        public void Redraw_Ctrl(Control enu_ctrl, Graphics graphics_show)
+        {
+            if (enu_ctrl.GetType() == typeof(TNCustCtrl_Points))
+            {
+                TNCustCtrl_Points user_ctrl = (TNCustCtrl_Points)enu_ctrl;
+
+                user_ctrl.Draw2PB(graphics_show, this);
+            }
+            else if (enu_ctrl.GetType() == typeof(TNCustCtrl_String))
+            {
+                TNCustCtrl_String user_ctrl = (TNCustCtrl_String)enu_ctrl;
+
+                user_ctrl.Draw2PB(graphics_show, this);
+            }
+            else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Rect))
+            {
+                TNCustCtrl_Rect user_ctrl = (TNCustCtrl_Rect)enu_ctrl;
+
+                user_ctrl.Draw2PB(graphics_show, this);
+            }
+            else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Lines))
+            {
+                TNCustCtrl_Lines user_ctrl = (TNCustCtrl_Lines)enu_ctrl;
+
+                user_ctrl.Draw2PB(graphics_show, this);
+            }
+            else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Polygon))
+            {
+                TNCustCtrl_Polygon user_ctrl = (TNCustCtrl_Polygon)enu_ctrl;
+
+                user_ctrl.Draw2PB(graphics_show, this);
+            }
         }
 
         public void DrawGrayLevel2PB(Graphics graphics_show, TNPictureBox pb)

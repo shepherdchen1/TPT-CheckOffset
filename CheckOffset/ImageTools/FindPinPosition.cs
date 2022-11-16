@@ -43,6 +43,8 @@ namespace CheckOffset.ImageTools
 
         public List<Pin_Found> Pin_Founds { get => _Pin_Founds; set => _Pin_Founds = value; }
 
+        public OpenCvSharp.Point[][] Found_Contours { get; set; }
+
         //////////////////////////////////////////////////////////////////////
         /// <summary>
         ///  member function.
@@ -167,7 +169,7 @@ namespace CheckOffset.ImageTools
         //    }
         //}
 
-        Cv2.ImShow("Init image", src_buffer);
+        //Cv2.ImShow("Init image", src_buffer);
                 //Mat dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1), MatType.CV_8U );
                 var dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1));
 
@@ -177,10 +179,10 @@ namespace CheckOffset.ImageTools
                 int size = _Pin_Conditions.Close_Size * 2 + 1;
         Mat se = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(size, size), new OpenCvSharp.Point(-1, -1));
         //Cv2.ImShow("SE image", se);
-        Cv2.ImShow("Source image", src_buffer);
+        //Cv2.ImShow("Source image", src_buffer);
 
                 Cv2.Dilate(src_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 1);
-                Cv2.ImShow("Dilation image", dest_buffer);
+                //Cv2.ImShow("Dilation image", dest_buffer);
 
                 Buffer_Save_File(dest_buffer, "d:\\test\\Dilate.bmp");
 
@@ -188,11 +190,13 @@ namespace CheckOffset.ImageTools
                 Buffer_Save_File(dest_buffer, "d:\\test\\Close.bmp");
                 dest_buffer.SaveImage("d:\\test\\close_2.bmp");
 
-                Cv2.ImShow("Closed image", dest_buffer);
+                //Cv2.ImShow("Closed image", dest_buffer);
 
                 Pin_Blob_Detect(dest_buffer, out OpenCvSharp.Point[][] contours);
 
                 Get_Pin_Pos( contours);
+
+                Found_Contours = contours;
             }
             catch (Exception ex)
             {
@@ -209,6 +213,13 @@ namespace CheckOffset.ImageTools
             contours = null;
             try
             {
+                if (tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH < 2)
+                {
+                    Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                     , $"Min_Pin_WH is:{tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH}");
+                    return;
+                }
+
                 Buffer_Save_File(buffer, "d:\\test\\blob_analyze_Source.bmp");
 
                 Cv2.FindContours(buffer
@@ -226,30 +237,16 @@ namespace CheckOffset.ImageTools
                 }
                 Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
 
-                int min_wh  = 10;
-
                 List<System.Drawing.Rectangle> blobs = new List<System.Drawing.Rectangle>();
                 Mat imgWithContours = Mat.Zeros(buffer.Rows, buffer.Cols, MatType.CV_8UC1);
                 for(int i = 0; i < contours.Length; i++)
                 {
                     if ( Cv2.ContourArea(contours[i]) >= 1)
                     {
-                        System.Drawing.Rectangle rt = new System.Drawing.Rectangle(Int32.MaxValue, Int32.MaxValue, 0, 0);
-                        for(int pt_id = 0; pt_id < contours[i].Length; pt_id++)
-                        {
-                            int min_x = System.Math.Min(rt.X, contours[i][pt_id].X);
-                            int min_y = System.Math.Min(rt.Y, contours[i][pt_id].Y);
-                            int max_x = System.Math.Max(rt.X, contours[i][pt_id].X);
-                            int max_y = System.Math.Max(rt.Y, contours[i][pt_id].Y);
+                        System.Drawing.Rectangle rt = Get_Contour_Rect(contours, i);
 
-                            rt.X = min_x;
-                            rt.Y = min_y;
-                            rt.Width  = max_x - min_x;
-                            rt.Height = max_y - min_y;
-                        }
-
-                        if ( rt.Width >= min_wh
-                            || rt.Height >= min_wh)
+                        if (   rt.Width >= tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH
+                            || rt.Height >= tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH)
                         {
                             blobs.Add(rt);
 
@@ -262,7 +259,7 @@ namespace CheckOffset.ImageTools
                 Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
 
                 buffer.SaveImage("d:\\test\\blob_analyze.bmp");
-                Cv2.ImShow("Blob Detect", buffer);
+                //Cv2.ImShow("Blob Detect", buffer);
             }
             catch (Exception ex)
             {
@@ -593,21 +590,19 @@ namespace CheckOffset.ImageTools
                     return new System.Drawing.Rectangle(0, 0, 0, 0);
                 }
 
-                System.Drawing.Rectangle rt = new System.Drawing.Rectangle(Int32.MaxValue, Int32.MaxValue, 0, 0);
+                int min_x = Int32.MaxValue;
+                int min_y = Int32.MaxValue;
+                int max_x = 0;
+                int max_y = 0;
                 for (int pt_id = 0; pt_id < contours[contour_id].Length; pt_id++)
                 {
-                    int min_x = System.Math.Min(rt.X, contours[contour_id][pt_id].X);
-                    int min_y = System.Math.Min(rt.Y, contours[contour_id][pt_id].Y);
-                    int max_x = System.Math.Max(rt.X, contours[contour_id][pt_id].X);
-                    int max_y = System.Math.Max(rt.Y, contours[contour_id][pt_id].Y);
-
-                    rt.X = min_x;
-                    rt.Y = min_y;
-                    rt.Width = max_x - min_x;
-                    rt.Height = max_y - min_y;
+                    min_x = System.Math.Min(min_x, contours[contour_id][pt_id].X);
+                    min_y = System.Math.Min(min_y, contours[contour_id][pt_id].Y);
+                    max_x = System.Math.Max(max_x, contours[contour_id][pt_id].X);
+                    max_y = System.Math.Max(max_y, contours[contour_id][pt_id].Y);
                 }
 
-                return rt;
+                return new System.Drawing.Rectangle( min_x, min_y, max_x - min_x + 1, max_y - min_y + 1);
             }
             catch (Exception ex)
             {
