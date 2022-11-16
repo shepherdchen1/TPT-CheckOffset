@@ -50,8 +50,9 @@ namespace CheckOffset.ImageTools
         private byte[,] _pins = new byte[0, 0];
 
         public byte[,] Pins { get => _pins; set => _pins = value; }
+        public byte[,] Buffer { get => _buffer; set => _buffer = value; }
 
-        private void Clear_Result()
+        public void Clear_Result()
         {
             try
             {
@@ -60,19 +61,24 @@ namespace CheckOffset.ImageTools
                 _pins = new byte[_buffer.GetLength(0), _buffer.GetLength(1)];
 
                 byte[] zero_buf = new byte[_edges.GetLength(1)];
-                for (int y = 0; y < _edges.GetLength(0); y++)
-                {
-                    Buffer.BlockCopy(zero_buf, 0, _edges, y * _edges.GetLength(1), zero_buf.GetLength(0));
-                }
+                //for (int y = 0; y < _edges.GetLength(0); y++)
+                //{
+                //    //Buffer.BlockCopy(zero_buf, 0, _edges, y * _edges.GetLength(1), zero_buf.GetLength(0));
+                //    Marshal.Copy(zero_buf, 0, _edges[y * _edges.GetLength(1), 0], zero_buf.GetLength(0));
+                //}
+                Array.Clear(_edges, 0, _edges.GetLength(0) * _edges.GetLength(1) );
 
-                for (int y = 0; y < _pins.GetLength(0); y++)
-                {
-                    Buffer.BlockCopy(zero_buf, 0, _v_weight, y * _v_weight.GetLength(1), zero_buf.GetLength(0));
-                    Buffer.BlockCopy(zero_buf, 0, _h_weight, y * _h_weight.GetLength(1), zero_buf.GetLength(0));
+                //for (int y = 0; y < _pins.GetLength(0); y++)
+                //{
+                //    Marshal.Copy(zero_buf, 0, _v_weight, y * _v_weight.GetLength(1), zero_buf.GetLength(0));
+                //    Marshal.Copy(zero_buf, 0, _h_weight, y * _h_weight.GetLength(1), zero_buf.GetLength(0));
 
-                    Buffer.BlockCopy(zero_buf, 0, _pins, y * _h_weight.GetLength(1), zero_buf.GetLength(0));
-                }
+                //    Marshal.Copy(zero_buf, 0, _pins, y * _h_weight.GetLength(1), zero_buf.GetLength(0));
+                //}
 
+                Array.Clear(_v_weight, 0, _v_weight.GetLength(0) * _v_weight.GetLength(1));
+                Array.Clear(_h_weight, 0, _h_weight.GetLength(0) * _h_weight.GetLength(1));
+                Array.Clear(_pins, 0, _pins.GetLength(0) * _pins.GetLength(1));
             }
             catch (Exception ex)
             {

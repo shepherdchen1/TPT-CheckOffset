@@ -101,12 +101,12 @@ namespace CheckOffset
                 if (null != _userctrl_image.User_Ctrls)
                 {
                     _userctrl_image.User_Ctrls.Clear();
-                    foreach (DS_Detect_Info cur_detect_infos in tnGlobal.Detect_Infos)
+                    foreach (DS_Detect_Pin_Info cur_detect_infos in tnGlobal.Detect_Infos)
                     {
                         TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                         TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
                         exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
-                        exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                        //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
                         _userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
                 }
@@ -117,7 +117,7 @@ namespace CheckOffset
                 _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rectangle(0, 0, 100, 100);
-                DS_Insp_Param new_insp_param = new DS_Insp_Param();
+                DS_Insp_Param_Pin new_insp_param = new DS_Insp_Param_Pin();
                 new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                 new_added_rect.Insp_param = new_insp_param;
             }
@@ -128,16 +128,16 @@ namespace CheckOffset
                 {
                     TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
 
-                    DS_Insp_Param new_insp_param = new DS_Insp_Param();
+                    DS_Insp_Param_Pin new_insp_param = new DS_Insp_Param_Pin();
                     new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                     editing_rect.Insp_param = new_insp_param;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
                     {
-                        DS_Detect_Info new_defect_info = new DS_Detect_Info();
+                        DS_Detect_Pin_Info new_defect_info = new DS_Detect_Pin_Info();
                         new_defect_info.Detect_Rect = editing_rect.Pos_Info.Editing_Rect;
-                        new_defect_info.Detect_Insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
+                        new_defect_info.Insp_Tol_Dir = Get_Insp_Tol_Dir();
                         tnGlobal.Detect_Infos.Add(new_defect_info);
                     }
 
@@ -162,7 +162,7 @@ namespace CheckOffset
                 return;
 
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
-            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Info>>(jsonString);
+            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Pin_Info>>(jsonString);
 
             _userctrl_image.Apply_GlobalSetting_To_Ctrls();
             _userctrl_image.Refresh();
@@ -176,7 +176,7 @@ namespace CheckOffset
             if (null == tnGlobal.Detect_Infos)
                 return;
 
-            string jsonString = System.Text.Json.JsonSerializer.Serialize<List<DS_Detect_Info>>(tnGlobal.Detect_Infos); // tnGlobal.Setting);
+            string jsonString = System.Text.Json.JsonSerializer.Serialize<List<DS_Detect_Pin_Info>>(tnGlobal.Detect_Infos); // tnGlobal.Setting);
 
 
             jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(tnGlobal.Detect_Infos);
@@ -211,7 +211,7 @@ namespace CheckOffset
                     foreach (Control ctrl_defect_info in _userctrl_image.User_Ctrls)
                     {
                         TNCustCtrl_Rect rect_user_ctrl = (TNCustCtrl_Rect)ctrl_defect_info;
-                        DS_Insp_Param chk_insp_param = rect_user_ctrl.Insp_param;
+                        DS_Insp_Param_Pin chk_insp_param = rect_user_ctrl.Insp_param;
                         DS_Insp_Result chk_insp_result = rect_user_ctrl.Insp_result;
 
                         //////////////////////////////////
@@ -533,16 +533,24 @@ namespace CheckOffset
                 return;
             }
 
-            IT_Detect iT_Detect = new IT_Detect(buffer);
-            iT_Detect.Detect_Pin();
-
-            for (int y = 0; y < iT_Detect.Pins.GetLength(0); y++)
+            if (null == tnGlobal._IT_Detect)
             {
-                for (int x = 0; x < iT_Detect.Pins.GetLength(1); x++)
+                tnGlobal._IT_Detect = new IT_Detect(buffer);
+            }
+            else
+            {
+                tnGlobal._IT_Detect.Clear_Result();
+            }
+
+            tnGlobal._IT_Detect.Detect_Pin();
+
+            for (int y = 0; y < tnGlobal._IT_Detect.Pins.GetLength(0); y++)
+            {
+                for (int x = 0; x < tnGlobal._IT_Detect.Pins.GetLength(1); x++)
                 {
-                    if (iT_Detect.Pins[y, x] <= 0)
+                    if (tnGlobal._IT_Detect.Pins[y, x] <= 0)
                         continue;
-                    else if (iT_Detect.Pins[y, x] == 1)
+                    else if (tnGlobal._IT_Detect.Pins[y, x] == 1)
                     {
                         TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
                         ctrl_string.Pos_Info.Points = new System.Drawing.Point[1];
@@ -561,7 +569,7 @@ namespace CheckOffset
                         //ctrl_string.Display_Font_Size = 8;
                         //_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
                     }
-                    else if (iT_Detect.Pins[y, x] >= 2)
+                    else if (tnGlobal._IT_Detect.Pins[y, x] >= 2)
                     {
                         TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
                         ctrl_string.Pos_Info.Points = new System.Drawing.Point[1];
@@ -584,13 +592,14 @@ namespace CheckOffset
 
             tbProjectFile.Text = openFileDialog_Img.FileName;
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
-            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Info>>(jsonString);
+            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Pin_Info>>(jsonString);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             string jsonString = File.ReadAllText(tbProjectFile.Text);
-            tnGlobal.Detect_Pins = Newtonsoft.Json.JsonConvert.DeserializeObject<DS_Defect_Pin_Info> (jsonString);
+            //tnGlobal.Detect_Pins = Newtonsoft.Json.JsonConvert.DeserializeObject<DS_Defect_Pin_Info> (jsonString);
+            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject< List<DS_Detect_Pin_Info> > (jsonString);
         }
 
         private void btnClearCacheItems_Click(object sender, EventArgs e)
@@ -961,38 +970,97 @@ namespace CheckOffset
 
         }
 
+        //private void btnOpenCV_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        //OpenCV_Bridge.OpenCB_1();
+        //        //Mat image = imread("D:\\test\\blobSource_24.bmp", 0);
+
+        //        var img = @"D:\test\blobSource_24.bmp";
+        //        //Mat image = new Mat(@"D:\test\blobSource_24.bmp");
+        //        Mat image = Cv2.ImRead(@"D:\\test\\blobSource_opencv_8.bmp", ImreadModes.Unchanged); // ImreadModes.GrayScale);
+        //        //var mainForm = new ImageViewer(img);
+
+        //        //using (var src = new Mat(@"D:\test\blobSource_24.bmp", ImreadModes.Unchanged))
+        //        //{
+        //            //using (var window = new Window("window", image: src, flags: WindowMode.AutoSize))
+        //            //{
+        //            //    Cv2.WaitKey();
+        //            //}
+        //        //}
+
+        //        //mainForm.FormBorderStyle = FormBorderStyle.None;
+        //        _userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
+        //        //mainForm.Owner = (Form) _userctrl_image;
+        //        //mainForm.ShowDialog();
+
+        //        //imshow("Grayscale image", image);
+
+        //        //// Save grayscale image
+        //        //imwrite("boyGray.jpg", image);
+
+        //        //imshow("Grayscale image", image);
+        //        //waitKey(0);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+        //                    , $"Exception catched: error:{ex.Message}");
+        //        // 儲存Exception到檔案
+        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+        //    }
+        //}
+
         private void btnOpenCV_Click(object sender, EventArgs e)
         {
             try
             {
-                //OpenCV_Bridge.OpenCB_1();
-                //Mat image = imread("D:\\test\\blobSource_24.bmp", 0);
-
                 var img = @"D:\test\blobSource_24.bmp";
-                //Mat image = new Mat(@"D:\test\blobSource_24.bmp");
                 Mat image = Cv2.ImRead(@"D:\\test\\blobSource_opencv_8.bmp", ImreadModes.Unchanged); // ImreadModes.GrayScale);
-                //var mainForm = new ImageViewer(img);
-
-                //using (var src = new Mat(@"D:\test\blobSource_24.bmp", ImreadModes.Unchanged))
-                //{
-                    //using (var window = new Window("window", image: src, flags: WindowMode.AutoSize))
-                    //{
-                    //    Cv2.WaitKey();
-                    //}
-                //}
-
-                //mainForm.FormBorderStyle = FormBorderStyle.None;
+                                                                                                     //var mainForm = new ImageViewer(img);
                 _userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
-                //mainForm.Owner = (Form) _userctrl_image;
-                //mainForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                            , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+        }
 
-                //imshow("Grayscale image", image);
+        private void btnFindPinPosition_Click(object sender, EventArgs e)
+        {
+            tnGlobal.Detect_Infos.Clear();
 
-                //// Save grayscale image
-                //imwrite("boyGray.jpg", image);
+            FindPinPosition pin_finder = new FindPinPosition();
+            pin_finder.Find_Pin_Position(tnGlobal._IT_Detect);
 
-                //imshow("Grayscale image", image);
-                //waitKey(0);
+            Paint_Pin_Pos();
+    }
+
+        private void numPinMinWH_ValueChanged(object sender, EventArgs e)
+        {
+            tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH = (int) numPinMinWH.Value;
+        }
+
+        private void Paint_Pin_Pos()
+        {
+            try
+            {
+                _userctrl_image.pb_Image.Cache_Ctrl.Clear();
+
+                foreach ( DS_Detect_Pin_Info insp_pin in tnGlobal.Detect_Infos )
+                {
+                    TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
+                    TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                    exist_added_rect.Pos_Info.Editing_Rect = insp_pin.Detect_Rect;
+                    //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                    _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                }
+
+                _userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {

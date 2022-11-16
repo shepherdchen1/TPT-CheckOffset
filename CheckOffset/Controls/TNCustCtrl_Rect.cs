@@ -46,7 +46,7 @@ namespace TNControls
         public bool Editing { get => _bEditing; set => _bEditing = value; }
 
         public HitTest_Result HitTest_Rresult { get => _HitTest_Rresult; set => _HitTest_Rresult = value; }
-        public DS_Insp_Param Insp_param { get => _insp_param; set => _insp_param = value; }
+        public DS_Insp_Param_Pin Insp_param { get => _insp_param; set => _insp_param = value; }
         public DS_Insp_Result Insp_result { get => _insp_result; set => _insp_result = value; }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace TNControls
 
         private bool _bEditing = false;
 
-        private DS_Insp_Param _insp_param = new DS_Insp_Param();
+        private DS_Insp_Param_Pin _insp_param = new DS_Insp_Param_Pin();
 
         private DS_Insp_Result _insp_result = new DS_Insp_Result();
 

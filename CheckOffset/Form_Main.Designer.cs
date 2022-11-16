@@ -60,18 +60,26 @@
             this.btnDetect = new System.Windows.Forms.Button();
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.btnDetectPins = new System.Windows.Forms.Button();
+            this.btnFindPinPosition = new System.Windows.Forms.Button();
+            this.btnOpenCV = new System.Windows.Forms.Button();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.btnLoadInspPins = new System.Windows.Forms.Button();
             this.btnSaveInspPins = new System.Windows.Forms.Button();
             this.btnDetectBlobOld = new System.Windows.Forms.Button();
             this.btnDetectBlob = new System.Windows.Forms.Button();
             this.btnClearCacheItems = new System.Windows.Forms.Button();
-            this.btnDetectPins = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
             this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnBmp2Array = new System.Windows.Forms.Button();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.tabCtrl_Insp_Rules = new System.Windows.Forms.TabControl();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.numPinMinWH = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.btnProjectFile = new System.Windows.Forms.Button();
@@ -92,7 +100,6 @@
             this.openFileDialog_Img = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_Setting = new System.Windows.Forms.OpenFileDialog();
-            this.btnOpenCV = new System.Windows.Forms.Button();
             this.pnlSetting.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -104,9 +111,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).BeginInit();
             this.tabPage3.SuspendLayout();
+            this.groupBox9.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).BeginInit();
+            this.tabPage5.SuspendLayout();
+            this.tabCtrl_Insp_Rules.SuspendLayout();
+            this.tabPage6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numPinMinWH)).BeginInit();
             this.tabPage4.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.pnlHeader.SuspendLayout();
@@ -120,9 +132,9 @@
             this.pnlSetting.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlSetting.Controls.Add(this.tabControl1);
             this.pnlSetting.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlSetting.Location = new System.Drawing.Point(1232, 0);
+            this.pnlSetting.Location = new System.Drawing.Point(1137, 0);
             this.pnlSetting.Name = "pnlSetting";
-            this.pnlSetting.Size = new System.Drawing.Size(386, 907);
+            this.pnlSetting.Size = new System.Drawing.Size(481, 907);
             this.pnlSetting.TabIndex = 0;
             // 
             // tabControl1
@@ -130,12 +142,13 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Location = new System.Drawing.Point(15, 15);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.Padding = new System.Drawing.Point(20, 3);
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(358, 872);
+            this.tabControl1.Size = new System.Drawing.Size(453, 872);
             this.tabControl1.TabIndex = 15;
             // 
             // tabPage1
@@ -148,7 +161,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 32);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(350, 836);
+            this.tabPage1.Size = new System.Drawing.Size(445, 836);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "影像";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -362,7 +375,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 32);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(350, 836);
+            this.tabPage2.Size = new System.Drawing.Size(445, 836);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "過濾";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -464,18 +477,59 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.groupBox9);
             this.tabPage3.Controls.Add(this.btnOpenCV);
             this.tabPage3.Controls.Add(this.groupBox8);
             this.tabPage3.Controls.Add(this.btnClearCacheItems);
-            this.tabPage3.Controls.Add(this.btnDetectPins);
             this.tabPage3.Controls.Add(this.groupBox5);
             this.tabPage3.Controls.Add(this.btnBmp2Array);
             this.tabPage3.Location = new System.Drawing.Point(4, 32);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(350, 836);
+            this.tabPage3.Size = new System.Drawing.Size(445, 836);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "測試";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.btnDetectPins);
+            this.groupBox9.Controls.Add(this.btnFindPinPosition);
+            this.groupBox9.Location = new System.Drawing.Point(17, 269);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(407, 130);
+            this.groupBox9.TabIndex = 11;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Pin";
+            // 
+            // btnDetectPins
+            // 
+            this.btnDetectPins.Location = new System.Drawing.Point(18, 29);
+            this.btnDetectPins.Name = "btnDetectPins";
+            this.btnDetectPins.Size = new System.Drawing.Size(166, 34);
+            this.btnDetectPins.TabIndex = 4;
+            this.btnDetectPins.Text = "Detect Pins";
+            this.btnDetectPins.UseVisualStyleBackColor = true;
+            this.btnDetectPins.Click += new System.EventHandler(this.btnDetectPins_Click);
+            // 
+            // btnFindPinPosition
+            // 
+            this.btnFindPinPosition.Location = new System.Drawing.Point(223, 29);
+            this.btnFindPinPosition.Name = "btnFindPinPosition";
+            this.btnFindPinPosition.Size = new System.Drawing.Size(166, 34);
+            this.btnFindPinPosition.TabIndex = 10;
+            this.btnFindPinPosition.Text = "Find Pin Pos";
+            this.btnFindPinPosition.UseVisualStyleBackColor = true;
+            this.btnFindPinPosition.Click += new System.EventHandler(this.btnFindPinPosition_Click);
+            // 
+            // btnOpenCV
+            // 
+            this.btnOpenCV.Location = new System.Drawing.Point(17, 766);
+            this.btnOpenCV.Name = "btnOpenCV";
+            this.btnOpenCV.Size = new System.Drawing.Size(123, 34);
+            this.btnOpenCV.TabIndex = 9;
+            this.btnOpenCV.Text = "OpenCV-1";
+            this.btnOpenCV.UseVisualStyleBackColor = true;
+            this.btnOpenCV.Click += new System.EventHandler(this.btnOpenCV_Click);
             // 
             // groupBox8
             // 
@@ -483,7 +537,7 @@
             this.groupBox8.Controls.Add(this.btnSaveInspPins);
             this.groupBox8.Controls.Add(this.btnDetectBlobOld);
             this.groupBox8.Controls.Add(this.btnDetectBlob);
-            this.groupBox8.Location = new System.Drawing.Point(17, 364);
+            this.groupBox8.Location = new System.Drawing.Point(17, 515);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(300, 208);
             this.groupBox8.TabIndex = 6;
@@ -540,16 +594,6 @@
             this.btnClearCacheItems.UseVisualStyleBackColor = true;
             this.btnClearCacheItems.Click += new System.EventHandler(this.btnClearCacheItems_Click);
             // 
-            // btnDetectPins
-            // 
-            this.btnDetectPins.Location = new System.Drawing.Point(35, 303);
-            this.btnDetectPins.Name = "btnDetectPins";
-            this.btnDetectPins.Size = new System.Drawing.Size(123, 34);
-            this.btnDetectPins.TabIndex = 4;
-            this.btnDetectPins.Text = "Detect Pins";
-            this.btnDetectPins.UseVisualStyleBackColor = true;
-            this.btnDetectPins.Click += new System.EventHandler(this.btnDetectPins_Click);
-            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.label2);
@@ -557,7 +601,7 @@
             this.groupBox5.Controls.Add(this.btnCannyEdgeDetect);
             this.groupBox5.Location = new System.Drawing.Point(17, 134);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(300, 113);
+            this.groupBox5.Size = new System.Drawing.Size(407, 113);
             this.groupBox5.TabIndex = 4;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Edge Detect";
@@ -573,14 +617,14 @@
             // 
             // numMinHysteresisThreshold
             // 
-            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(18, 68);
+            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(98, 68);
             this.numMinHysteresisThreshold.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
             this.numMinHysteresisThreshold.Name = "numMinHysteresisThreshold";
-            this.numMinHysteresisThreshold.Size = new System.Drawing.Size(135, 30);
+            this.numMinHysteresisThreshold.Size = new System.Drawing.Size(139, 30);
             this.numMinHysteresisThreshold.TabIndex = 3;
             this.numMinHysteresisThreshold.Value = new decimal(new int[] {
             55,
@@ -590,7 +634,7 @@
             // 
             // btnCannyEdgeDetect
             // 
-            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(167, 64);
+            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(266, 64);
             this.btnCannyEdgeDetect.Name = "btnCannyEdgeDetect";
             this.btnCannyEdgeDetect.Size = new System.Drawing.Size(123, 34);
             this.btnCannyEdgeDetect.TabIndex = 1;
@@ -608,13 +652,71 @@
             this.btnBmp2Array.UseVisualStyleBackColor = true;
             this.btnBmp2Array.Click += new System.EventHandler(this.btnBmp2Array_Click);
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.tabCtrl_Insp_Rules);
+            this.tabPage5.Location = new System.Drawing.Point(4, 32);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Size = new System.Drawing.Size(445, 836);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "檢規";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // tabCtrl_Insp_Rules
+            // 
+            this.tabCtrl_Insp_Rules.Controls.Add(this.tabPage6);
+            this.tabCtrl_Insp_Rules.Location = new System.Drawing.Point(12, 15);
+            this.tabCtrl_Insp_Rules.Name = "tabCtrl_Insp_Rules";
+            this.tabCtrl_Insp_Rules.SelectedIndex = 0;
+            this.tabCtrl_Insp_Rules.Size = new System.Drawing.Size(416, 799);
+            this.tabCtrl_Insp_Rules.TabIndex = 0;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.numPinMinWH);
+            this.tabPage6.Controls.Add(this.label4);
+            this.tabPage6.Location = new System.Drawing.Point(4, 32);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage6.Size = new System.Drawing.Size(408, 763);
+            this.tabPage6.TabIndex = 0;
+            this.tabPage6.Text = "Pin 腳位";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // numPinMinWH
+            // 
+            this.numPinMinWH.Location = new System.Drawing.Point(167, 22);
+            this.numPinMinWH.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.numPinMinWH.Name = "numPinMinWH";
+            this.numPinMinWH.Size = new System.Drawing.Size(187, 30);
+            this.numPinMinWH.TabIndex = 1;
+            this.numPinMinWH.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numPinMinWH.ValueChanged += new System.EventHandler(this.numPinMinWH_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(20, 26);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(141, 23);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Min WH(pixel) :";
+            // 
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.groupBox7);
             this.tabPage4.Controls.Add(this.groupBox6);
             this.tabPage4.Location = new System.Drawing.Point(4, 32);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(350, 836);
+            this.tabPage4.Size = new System.Drawing.Size(445, 836);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "檢測資料";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -697,14 +799,14 @@
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1232, 52);
+            this.pnlHeader.Size = new System.Drawing.Size(1137, 52);
             this.pnlHeader.TabIndex = 2;
             // 
             // labelReason
             // 
             this.labelReason.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelReason.AutoSize = true;
-            this.labelReason.Location = new System.Drawing.Point(991, 17);
+            this.labelReason.Location = new System.Drawing.Point(896, 17);
             this.labelReason.Name = "labelReason";
             this.labelReason.Size = new System.Drawing.Size(72, 23);
             this.labelReason.TabIndex = 1;
@@ -715,7 +817,7 @@
             this.labelCheckResult.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelCheckResult.AutoSize = true;
             this.labelCheckResult.Font = new System.Drawing.Font("Microsoft JhengHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.labelCheckResult.Location = new System.Drawing.Point(526, 10);
+            this.labelCheckResult.Location = new System.Drawing.Point(431, 10);
             this.labelCheckResult.Name = "labelCheckResult";
             this.labelCheckResult.Size = new System.Drawing.Size(83, 30);
             this.labelCheckResult.TabIndex = 0;
@@ -730,14 +832,14 @@
             this.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlFooter.Location = new System.Drawing.Point(0, 825);
             this.pnlFooter.Name = "pnlFooter";
-            this.pnlFooter.Size = new System.Drawing.Size(1232, 82);
+            this.pnlFooter.Size = new System.Drawing.Size(1137, 82);
             this.pnlFooter.TabIndex = 3;
             // 
             // labelScale
             // 
             this.labelScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelScale.AutoSize = true;
-            this.labelScale.Location = new System.Drawing.Point(958, 47);
+            this.labelScale.Location = new System.Drawing.Point(863, 47);
             this.labelScale.Name = "labelScale";
             this.labelScale.Size = new System.Drawing.Size(31, 23);
             this.labelScale.TabIndex = 2;
@@ -747,7 +849,7 @@
             // 
             this.labelGrayLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelGrayLevel.AutoSize = true;
-            this.labelGrayLevel.Location = new System.Drawing.Point(1069, 14);
+            this.labelGrayLevel.Location = new System.Drawing.Point(974, 14);
             this.labelGrayLevel.Name = "labelGrayLevel";
             this.labelGrayLevel.Size = new System.Drawing.Size(20, 23);
             this.labelGrayLevel.TabIndex = 1;
@@ -757,7 +859,7 @@
             // 
             this.labelCursorPos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelCursorPos.AutoSize = true;
-            this.labelCursorPos.Location = new System.Drawing.Point(949, 14);
+            this.labelCursorPos.Location = new System.Drawing.Point(854, 14);
             this.labelCursorPos.Name = "labelCursorPos";
             this.labelCursorPos.Size = new System.Drawing.Size(46, 23);
             this.labelCursorPos.TabIndex = 0;
@@ -770,7 +872,7 @@
             this.tabUser.Location = new System.Drawing.Point(0, 52);
             this.tabUser.Name = "tabUser";
             this.tabUser.SelectedIndex = 0;
-            this.tabUser.Size = new System.Drawing.Size(1232, 773);
+            this.tabUser.Size = new System.Drawing.Size(1137, 773);
             this.tabUser.TabIndex = 4;
             this.tabUser.SelectedIndexChanged += new System.EventHandler(this.tabUser_SelectedIndexChanged);
             // 
@@ -779,7 +881,7 @@
             this.tabPage_View.Location = new System.Drawing.Point(4, 32);
             this.tabPage_View.Name = "tabPage_View";
             this.tabPage_View.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_View.Size = new System.Drawing.Size(1224, 737);
+            this.tabPage_View.Size = new System.Drawing.Size(1129, 737);
             this.tabPage_View.TabIndex = 1;
             this.tabPage_View.Text = "tabPage";
             this.tabPage_View.UseVisualStyleBackColor = true;
@@ -797,16 +899,6 @@
             // 
             this.openFileDialog_Setting.FileName = "openFileDialog1";
             this.openFileDialog_Setting.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
-            // 
-            // btnOpenCV
-            // 
-            this.btnOpenCV.Location = new System.Drawing.Point(47, 630);
-            this.btnOpenCV.Name = "btnOpenCV";
-            this.btnOpenCV.Size = new System.Drawing.Size(123, 34);
-            this.btnOpenCV.TabIndex = 9;
-            this.btnOpenCV.Text = "OpenCV-1";
-            this.btnOpenCV.UseVisualStyleBackColor = true;
-            this.btnOpenCV.Click += new System.EventHandler(this.btnOpenCV_Click);
             // 
             // For_Main
             // 
@@ -833,10 +925,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).EndInit();
             this.tabPage3.ResumeLayout(false);
+            this.groupBox9.ResumeLayout(false);
             this.groupBox8.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).EndInit();
+            this.tabPage5.ResumeLayout(false);
+            this.tabCtrl_Insp_Rules.ResumeLayout(false);
+            this.tabPage6.ResumeLayout(false);
+            this.tabPage6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numPinMinWH)).EndInit();
             this.tabPage4.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
@@ -916,5 +1014,12 @@
         private Button btnSaveInspPins;
         private Button btnLoadInspPins;
         private Button btnOpenCV;
+        private Button btnFindPinPosition;
+        private GroupBox groupBox9;
+        private TabPage tabPage5;
+        private TabControl tabCtrl_Insp_Rules;
+        private TabPage tabPage6;
+        private NumericUpDown numPinMinWH;
+        private Label label4;
     }
 }

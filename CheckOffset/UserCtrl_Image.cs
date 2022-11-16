@@ -426,11 +426,11 @@ namespace CheckOffset
 
             if (null != tnGlobal.Detect_Infos)
             {
-                foreach (DS_Detect_Info detect_info in tnGlobal.Detect_Infos)
+                foreach (DS_Detect_Pin_Info detect_info in tnGlobal.Detect_Infos)
                 {
                     TNCustCtrl_Rect new_detect = new TNCustCtrl_Rect();
                     new_detect.Pos_Info.Editing_Rect = detect_info.Detect_Rect;
-                    new_detect.Insp_param = detect_info.Detect_Insp_param;
+                    //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
                     User_Ctrls.Add(new_detect);
                 }
             }
@@ -466,9 +466,9 @@ namespace CheckOffset
                     continue;
                 }
 
-                DS_Detect_Info new_detect_info = new DS_Detect_Info();
+                DS_Detect_Pin_Info new_detect_info = new DS_Detect_Pin_Info();
                 new_detect_info.Detect_Rect = rt_user_ctrl.Pos_Info.Editing_Rect;
-                new_detect_info.Detect_Insp_param = rt_user_ctrl.Insp_param;
+                //new_detect_info.Detect_Insp_param = tnGlobal.Insp_Param_Pin;
 
                 tnGlobal.Detect_Infos.Add(new_detect_info);
             }

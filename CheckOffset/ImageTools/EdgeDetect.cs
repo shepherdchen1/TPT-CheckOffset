@@ -327,15 +327,40 @@ namespace TN.Insp_Param
         /// <summary>
         /// data member
         /// </summary>
-        private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+        /// 
+        private DS_Insp_Param_Pin _Insp_Param_Pin = new DS_Insp_Param_Pin();
 
         /// <summary>
         /// member function
         /// </summary>
-        public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+        public DS_Insp_Param_Pin DS_Insp_Param_Pin { get => _Insp_Param_Pin; set => _Insp_Param_Pin = value; }
+
 
         public DS_Insp_Param()
         {
+        }
+    }
+
+    public class DS_Insp_Param_Pin
+    {
+        /// <summary>
+        /// data member
+        /// </summary>
+        /// 
+        private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+
+        private int _Min_Pin_WH = 10;
+
+        /// <summary>
+        /// member function
+        /// </summary>
+        public int Min_Pin_WH { get => _Min_Pin_WH; set => _Min_Pin_WH = value; }
+
+        public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+
+        public DS_Insp_Param_Pin()
+        {
+            _Min_Pin_WH = 10;
             _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
         }
 
@@ -343,6 +368,29 @@ namespace TN.Insp_Param
         {
             return $"Dir:{Insp_Tol_Dir}";
         }
+    }
+
+    public class DS_Insp_Param_Edge
+    {
+        /// <summary>
+        /// data member
+        /// </summary>
+        //private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+
+        /// <summary>
+        /// member function
+        /// </summary>
+        //public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+
+        public DS_Insp_Param_Edge()
+        {
+            //_Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+        }
+
+        //public string Draw_String()
+        //{
+            //return $"Dir:{Insp_Tol_Dir}";
+        //}
     }
 
     public enum EN_Insp_Result_Type

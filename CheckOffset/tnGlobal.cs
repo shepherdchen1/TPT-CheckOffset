@@ -1,4 +1,5 @@
 ﻿using CheckOffset;
+using CheckOffset.ImageTools;
 using CheckOffset.ProjectInspInfo;
 using System;
 using System.Collections.Generic;
@@ -114,9 +115,13 @@ namespace CheckOffset
 
         public static DS_Setting_Info Setting = new DS_Setting_Info();
 
-        public static List<DS_Detect_Info>? Detect_Infos = new List<DS_Detect_Info>();
+        public static DS_Insp_Param Insp_Param = new DS_Insp_Param();
 
-        public static DS_Defect_Pin_Info? Detect_Pins = null;
+        public static List<DS_Detect_Pin_Info>? Detect_Infos = new List<DS_Detect_Pin_Info>();
+
+        public static IT_Detect _IT_Detect = null;
+
+        //public static DS_Defect_Pin_Info? Detect_Pins = null;
 
         // change to public for update progress
         public static BackgroundWorker BKWorker_Delete_Log = new BackgroundWorker();
@@ -448,18 +453,42 @@ namespace CheckOffset
         }
     }
 
-    public class DS_Detect_Info
+    public class DS_Insp_Param
     {
-        public Rectangle Detect_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
+        //public Rectangle Detect_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
 
-        public DS_Insp_Param Detect_Insp_param = new DS_Insp_Param();
+        public DS_Insp_Param_Pin Insp_Param_Pin = new DS_Insp_Param_Pin();
+
+        //private int _Min_Pin_WH = 10;
+
+        //private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+
+        //public DS_Insp_Result Detect_Insp_Result = new DS_Insp_Result();
+
+        public DS_Insp_Param()
+        {
+             Insp_Param_Pin = new DS_Insp_Param_Pin();
+            //Detect_Rect = new Rectangle(0, 0, 0, 0);
+            //Detect_Insp_param = new DS_Insp_Param_Pin();
+            //Detect_Insp_Result = new DS_Insp_Result();
+        }
+    }
+
+    public class DS_Detect_Pin_Info
+    {
+        private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+
+
+        public Rectangle Detect_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
 
         public DS_Insp_Result Detect_Insp_Result = new DS_Insp_Result();
 
-        public DS_Detect_Info()
+        public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+
+        public DS_Detect_Pin_Info()
         {
             Detect_Rect = new Rectangle(0, 0, 0, 0);
-            Detect_Insp_param = new DS_Insp_Param();
+            _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
             Detect_Insp_Result = new DS_Insp_Result();
         }
     }
