@@ -117,7 +117,7 @@ namespace CheckOffset
 
         public static DS_Insp_Param Insp_Param = new DS_Insp_Param();
 
-        public static List<DS_Detect_Pin_Info>? Detect_Infos = new List<DS_Detect_Pin_Info>();
+        public static DS_Detect_Info Detect_Info = new DS_Detect_Info();
 
         public static IT_Detect _IT_Detect = null;
 
@@ -474,6 +474,26 @@ namespace CheckOffset
         }
     }
 
+    public class DS_Detect_Info
+    {
+        public DS_Detect_Align_Info Align_Info = new DS_Detect_Align_Info();
+
+        public List<DS_Detect_Pin_Info>   Detect_Pin_Infos = new List<DS_Detect_Pin_Info>();
+    }
+
+    /// <summary>
+    /// 定位點
+    /// </summary>
+    public class DS_Detect_Align_Info
+    {
+        public Rectangle Align_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
+        public bool      Align_Is_White = true;
+        public DS_Detect_Align_Info()
+        {
+            Align_Rect = new Rectangle(0, 0, 0, 0);
+            Align_Is_White = true;
+        }
+    }
     public class DS_Detect_Pin_Info
     {
         private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;

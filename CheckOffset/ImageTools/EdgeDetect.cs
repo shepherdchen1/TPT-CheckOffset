@@ -366,6 +366,9 @@ namespace TN.Insp_Param
 
         public string Draw_String()
         {
+            if (EN_Insp_Tol_Dir.EN_Insp_Tol_None == Insp_Tol_Dir)
+                return "";
+
             return $"Dir:{Insp_Tol_Dir}";
         }
     }

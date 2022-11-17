@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using TN.Tools.Debug;
+using TN.ImageTools;
 
 namespace CheckOffset.ImageTools
 {
@@ -49,51 +50,6 @@ namespace CheckOffset.ImageTools
         /// <summary>
         ///  member function.
         /// </summary>
-
-        private Bitmap? To_Bitmap(byte[,] buffer)
-        {
-            try
-            {
-                Bitmap bitmap;
-                unsafe
-                {
-                    fixed (byte* intPtr = &buffer[0, 0])
-                    {
-                        bitmap = new Bitmap(buffer.GetLength(1), buffer.GetLength(0), buffer.GetLength(1), PixelFormat.Format8bppIndexed
-                            , new IntPtr(intPtr));
-                    }
-                }
-
-                return bitmap;
-            }
-            catch (Exception ex)
-            {
-                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , $"Exception catched: error:{ex.Message}");
-                // 儲存Exception到檔案
-                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-            }
-
-            return null;
-        }
-
-        void Buffer_Save_File(Mat<byte> buffer, string file_name)
-        {
-            try
-            {
-                byte[,] buffer_2d;
-                buffer_2d = buffer.ToRectangularArray();
-                Bitmap temp_bmp = To_Bitmap(buffer_2d);
-                temp_bmp.Save(file_name);
-            }
-            catch (Exception ex)
-            {
-                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                   , $"Exception catched: error:{ex.Message}");
-                // 儲存Exception到檔案
-                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-            }
-        }
 
 
 
@@ -157,23 +113,10 @@ namespace CheckOffset.ImageTools
         {
             try
             {
-                // 
                 Mat<byte> src_buffer = Init_Source(pin_candidate_pts);
-        //Mat src_buffer = Mat.FromArray(pin_candidate_pts.Pins);
-        //for(int y =0; y < src_buffer.Rows; y++)
-        //{
-        //    for (int x = 0; x < src_buffer.Cols; x++)
-        //    {
-        //        if (src_buffer.Get<Byte>(y, x) >= 1)
-        //            src_buffer.Set<int>(y, x, 255);
-        //    }
-        //}
-
-        //Cv2.ImShow("Init image", src_buffer);
-                //Mat dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1), MatType.CV_8U );
                 var dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1));
 
-        Buffer_Save_File(src_buffer, "d:\\test\\Init.bmp");
+        Image_Buffer_Gray.Buffer_Save_File(src_buffer, "d:\\test\\Init.bmp");
 
 
                 int size = _Pin_Conditions.Close_Size * 2 + 1;
@@ -184,10 +127,10 @@ namespace CheckOffset.ImageTools
                 Cv2.Dilate(src_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 1);
                 //Cv2.ImShow("Dilation image", dest_buffer);
 
-                Buffer_Save_File(dest_buffer, "d:\\test\\Dilate.bmp");
+            Image_Buffer_Gray.Buffer_Save_File(dest_buffer, "d:\\test\\Dilate.bmp");
 
                 Cv2.Erode(dest_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 1);
-                Buffer_Save_File(dest_buffer, "d:\\test\\Close.bmp");
+            Image_Buffer_Gray.Buffer_Save_File(dest_buffer, "d:\\test\\Close.bmp");
                 dest_buffer.SaveImage("d:\\test\\close_2.bmp");
 
                 //Cv2.ImShow("Closed image", dest_buffer);
@@ -220,7 +163,7 @@ namespace CheckOffset.ImageTools
                     return;
                 }
 
-                Buffer_Save_File(buffer, "d:\\test\\blob_analyze_Source.bmp");
+            Image_Buffer_Gray.Buffer_Save_File(buffer, "d:\\test\\blob_analyze_Source.bmp");
 
                 Cv2.FindContours(buffer
                         , out contours
@@ -235,7 +178,7 @@ namespace CheckOffset.ImageTools
                         mat_zero.Set<byte>(y, x, 0);
                     }
                 }
-                Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
+            Image_Buffer_Gray.Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
 
                 List<System.Drawing.Rectangle> blobs = new List<System.Drawing.Rectangle>();
                 Mat imgWithContours = Mat.Zeros(buffer.Rows, buffer.Cols, MatType.CV_8UC1);
@@ -256,7 +199,7 @@ namespace CheckOffset.ImageTools
                     }
                 }
 
-                Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
+            Image_Buffer_Gray.Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
 
                 buffer.SaveImage("d:\\test\\blob_analyze.bmp");
                 //Cv2.ImShow("Blob Detect", buffer);
@@ -269,231 +212,7 @@ namespace CheckOffset.ImageTools
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
         }
-        //public void Find_Pin_Position(IT_Detect pin_candidate_pts)
-        //{
-        //    try
-        //    {
-        //        // 
-        //        Mat<byte> src_buffer = Init_Source(pin_candidate_pts);
-
-
-        //        Cv2.ImShow("Init image", src_buffer);
-        //        //Mat dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1), MatType.CV_8U );
-        //        var dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1));
-
-        //        byte[,] buffer_2d;
-        //        buffer_2d = src_buffer.ToRectangularArray();
-        //        Bitmap temp_bmp = To_Bitmap(buffer_2d);
-        //        temp_bmp.Save("d:\\test\\Init.bmp");
-
-        //        int size = _Pin_Conditions.Close_Size * 2 + 1;
-        //        Mat se = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(size, size), new OpenCvSharp.Point(-1, -1));
-        //        //Cv2.ImShow("SE image", se);
-        //        Cv2.ImShow("Source image", src_buffer);
-
-        //        Cv2.Dilate(src_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 3);
-        //        Cv2.ImShow("Dilation image", dest_buffer);
-
-        //        buffer_2d = dest_buffer.ToRectangularArray();
-        //        temp_bmp = To_Bitmap(buffer_2d);
-        //        temp_bmp.Save("d:\\test\\Dilate.bmp");
-
-        //        Cv2.Erode(dest_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 2);
-
-        //        buffer_2d = dest_buffer.ToRectangularArray();
-        //        temp_bmp = To_Bitmap(buffer_2d);
-        //        temp_bmp.Save("d:\\test\\Close.bmp");
-
-        //        Cv2.ImShow("Closed image", dest_buffer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //           , $"Exception catched: error:{ex.Message}");
-        //        // 儲存Exception到檔案
-        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-        //    }
-        //}
-
-        //public void Find_Pin_Position(IT_Detect pin_candidate_pts)
-        //{
-        //    try
-        //    {
-        //        // 
-        //        Mat<byte>? src_buffer = Init_Source(pin_candidate_pts);
-        //        Mat<byte>? src_buffer_2 = Init_Source(pin_candidate_pts);
-        //        if (null == src_buffer || null == src_buffer_2)
-        //        {
-        //            Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //               , $"src_buffer is null");
-        //            return;
-        //        }
-
-        //        src_buffer.SaveImage("d:\\test\\Source.bmp");
-
-        //        Cv2.ImShow("Init image", src_buffer);
-        //        //Mat dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1), MatType.CV_8U );
-        //        Mat<byte> dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1));
-
-        //        byte[,] buffer_2d;
-        //        buffer_2d = src_buffer.ToRectangularArray();
-        //        Bitmap? temp_bmp = To_Bitmap(buffer_2d);
-        //        if ( null != temp_bmp)
-        //            temp_bmp.Save("d:\\test\\Init.bmp");
-
-        //        //Mat element = Cv2.GetStructuringElement(MorphShapes.Cross, new OpenCvSharp.Size(3, 3));
-
-        //        Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(3, 3));
-
-
-        //        Cv2.Dilate(src_buffer, src_buffer, element, new OpenCvSharp.Point(-1, -1), 2);
-        //        src_buffer.SaveImage("d:\\test\\Source_Dilate.bmp");
-
-        //        Cv2.Erode(src_buffer, src_buffer, element, new OpenCvSharp.Point(-1, -1), 2);
-        //        src_buffer.SaveImage("d:\\test\\Source_Dil_Erod.bmp");
-
-        //        Cv2.MorphologyEx(src_buffer_2, dest_buffer, MorphTypes.Close, element);
-        //        dest_buffer.SaveImage("d:\\test\\Source_Close.bmp");
-
-        //        int size = _Pin_Conditions.Close_Size * 2 + 1;
-        //        Mat se = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(size, size), new OpenCvSharp.Point(-1, -1));
-        //        //Cv2.ImShow("SE image", se);
-        //        Cv2.ImShow("Source image", src_buffer);
-
-        //        //Mat skel = new Mat(src_buffer.Size().Width, src_buffer.Size().Height, MatType.CV_8UC1, new Scalar(0));
-        //        Mat<byte> skel = new Mat<byte>(src_buffer.Size().Height, src_buffer.Size().Width, new Scalar(0));
-        //        bool done;
-        //        int it_id = 0;
-        //        do
-        //        {
-        //            Cv2.MorphologyEx(dest_buffer, dest_buffer, MorphTypes.Open, element);
-        //            Cv2.BitwiseNot(dest_buffer, dest_buffer);
-        //            Cv2.BitwiseAnd(src_buffer, dest_buffer, dest_buffer);
-        //            Cv2.BitwiseOr(skel, dest_buffer, skel);
-        //            Cv2.Erode(src_buffer, src_buffer, element);
-
-        //            src_buffer.SaveImage($"d:\\test\\Ske{it_id}.bmp");
-        //            it_id++;
-
-        //            unsafe
-        //            {
-        //                double max;
-        //                double min;
-        //                Cv2.MinMaxLoc(src_buffer, out min, out max);
-        //                done = (max == 0);
-        //            }
-        //        } while (!done);
-
-        //        src_buffer.SaveImage("d:\\test\\Ske.bmp");
-
-        //        Cv2.ImShow("Ske image", src_buffer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //           , $"Exception catched: error:{ex.Message}");
-        //        // 儲存Exception到檔案
-        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-        //    }
-        //}
-
-        //public void Find_Pin_Position(IT_Detect pin_candidate_pts)
-        //{
-        //    try
-        //    {
-        //        // 
-        //        Mat<byte> src_buffer = Init_Source(pin_candidate_pts);
-
-        //        Cv2.ImShow("Init image", src_buffer);
-        //        //Mat dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1), MatType.CV_8U );
-        //        var dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1));
-
-        //        byte[,] buffer_2d;
-        //        buffer_2d = src_buffer.ToRectangularArray();
-        //        Bitmap temp_bmp = To_Bitmap(buffer_2d);
-        //        temp_bmp.Save("d:\\test\\Init.bmp");
-
-        //        int size = _Pin_Conditions.Close_Size * 2 + 1;
-        //        Mat se = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(size, size), new OpenCvSharp.Point(-1, -1));
-        //        //Cv2.ImShow("SE image", se);
-        //        Cv2.ImShow("Source image", src_buffer);
-
-        //        Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(5, 5));
-        //        Cv2.MorphologyEx(src_buffer, dest_buffer, MorphTypes.Close, element);
-        //        Cv2.ImShow("Close image", dest_buffer);
-        //        dest_buffer.SaveImage("d:\\test\\Close.bmp");
-
-        //        //buffer_2d = dest_buffer.ToRectangularArray();
-        //        //temp_bmp = To_Bitmap(buffer_2d);
-        //        //temp_bmp.Save("d:\\test\\Dilate.bmp");
-
-        //        //Cv2.Erode(dest_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 1);
-
-        //        //buffer_2d = dest_buffer.ToRectangularArray();
-        //        //temp_bmp = To_Bitmap(buffer_2d);
-        //        //temp_bmp.Save("d:\\test\\final.bmp");
-
-        //        Cv2.ImShow("Closed image", dest_buffer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //           , $"Exception catched: error:{ex.Message}");
-        //        // 儲存Exception到檔案
-        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-        //    }
-        //}
-        //public void Find_Pin_Position(IT_Detect pin_candidate_pts)
-        //{
-        //    try
-        //    {
-        //        // 
-        //        Mat<byte> src_buffer = Init_Source(pin_candidate_pts);
-
-        //        Cv2.ImShow("Init image", src_buffer);
-        //        //Mat dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1), MatType.CV_8U );
-        //        Mat<byte> dest_buffer = new Mat<byte>(pin_candidate_pts.Buffer.GetLength(0), pin_candidate_pts.Buffer.GetLength(1));
-
-        //        byte[,] buffer_2d;
-        //        buffer_2d = src_buffer.ToRectangularArray();
-        //        Bitmap temp_bmp = To_Bitmap(buffer_2d);
-        //        temp_bmp.Save("d:\\test\\Init.bmp");
-
-        //        int size = _Pin_Conditions.Close_Size * 2 + 1;
-        //        Mat se = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(size, size), new OpenCvSharp.Point(-1, -1));
-        //        //Cv2.ImShow("SE image", se);
-        //        Cv2.ImShow("Source image", src_buffer);
-
-        //        Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(5, 5));
-        //        Cv2.MorphologyEx(src_buffer, dest_buffer, MorphTypes.Close, element);
-        //        dest_buffer.SaveImage("d:\\test\\Close.bmp");
-
-        //        Cv2.MorphologyEx(dest_buffer, dest_buffer, MorphTypes.Close, element);
-        //        dest_buffer.SaveImage("d:\\test\\Close2.bmp");
-
-        //        Cv2.MorphologyEx(dest_buffer, dest_buffer, MorphTypes.Close, element);
-        //        dest_buffer.SaveImage("d:\\test\\Close3.bmp");
-
-        //        //buffer_2d = dest_buffer.ToRectangularArray();
-        //        //temp_bmp = To_Bitmap(buffer_2d);
-        //        //temp_bmp.Save("d:\\test\\Dilate.bmp");
-
-        //        //Cv2.Erode(dest_buffer, dest_buffer, se, new OpenCvSharp.Point(-1, -1), 1);
-
-        //        //buffer_2d = dest_buffer.ToRectangularArray();
-        //        //temp_bmp = To_Bitmap(buffer_2d);
-        //        //temp_bmp.Save("d:\\test\\final.bmp");
-
-        //        Cv2.ImShow("Closed image", dest_buffer);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-        //           , $"Exception catched: error:{ex.Message}");
-        //        // 儲存Exception到檔案
-        //        TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
-        //    }
-        //}
+     
 
         private Mat<byte>? Init_Source(IT_Detect pin_candidate_pts)
         {
@@ -553,7 +272,6 @@ namespace CheckOffset.ImageTools
             return null;
         }
 
-
         private void Get_Pin_Pos(OpenCvSharp.Point[][] contours)
         {
             try
@@ -569,7 +287,7 @@ namespace CheckOffset.ImageTools
 
                     DS_Detect_Pin_Info new_pin = new DS_Detect_Pin_Info();
                     new_pin.Detect_Rect = rt;
-                    tnGlobal.Detect_Infos.Add(new_pin);
+                    tnGlobal.Detect_Info.Detect_Pin_Infos.Add(new_pin);
                 }
             }
             catch (Exception ex)

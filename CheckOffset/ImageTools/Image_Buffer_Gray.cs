@@ -11,6 +11,7 @@ using TN.Tools.Debug;
 using System.Runtime.InteropServices;
 using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.CompilerServices;
+using OpenCvSharp;
 
 namespace TN.ImageTools
 {
@@ -306,6 +307,51 @@ namespace TN.ImageTools
             }
 
             return null;
+        }
+
+        public static Bitmap? To_Bitmap(byte[,] buffer)
+        {
+            try
+            {
+                Bitmap bitmap;
+                unsafe
+                {
+                    fixed (byte* intPtr = &buffer[0, 0])
+                    {
+                        bitmap = new Bitmap(buffer.GetLength(1), buffer.GetLength(0), buffer.GetLength(1), PixelFormat.Format8bppIndexed
+                            , new IntPtr(intPtr));
+                    }
+                }
+
+                return bitmap;
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                   , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+
+            return null;
+        }
+
+        public static void Buffer_Save_File(Mat<byte> buffer, string file_name)
+        {
+            try
+            {
+                byte[,] buffer_2d;
+                buffer_2d = buffer.ToRectangularArray();
+                Bitmap temp_bmp = To_Bitmap(buffer_2d);
+                temp_bmp.Save(file_name);
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                   , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
         }
     }
 }

@@ -88,7 +88,7 @@ namespace CheckOffset
 
         private void chkNewInsp_Rect_CheckedChanged(object sender, EventArgs e)
         {
-            if (null == tnGlobal.Detect_Infos)
+            if (null == tnGlobal.Detect_Info.Detect_Pin_Infos)
                 return;
 
             //aaa
@@ -101,7 +101,7 @@ namespace CheckOffset
                 if (null != _userctrl_image.User_Ctrls)
                 {
                     _userctrl_image.User_Ctrls.Clear();
-                    foreach (DS_Detect_Pin_Info cur_detect_infos in tnGlobal.Detect_Infos)
+                    foreach (DS_Detect_Pin_Info cur_detect_infos in tnGlobal.Detect_Info.Detect_Pin_Infos)
                     {
                         TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                         TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
@@ -138,7 +138,7 @@ namespace CheckOffset
                         DS_Detect_Pin_Info new_defect_info = new DS_Detect_Pin_Info();
                         new_defect_info.Detect_Rect = editing_rect.Pos_Info.Editing_Rect;
                         new_defect_info.Insp_Tol_Dir = Get_Insp_Tol_Dir();
-                        tnGlobal.Detect_Infos.Add(new_defect_info);
+                        tnGlobal.Detect_Info.Detect_Pin_Infos.Add(new_defect_info);
                     }
 
                     _userctrl_image.Apply_GlobalSetting_To_Ctrls();
@@ -162,7 +162,12 @@ namespace CheckOffset
                 return;
 
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
-            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Pin_Info>>(jsonString);
+            tnGlobal.Detect_Info = Newtonsoft.Json.JsonConvert.DeserializeObject<DS_Detect_Info>(jsonString);
+
+            _userctrl_image.User_Ctrls.Clear();
+
+            Paint_Align();
+            Paint_Pin_Pos();
 
             _userctrl_image.Apply_GlobalSetting_To_Ctrls();
             _userctrl_image.Refresh();
@@ -170,29 +175,16 @@ namespace CheckOffset
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            saveFileDialog.Filter = $"json files(*.json)| *.json | All files(*.*) | *.*";
             if (DialogResult.OK != saveFileDialog.ShowDialog())
                 return;
 
-            if (null == tnGlobal.Detect_Infos)
+            if (null == tnGlobal.Detect_Info)
                 return;
 
-            string jsonString = System.Text.Json.JsonSerializer.Serialize<List<DS_Detect_Pin_Info>>(tnGlobal.Detect_Infos); // tnGlobal.Setting);
-
-
-            jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(tnGlobal.Detect_Infos);
-            //if (!File.Exists(path))
-            {
-                // Create a file to write to.
-                File.WriteAllText(saveFileDialog.FileName, jsonString );
-
-                //using (StreamWriter sw = File.CreateText(saveFileDialog.FileName))
-                //{
-                //    sw.WriteLine("Hello");
-                //    sw.WriteLine("And");
-                //    sw.WriteLine("Welcome");
-                //}
-            }
-
+            //string jsonString_align = System.Text.Json.JsonSerializer.Serialize<DS_Detect_Align_Info>(tnGlobal.Align_Info); // tnGlobal.Setting);
+            string jsonString_align = Newtonsoft.Json.JsonConvert.SerializeObject(tnGlobal.Detect_Info);
+            File.WriteAllText(saveFileDialog.FileName, jsonString_align);
         }
 
         private void btnDetect_Click(object sender, EventArgs e)
@@ -204,7 +196,7 @@ namespace CheckOffset
                 _userctrl_image.Cache_Ctrl.Clear();
 
                 bool check_res = true;
-                if (null != tnGlobal.Detect_Infos)
+                if (null != tnGlobal.Detect_Info)
                 {
                     //bool first_white = false;
                     int max_valid_gap = (int)numMaxValidPixel.Value;
@@ -437,6 +429,9 @@ namespace CheckOffset
             if (chkNewInsp_Rect.Checked)
                 return Editing_Mode.EDT_New_ROI;
 
+            if (chkSelectPattern.Checked)
+                return Editing_Mode.EDT_New_Align;
+
             if (null != _userctrl_image.Editing_Ctrl)
                 return Editing_Mode.EDT_Editing_ROI;
 
@@ -515,10 +510,14 @@ namespace CheckOffset
 
         private void btnSaveBinary_Click(object sender, EventArgs e)
         {
-            _userctrl_image.pb_Image.Image.Save($"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
+            saveFileDialog.Filter = $"Image files (*.bmp)|*.bmp|All files (*.*)|*.*";
+            if (DialogResult.OK != saveFileDialog.ShowDialog())
+                return;
+
+            _userctrl_image.pb_Image.Image.Save(saveFileDialog.FileName);
             if (null != _userctrl_image.Image)
             {
-                _userctrl_image.Image.Save($"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
+                _userctrl_image.Image.Save(saveFileDialog.FileName); // $"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
             }
         }
 
@@ -592,14 +591,14 @@ namespace CheckOffset
 
             tbProjectFile.Text = openFileDialog_Img.FileName;
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
-            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DS_Detect_Pin_Info>>(jsonString);
+            tnGlobal.Detect_Info = Newtonsoft.Json.JsonConvert.DeserializeObject<DS_Detect_Info>(jsonString);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             string jsonString = File.ReadAllText(tbProjectFile.Text);
             //tnGlobal.Detect_Pins = Newtonsoft.Json.JsonConvert.DeserializeObject<DS_Defect_Pin_Info> (jsonString);
-            tnGlobal.Detect_Infos = Newtonsoft.Json.JsonConvert.DeserializeObject< List<DS_Detect_Pin_Info> > (jsonString);
+            tnGlobal.Detect_Info = Newtonsoft.Json.JsonConvert.DeserializeObject< DS_Detect_Info > (jsonString);
         }
 
         private void btnClearCacheItems_Click(object sender, EventArgs e)
@@ -1032,7 +1031,7 @@ namespace CheckOffset
 
         private void btnFindPinPosition_Click(object sender, EventArgs e)
         {
-            tnGlobal.Detect_Infos.Clear();
+            tnGlobal.Detect_Info.Detect_Pin_Infos.Clear();
 
             FindPinPosition pin_finder = new FindPinPosition();
             pin_finder.Find_Pin_Position(tnGlobal._IT_Detect);
@@ -1048,21 +1047,14 @@ namespace CheckOffset
                     exist_added_pgn.Pos_Info.Points[pt_id].X = pin_finder.Found_Contours[contour_id][pt_id].X;
                     exist_added_pgn.Pos_Info.Points[pt_id].Y = pin_finder.Found_Contours[contour_id][pt_id].Y;
                 }
-                //for (int pt_id = 0; pt_id < pin_finder.Found_Contours[contour_id].Length; pt_id++)
-                //{
-                //    exist_added_pts.Pos_Info.Points[pt_id]. = insp_pin.Detect_Rect;
-                //    //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
-                //    exist_added_rect.Display_Color = Color.Green;
-                //    _userctrl_image.User_Ctrls.Add(exist_added_rect);
-                //}
-                //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+
                 exist_added_pgn.Display_Color = Color.Purple;
                 _userctrl_image.Cache_Ctrl.Add(exist_added_pgn);
             }
 
             Paint_Pin_Pos();
 
-            labelCheckResult.Text = $"Found blob:{tnGlobal.Detect_Infos.Count}";
+            labelCheckResult.Text = $"Found blob:{tnGlobal.Detect_Info.Detect_Pin_Infos.Count}";
     }
 
         private void numPinMinWH_ValueChanged(object sender, EventArgs e)
@@ -1074,7 +1066,7 @@ namespace CheckOffset
         {
             try
             {
-                foreach ( DS_Detect_Pin_Info insp_pin in tnGlobal.Detect_Infos )
+                foreach ( DS_Detect_Pin_Info insp_pin in tnGlobal.Detect_Info.Detect_Pin_Infos)
                 {
                     TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                     TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
@@ -1093,6 +1085,135 @@ namespace CheckOffset
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
+        }
+
+        private void Paint_Align()
+        {
+            try
+            {
+                TNCustCtrl_Rect align_rect = new TNCustCtrl_Rect();
+                align_rect.Pos_Info.Editing_Rect = tnGlobal.Detect_Info.Align_Info.Align_Rect;
+                align_rect.Display_Color = Color.Green;
+
+                _userctrl_image.User_Ctrls.Add(align_rect);
+
+                _userctrl_image.pb_Image.Repaint();
+            }
+            catch (Exception ex)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                            , $"Exception catched: error:{ex.Message}");
+                // 儲存Exception到檔案
+                TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+        }
+
+        private void saveFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void btnSelectPattern_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkSelectPattern_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkSelectPattern.Checked)
+            {
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+
+                /////////////////////////////////////////////////
+                /// add exist rect.
+                if (null != _userctrl_image.User_Ctrls)
+                {
+                    _userctrl_image.User_Ctrls.Clear();
+                    foreach (DS_Detect_Pin_Info cur_detect_infos in tnGlobal.Detect_Info.Detect_Pin_Infos)
+                    {
+                        TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
+                        TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                        exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
+                        //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                        _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                    }
+
+                    _userctrl_image.CBMouse_Up += UserCtrl_Img_Mouse_Up;
+                }
+
+                /////////////////////////////////////////////////
+                // add new editing rect.
+                TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
+                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+
+                new_added_rect.Pos_Info.Editing_Rect = new Rectangle(0, 0, 100, 100);
+                new_added_rect.Display_Color = Color.Blue;
+                //DS_Insp_Param_Pin new_insp_param = new DS_Insp_Param_Pin();
+                //new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
+                //new_added_rect.Insp_param = new_insp_param;
+            }
+            else
+            {
+                _userctrl_image.CBMouse_Up -= UserCtrl_Img_Mouse_Up;
+                // 新增完畢
+                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                {
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+
+                    const int min_roi_valid_size = 2;
+                    if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
+                    {
+                        DS_Detect_Align_Info new_align_info = new DS_Detect_Align_Info();
+                        new_align_info.Align_Rect = editing_rect.Pos_Info.Editing_Rect;
+
+                        tnGlobal.Detect_Info.Align_Info = new_align_info;
+                    }
+
+                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                }
+
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+            }
+        }
+
+        void UserCtrl_Img_Mouse_Up()
+        {
+            if (!chkSelectPattern.Checked)
+                return;
+
+            // 新增完畢
+            if (null == _userctrl_image.pb_Image.Editing_Ctrl)
+                return;
+
+            TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+
+            const int min_roi_valid_size = 2;
+            if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
+            {
+                DS_Detect_Align_Info new_align_info = new DS_Detect_Align_Info();
+                new_align_info.Align_Rect = editing_rect.Pos_Info.Editing_Rect;
+
+
+
+                tnGlobal.Detect_Info.Align_Info = new_align_info;
+            }
+
+            _userctrl_image.pb_Image.Editing_Ctrl = null;
+
+            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            Mat<byte>? src_buffer = OpenCVMatTool.Clone_Bmp_2_Mat(bmp);
+            if (!chkPatternIsWhite.Checked)
+                Cv2.BitwiseNot(src_buffer, src_buffer);
+
+            FindAlignment find_align = new FindAlignment(src_buffer);
+            find_align.Find_Alignment(tnGlobal.Detect_Info.Align_Info.Align_Rect);
+
+            tnGlobal.Detect_Info.Align_Info.Align_Is_White = chkPatternIsWhite.Checked;
+
+            // repaint align.
+            _userctrl_image.User_Ctrls.Clear();
+            Paint_Align();
+            _userctrl_image.Refresh();
         }
     } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

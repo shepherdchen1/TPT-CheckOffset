@@ -21,6 +21,8 @@ namespace CheckOffset
     //public delegate int Delegate_Report_GrayLevel_Gray(int x, int y, int gray_level);
     public delegate Editing_Mode Delegate_Query_Editing_Mode();
 
+    public delegate void Delegate_Mouse_Up();
+
     public partial class UserCtrl_Image : UserControl
     {
         //private Bitmap? _Image = null;
@@ -40,6 +42,8 @@ namespace CheckOffset
         //public static event Delegate_Report_GrayLevel      Report_GrayLevel;
         public event Delegate_Report_GrayLevel_Gray? Report_GrayLevel_Gray;
         public event Delegate_Query_Editing_Mode?    Query_Editing_Mode;
+
+        public event Delegate_Mouse_Up?     CBMouse_Up;
 
         public List<Control> User_Ctrls
         {
@@ -145,6 +149,7 @@ namespace CheckOffset
                 switch (Query_Editing_Mode())
                 {
                     case Editing_Mode.EDT_New_ROI:
+                    case Editing_Mode.EDT_New_Align:
                         {
                             if (null != editing_cttl)
                             {
@@ -230,6 +235,7 @@ namespace CheckOffset
                 switch (Query_Editing_Mode())
                 {
                     case Editing_Mode.EDT_New_ROI:
+                    case Editing_Mode.EDT_New_Align:
                         {
                             if (null == editing_cttl)
                             {
@@ -292,6 +298,11 @@ namespace CheckOffset
                         Apply_Ctrls_To_GlobalSetting();
 
                         pb_Image.Refresh();
+                    }
+
+                    if (null != CBMouse_Up)
+                    {
+                        CBMouse_Up();
                     }
                 }
             }
@@ -424,12 +435,22 @@ namespace CheckOffset
 
             User_Ctrls.Clear();
 
-            if (null != tnGlobal.Detect_Infos)
+            if (null != tnGlobal.Detect_Info.Align_Info)
             {
-                foreach (DS_Detect_Pin_Info detect_info in tnGlobal.Detect_Infos)
+                TNCustCtrl_Rect new_align = new TNCustCtrl_Rect();
+                new_align.Pos_Info.Editing_Rect = tnGlobal.Detect_Info.Align_Info.Align_Rect;
+                new_align.Display_Color = Color.Green;
+                //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
+                User_Ctrls.Add(new_align);
+            }
+
+            if (null != tnGlobal.Detect_Info)
+            {
+                foreach (DS_Detect_Pin_Info detect_info in tnGlobal.Detect_Info.Detect_Pin_Infos)
                 {
                     TNCustCtrl_Rect new_detect = new TNCustCtrl_Rect();
                     new_detect.Pos_Info.Editing_Rect = detect_info.Detect_Rect;
+                    new_detect.Display_Color = Color.Blue;
                     //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
                     User_Ctrls.Add(new_detect);
                 }
@@ -438,15 +459,15 @@ namespace CheckOffset
 
         public void Apply_Ctrls_To_GlobalSetting()
         {
-            if (null == tnGlobal.Detect_Infos)
+            if (null == tnGlobal.Detect_Info)
             {
                 Log_Utl.Log_Event(Event_Level.Warning
                                     , System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                                    , $"Detect_Infos is null");
+                                    , $"Detect_Info is null");
                 return;
             }
 
-            tnGlobal.Detect_Infos.Clear();
+            tnGlobal.Detect_Info.Detect_Pin_Infos.Clear();
             if (null == User_Ctrls)
             {
                 Log_Utl.Log_Event(Event_Level.Warning
@@ -470,7 +491,7 @@ namespace CheckOffset
                 new_detect_info.Detect_Rect = rt_user_ctrl.Pos_Info.Editing_Rect;
                 //new_detect_info.Detect_Insp_param = tnGlobal.Insp_Param_Pin;
 
-                tnGlobal.Detect_Infos.Add(new_detect_info);
+                tnGlobal.Detect_Info.Detect_Pin_Infos.Add(new_detect_info);
             }
         }
     } // end of     public partial class UserCtrl_Image : UserControl
@@ -480,5 +501,6 @@ namespace CheckOffset
         EDT_None = 0
         , EDT_New_ROI
         , EDT_Editing_ROI
+        , EDT_New_Align
     }
 }
