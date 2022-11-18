@@ -60,9 +60,18 @@
             this.btnDetect = new System.Windows.Forms.Button();
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.chkPatternIsWhite = new System.Windows.Forms.CheckBox();
+            this.chKDisplayDefect = new System.Windows.Forms.CheckBox();
+            this.chkDisplayDefectMaskPos = new System.Windows.Forms.CheckBox();
+            this.btnTestInsp = new System.Windows.Forms.Button();
+            this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabPage7 = new System.Windows.Forms.TabPage();
             this.chkSelectPattern = new System.Windows.Forms.CheckBox();
+            this.chkPatternIsWhite = new System.Windows.Forms.CheckBox();
+            this.tabPage8 = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
             this.btnDetectPins = new System.Windows.Forms.Button();
+            this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnFindPinPosition = new System.Windows.Forms.Button();
             this.btnOpenCV = new System.Windows.Forms.Button();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
@@ -71,16 +80,17 @@
             this.btnDetectBlobOld = new System.Windows.Forms.Button();
             this.btnDetectBlob = new System.Windows.Forms.Button();
             this.btnClearCacheItems = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
-            this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnBmp2Array = new System.Windows.Forms.Button();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabCtrl_Insp_Rules = new System.Windows.Forms.TabControl();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.numPinMinWH = new System.Windows.Forms.NumericUpDown();
+            this.numPinMinH = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
+            this.numPinMinW = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.btnCreateInspMap = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.btnProjectFile = new System.Windows.Forms.Button();
             this.tbProjectFile = new System.Windows.Forms.TextBox();
@@ -101,9 +111,6 @@
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_Setting = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog_Img = new System.Windows.Forms.SaveFileDialog();
-            this.tabControl2 = new System.Windows.Forms.TabControl();
-            this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.tabPage8 = new System.Windows.Forms.TabPage();
             this.pnlSetting.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -115,20 +122,22 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).BeginInit();
             this.tabPage3.SuspendLayout();
-            this.groupBox8.SuspendLayout();
+            this.tabControl2.SuspendLayout();
+            this.tabPage7.SuspendLayout();
+            this.tabPage8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).BeginInit();
+            this.groupBox8.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabCtrl_Insp_Rules.SuspendLayout();
             this.tabPage6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numPinMinWH)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPinMinH)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPinMinW)).BeginInit();
             this.tabPage4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.pnlHeader.SuspendLayout();
             this.pnlFooter.SuspendLayout();
             this.tabUser.SuspendLayout();
-            this.tabControl2.SuspendLayout();
-            this.tabPage7.SuspendLayout();
-            this.tabPage8.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlSetting
@@ -475,13 +484,16 @@
             this.numThreshold.Size = new System.Drawing.Size(112, 30);
             this.numThreshold.TabIndex = 13;
             this.numThreshold.Value = new decimal(new int[] {
-            40,
+            60,
             0,
             0,
             0});
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.chKDisplayDefect);
+            this.tabPage3.Controls.Add(this.chkDisplayDefectMaskPos);
+            this.tabPage3.Controls.Add(this.btnTestInsp);
             this.tabPage3.Controls.Add(this.tabControl2);
             this.tabPage3.Controls.Add(this.btnOpenCV);
             this.tabPage3.Controls.Add(this.groupBox8);
@@ -494,17 +506,59 @@
             this.tabPage3.Text = "測試";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // chkPatternIsWhite
+            // chKDisplayDefect
             // 
-            this.chkPatternIsWhite.AutoSize = true;
-            this.chkPatternIsWhite.Checked = true;
-            this.chkPatternIsWhite.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPatternIsWhite.Location = new System.Drawing.Point(21, 34);
-            this.chkPatternIsWhite.Name = "chkPatternIsWhite";
-            this.chkPatternIsWhite.Size = new System.Drawing.Size(169, 27);
-            this.chkPatternIsWhite.TabIndex = 13;
-            this.chkPatternIsWhite.Text = "Pattern is white";
-            this.chkPatternIsWhite.UseVisualStyleBackColor = true;
+            this.chKDisplayDefect.AutoSize = true;
+            this.chKDisplayDefect.Location = new System.Drawing.Point(42, 559);
+            this.chKDisplayDefect.Name = "chKDisplayDefect";
+            this.chKDisplayDefect.Size = new System.Drawing.Size(97, 27);
+            this.chKDisplayDefect.TabIndex = 16;
+            this.chKDisplayDefect.Text = "Defect ";
+            this.chKDisplayDefect.UseVisualStyleBackColor = true;
+            this.chKDisplayDefect.CheckedChanged += new System.EventHandler(this.chKDisplayDefect_CheckedChanged);
+            // 
+            // chkDisplayDefectMaskPos
+            // 
+            this.chkDisplayDefectMaskPos.AutoSize = true;
+            this.chkDisplayDefectMaskPos.Location = new System.Drawing.Point(42, 520);
+            this.chkDisplayDefectMaskPos.Name = "chkDisplayDefectMaskPos";
+            this.chkDisplayDefectMaskPos.Size = new System.Drawing.Size(184, 27);
+            this.chkDisplayDefectMaskPos.TabIndex = 15;
+            this.chkDisplayDefectMaskPos.Text = "Defect Candidate";
+            this.chkDisplayDefectMaskPos.UseVisualStyleBackColor = true;
+            this.chkDisplayDefectMaskPos.CheckedChanged += new System.EventHandler(this.chkDisplayDefectMaskPos_CheckedChanged);
+            // 
+            // btnTestInsp
+            // 
+            this.btnTestInsp.Location = new System.Drawing.Point(301, 515);
+            this.btnTestInsp.Name = "btnTestInsp";
+            this.btnTestInsp.Size = new System.Drawing.Size(123, 34);
+            this.btnTestInsp.TabIndex = 9;
+            this.btnTestInsp.Text = "Test Insp";
+            this.btnTestInsp.UseVisualStyleBackColor = true;
+            this.btnTestInsp.Click += new System.EventHandler(this.btnTestInsp_Click);
+            // 
+            // tabControl2
+            // 
+            this.tabControl2.Controls.Add(this.tabPage7);
+            this.tabControl2.Controls.Add(this.tabPage8);
+            this.tabControl2.Location = new System.Drawing.Point(17, 135);
+            this.tabControl2.Name = "tabControl2";
+            this.tabControl2.SelectedIndex = 0;
+            this.tabControl2.Size = new System.Drawing.Size(407, 352);
+            this.tabControl2.TabIndex = 14;
+            // 
+            // tabPage7
+            // 
+            this.tabPage7.Controls.Add(this.chkSelectPattern);
+            this.tabPage7.Controls.Add(this.chkPatternIsWhite);
+            this.tabPage7.Location = new System.Drawing.Point(4, 32);
+            this.tabPage7.Name = "tabPage7";
+            this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage7.Size = new System.Drawing.Size(399, 316);
+            this.tabPage7.TabIndex = 0;
+            this.tabPage7.Text = "定位";
+            this.tabPage7.UseVisualStyleBackColor = true;
             // 
             // chkSelectPattern
             // 
@@ -518,6 +572,59 @@
             this.chkSelectPattern.UseVisualStyleBackColor = true;
             this.chkSelectPattern.CheckedChanged += new System.EventHandler(this.chkSelectPattern_CheckedChanged);
             // 
+            // chkPatternIsWhite
+            // 
+            this.chkPatternIsWhite.AutoSize = true;
+            this.chkPatternIsWhite.Checked = true;
+            this.chkPatternIsWhite.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPatternIsWhite.Location = new System.Drawing.Point(21, 34);
+            this.chkPatternIsWhite.Name = "chkPatternIsWhite";
+            this.chkPatternIsWhite.Size = new System.Drawing.Size(169, 27);
+            this.chkPatternIsWhite.TabIndex = 13;
+            this.chkPatternIsWhite.Text = "Pattern is white";
+            this.chkPatternIsWhite.UseVisualStyleBackColor = true;
+            // 
+            // tabPage8
+            // 
+            this.tabPage8.Controls.Add(this.label2);
+            this.tabPage8.Controls.Add(this.numMinHysteresisThreshold);
+            this.tabPage8.Controls.Add(this.btnDetectPins);
+            this.tabPage8.Controls.Add(this.btnCannyEdgeDetect);
+            this.tabPage8.Controls.Add(this.btnFindPinPosition);
+            this.tabPage8.Location = new System.Drawing.Point(4, 32);
+            this.tabPage8.Name = "tabPage8";
+            this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage8.Size = new System.Drawing.Size(399, 316);
+            this.tabPage8.TabIndex = 1;
+            this.tabPage8.Text = "腳位";
+            this.tabPage8.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(27, 39);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(191, 23);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Min HysteresisThresh";
+            // 
+            // numMinHysteresisThreshold
+            // 
+            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(79, 78);
+            this.numMinHysteresisThreshold.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numMinHysteresisThreshold.Name = "numMinHysteresisThreshold";
+            this.numMinHysteresisThreshold.Size = new System.Drawing.Size(139, 30);
+            this.numMinHysteresisThreshold.TabIndex = 3;
+            this.numMinHysteresisThreshold.Value = new decimal(new int[] {
+            55,
+            0,
+            0,
+            0});
+            // 
             // btnDetectPins
             // 
             this.btnDetectPins.Location = new System.Drawing.Point(27, 150);
@@ -527,6 +634,16 @@
             this.btnDetectPins.Text = "Detect Pins";
             this.btnDetectPins.UseVisualStyleBackColor = true;
             this.btnDetectPins.Click += new System.EventHandler(this.btnDetectPins_Click);
+            // 
+            // btnCannyEdgeDetect
+            // 
+            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(252, 74);
+            this.btnCannyEdgeDetect.Name = "btnCannyEdgeDetect";
+            this.btnCannyEdgeDetect.Size = new System.Drawing.Size(123, 34);
+            this.btnCannyEdgeDetect.TabIndex = 1;
+            this.btnCannyEdgeDetect.Text = "Canny Edge Degect";
+            this.btnCannyEdgeDetect.UseVisualStyleBackColor = true;
+            this.btnCannyEdgeDetect.Click += new System.EventHandler(this.btnCannyEdgeDetect_Click);
             // 
             // btnFindPinPosition
             // 
@@ -554,7 +671,7 @@
             this.groupBox8.Controls.Add(this.btnSaveInspPins);
             this.groupBox8.Controls.Add(this.btnDetectBlobOld);
             this.groupBox8.Controls.Add(this.btnDetectBlob);
-            this.groupBox8.Location = new System.Drawing.Point(17, 515);
+            this.groupBox8.Location = new System.Drawing.Point(120, 592);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(300, 208);
             this.groupBox8.TabIndex = 6;
@@ -603,7 +720,7 @@
             // 
             // btnClearCacheItems
             // 
-            this.btnClearCacheItems.Location = new System.Drawing.Point(17, 17);
+            this.btnClearCacheItems.Location = new System.Drawing.Point(251, 13);
             this.btnClearCacheItems.Name = "btnClearCacheItems";
             this.btnClearCacheItems.Size = new System.Drawing.Size(173, 34);
             this.btnClearCacheItems.TabIndex = 5;
@@ -611,45 +728,9 @@
             this.btnClearCacheItems.UseVisualStyleBackColor = true;
             this.btnClearCacheItems.Click += new System.EventHandler(this.btnClearCacheItems_Click);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(27, 39);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(191, 23);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Min HysteresisThresh";
-            // 
-            // numMinHysteresisThreshold
-            // 
-            this.numMinHysteresisThreshold.Location = new System.Drawing.Point(79, 78);
-            this.numMinHysteresisThreshold.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.numMinHysteresisThreshold.Name = "numMinHysteresisThreshold";
-            this.numMinHysteresisThreshold.Size = new System.Drawing.Size(139, 30);
-            this.numMinHysteresisThreshold.TabIndex = 3;
-            this.numMinHysteresisThreshold.Value = new decimal(new int[] {
-            55,
-            0,
-            0,
-            0});
-            // 
-            // btnCannyEdgeDetect
-            // 
-            this.btnCannyEdgeDetect.Location = new System.Drawing.Point(252, 74);
-            this.btnCannyEdgeDetect.Name = "btnCannyEdgeDetect";
-            this.btnCannyEdgeDetect.Size = new System.Drawing.Size(123, 34);
-            this.btnCannyEdgeDetect.TabIndex = 1;
-            this.btnCannyEdgeDetect.Text = "Canny Edge Degect";
-            this.btnCannyEdgeDetect.UseVisualStyleBackColor = true;
-            this.btnCannyEdgeDetect.Click += new System.EventHandler(this.btnCannyEdgeDetect_Click);
-            // 
             // btnBmp2Array
             // 
-            this.btnBmp2Array.Location = new System.Drawing.Point(48, 70);
+            this.btnBmp2Array.Location = new System.Drawing.Point(247, 69);
             this.btnBmp2Array.Name = "btnBmp2Array";
             this.btnBmp2Array.Size = new System.Drawing.Size(173, 34);
             this.btnBmp2Array.TabIndex = 0;
@@ -678,7 +759,9 @@
             // 
             // tabPage6
             // 
-            this.tabPage6.Controls.Add(this.numPinMinWH);
+            this.tabPage6.Controls.Add(this.numPinMinH);
+            this.tabPage6.Controls.Add(this.label8);
+            this.tabPage6.Controls.Add(this.numPinMinW);
             this.tabPage6.Controls.Add(this.label4);
             this.tabPage6.Location = new System.Drawing.Point(4, 32);
             this.tabPage6.Name = "tabPage6";
@@ -688,35 +771,68 @@
             this.tabPage6.Text = "Pin 腳位";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
-            // numPinMinWH
+            // numPinMinH
             // 
-            this.numPinMinWH.Location = new System.Drawing.Point(167, 22);
-            this.numPinMinWH.Minimum = new decimal(new int[] {
+            this.numPinMinH.Location = new System.Drawing.Point(167, 75);
+            this.numPinMinH.Maximum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.numPinMinH.Name = "numPinMinH";
+            this.numPinMinH.Size = new System.Drawing.Size(187, 30);
+            this.numPinMinH.TabIndex = 3;
+            this.numPinMinH.Value = new decimal(new int[] {
             2,
             0,
             0,
             0});
-            this.numPinMinWH.Name = "numPinMinWH";
-            this.numPinMinWH.Size = new System.Drawing.Size(187, 30);
-            this.numPinMinWH.TabIndex = 1;
-            this.numPinMinWH.Value = new decimal(new int[] {
-            5,
+            this.numPinMinH.ValueChanged += new System.EventHandler(this.numPinMinH_ValueChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(20, 79);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(102, 23);
+            this.label8.TabIndex = 2;
+            this.label8.Text = "Tol Min H :";
+            // 
+            // numPinMinW
+            // 
+            this.numPinMinW.Location = new System.Drawing.Point(167, 22);
+            this.numPinMinW.Maximum = new decimal(new int[] {
+            50,
             0,
             0,
             0});
-            this.numPinMinWH.ValueChanged += new System.EventHandler(this.numPinMinWH_ValueChanged);
+            this.numPinMinW.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numPinMinW.Name = "numPinMinW";
+            this.numPinMinW.Size = new System.Drawing.Size(187, 30);
+            this.numPinMinW.TabIndex = 1;
+            this.numPinMinW.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.numPinMinW.ValueChanged += new System.EventHandler(this.numPinMinW_ValueChanged);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(20, 26);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(141, 23);
+            this.label4.Size = new System.Drawing.Size(106, 23);
             this.label4.TabIndex = 0;
-            this.label4.Text = "Min WH(pixel) :";
+            this.label4.Text = "Tol Min W :";
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.groupBox5);
             this.tabPage4.Controls.Add(this.groupBox7);
             this.tabPage4.Controls.Add(this.groupBox6);
             this.tabPage4.Location = new System.Drawing.Point(4, 32);
@@ -725,6 +841,26 @@
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "檢測資料";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.btnCreateInspMap);
+            this.groupBox5.Location = new System.Drawing.Point(33, 213);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(386, 225);
+            this.groupBox5.TabIndex = 2;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "groupBox5";
+            // 
+            // btnCreateInspMap
+            // 
+            this.btnCreateInspMap.Location = new System.Drawing.Point(23, 48);
+            this.btnCreateInspMap.Name = "btnCreateInspMap";
+            this.btnCreateInspMap.Size = new System.Drawing.Size(112, 34);
+            this.btnCreateInspMap.TabIndex = 0;
+            this.btnCreateInspMap.Text = "Create Insp Mat";
+            this.btnCreateInspMap.UseVisualStyleBackColor = true;
+            this.btnCreateInspMap.Click += new System.EventHandler(this.btnCreateInspMap_Click);
             // 
             // groupBox7
             // 
@@ -910,43 +1046,6 @@
             // 
             this.saveFileDialog_Img.Filter = "Image files (*.bmp)|*.bmp|All files (*.*)|*.*";
             // 
-            // tabControl2
-            // 
-            this.tabControl2.Controls.Add(this.tabPage7);
-            this.tabControl2.Controls.Add(this.tabPage8);
-            this.tabControl2.Location = new System.Drawing.Point(17, 135);
-            this.tabControl2.Name = "tabControl2";
-            this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(407, 352);
-            this.tabControl2.TabIndex = 14;
-            // 
-            // tabPage7
-            // 
-            this.tabPage7.Controls.Add(this.chkSelectPattern);
-            this.tabPage7.Controls.Add(this.chkPatternIsWhite);
-            this.tabPage7.Location = new System.Drawing.Point(4, 32);
-            this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(292, 238);
-            this.tabPage7.TabIndex = 0;
-            this.tabPage7.Text = "定位";
-            this.tabPage7.UseVisualStyleBackColor = true;
-            // 
-            // tabPage8
-            // 
-            this.tabPage8.Controls.Add(this.label2);
-            this.tabPage8.Controls.Add(this.numMinHysteresisThreshold);
-            this.tabPage8.Controls.Add(this.btnDetectPins);
-            this.tabPage8.Controls.Add(this.btnCannyEdgeDetect);
-            this.tabPage8.Controls.Add(this.btnFindPinPosition);
-            this.tabPage8.Location = new System.Drawing.Point(4, 32);
-            this.tabPage8.Name = "tabPage8";
-            this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(399, 316);
-            this.tabPage8.TabIndex = 1;
-            this.tabPage8.Text = "腳位";
-            this.tabPage8.UseVisualStyleBackColor = true;
-            // 
             // For_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
@@ -972,14 +1071,22 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).EndInit();
             this.tabPage3.ResumeLayout(false);
-            this.groupBox8.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            this.tabControl2.ResumeLayout(false);
+            this.tabPage7.ResumeLayout(false);
+            this.tabPage7.PerformLayout();
+            this.tabPage8.ResumeLayout(false);
+            this.tabPage8.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).EndInit();
+            this.groupBox8.ResumeLayout(false);
             this.tabPage5.ResumeLayout(false);
             this.tabCtrl_Insp_Rules.ResumeLayout(false);
             this.tabPage6.ResumeLayout(false);
             this.tabPage6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numPinMinWH)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPinMinH)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPinMinW)).EndInit();
             this.tabPage4.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             this.pnlHeader.ResumeLayout(false);
@@ -987,11 +1094,6 @@
             this.pnlFooter.ResumeLayout(false);
             this.pnlFooter.PerformLayout();
             this.tabUser.ResumeLayout(false);
-            this.tabControl2.ResumeLayout(false);
-            this.tabPage7.ResumeLayout(false);
-            this.tabPage7.PerformLayout();
-            this.tabPage8.ResumeLayout(false);
-            this.tabPage8.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1066,7 +1168,7 @@
         private TabPage tabPage5;
         private TabControl tabCtrl_Insp_Rules;
         private TabPage tabPage6;
-        private NumericUpDown numPinMinWH;
+        private NumericUpDown numPinMinW;
         private Label label4;
         private SaveFileDialog saveFileDialog_Img;
         private CheckBox chkSelectPattern;
@@ -1074,5 +1176,12 @@
         private TabControl tabControl2;
         private TabPage tabPage7;
         private TabPage tabPage8;
+        private GroupBox groupBox5;
+        private Button btnCreateInspMap;
+        private Button btnTestInsp;
+        private CheckBox chKDisplayDefect;
+        private CheckBox chkDisplayDefectMaskPos;
+        private NumericUpDown numPinMinH;
+        private Label label8;
     }
 }

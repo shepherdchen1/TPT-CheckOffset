@@ -13,7 +13,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TN.ImageTools;
 using TN.Tools.Debug;
+
+using OpenCvSharp;
+
 using static System.Net.Mime.MediaTypeNames;
+using CheckOffset.ImageTools;
 
 namespace CheckOffset
 {
@@ -27,14 +31,14 @@ namespace CheckOffset
     {
         //private Bitmap? _Image = null;
         //public Bitmap? _show_image = null;
-        public Point _pt_LBtnDown; // image 坐標系
-        public Point _pt_Current;  // image 坐標系
+        public OpenCvSharp.Point _pt_LBtnDown; // image 坐標系
+        public OpenCvSharp.Point _pt_Current;  // image 坐標系
 
         //private float _scale = 1.0f;
         //private Point _offset;     // 原始影像座標(_image)顯示的起點: 往右拉，X值為負值，代表影像原點座標要往負方向開始截取.
 
-        Point _move_start_pt = new Point(0, 0);
-        Point _move_start_offset = new Point(0, 0);
+        OpenCvSharp.Point _move_start_pt = new OpenCvSharp.Point(0, 0);
+        OpenCvSharp.Point _move_start_offset = new OpenCvSharp.Point(0, 0);
 
         Editing_Mode _editing_mode = Editing_Mode.EDT_None;
 
@@ -99,7 +103,7 @@ namespace CheckOffset
             set => pb_Image.Image_Scale = value;
         }
 
-        public Point Offset 
+        public OpenCvSharp.Point Offset 
         { 
             get => pb_Image.Image_Offset; 
             set => pb_Image.Image_Offset = value;
@@ -131,7 +135,7 @@ namespace CheckOffset
         private void pb_Image_MouseDown(object? sender, MouseEventArgs e)
         {
             // 轉換到 Image 座標系.
-            _pt_LBtnDown = pb_Image.GetImagePointFromPB(e.Location);
+            _pt_LBtnDown = pb_Image.GetImagePointFromPB( OpenCVMatTool.ToOpenCvPoint(e.Location) );
 
             ll_Test.Text = $"{_pt_LBtnDown.X}, {_pt_LBtnDown.Y}, 0, 0";
 
@@ -153,9 +157,9 @@ namespace CheckOffset
                         {
                             if (null != editing_cttl)
                             {
-                                Point pt_image = pb_Image.GetImagePointFromPB(_pt_LBtnDown);
+                                OpenCvSharp.Point pt_image = pb_Image.GetImagePointFromPB(_pt_LBtnDown);
                                 TNCustCtrl_Rect.DS_Pos_Info pos_info = editing_cttl.Pos_Info;
-                                pos_info.Editing_Rect = new Rectangle(pt_image.X, pt_image.Y, 0, 0);
+                                pos_info.Editing_Rect = new Rect(pt_image.X, pt_image.Y, 0, 0);
                                 editing_cttl.Pos_Info = pos_info;
                             }
                         }
@@ -219,7 +223,7 @@ namespace CheckOffset
         private void pb_Image_MouseMove(object? sender, MouseEventArgs e)
         {
             // 轉換到 Image 座標系.
-            _pt_Current = pb_Image.GetImagePointFromPB(e.Location);
+            _pt_Current = pb_Image.GetImagePointFromPB( OpenCVMatTool.ToOpenCvPoint(e.Location) );
 
             if (e.Button == MouseButtons.Left)
             {
@@ -283,7 +287,7 @@ namespace CheckOffset
         private void pb_Image_MouseUp(object? sender, MouseEventArgs e)
         {
             // 轉換到 Image 座標系.
-            _pt_Current = pb_Image.GetImagePointFromPB(e.Location);
+            _pt_Current = pb_Image.GetImagePointFromPB(OpenCVMatTool.ToOpenCvPoint(e.Location) );
 
             if (e.Button == MouseButtons.Left)
             {
@@ -311,7 +315,7 @@ namespace CheckOffset
         private void pb_Image_MouseClick(object? sender, MouseEventArgs e)
         {
             // 轉換到 Image 座標系.
-            _pt_Current = pb_Image.GetImagePointFromPB(e.Location);
+            _pt_Current = pb_Image.GetImagePointFromPB(OpenCVMatTool.ToOpenCvPoint(e.Location) );
 
             if (null == Query_Editing_Mode)
             {
@@ -381,14 +385,14 @@ namespace CheckOffset
 
         private void UserCtrl_Image_MouseMove(object sender, MouseEventArgs e)
         {
-            _pt_Current = e.Location;
+            _pt_Current = OpenCVMatTool.ToOpenCvPoint(e.Location);
             if (e.Button == MouseButtons.Left)
             {
                 TNCustCtrl_Rect? editing_cttl = (TNCustCtrl_Rect?)pb_Image.Editing_Ctrl;
                 if (editing_cttl != null)
                 {
                     TNCustCtrl_Rect.DS_Pos_Info pos_info = editing_cttl.Pos_Info;
-                    pos_info.Editing_Rect = new Rectangle(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
+                    pos_info.Editing_Rect = new Rect(Math.Min(_pt_LBtnDown.X, _pt_Current.X)
                           , Math.Min(_pt_LBtnDown.Y, _pt_Current.Y)
                           , Math.Abs(_pt_Current.X - _pt_LBtnDown.X)
                           , Math.Abs(_pt_Current.Y - _pt_LBtnDown.Y));
@@ -399,7 +403,7 @@ namespace CheckOffset
 
         private void UserCtrl_Image_MouseDown(object sender, MouseEventArgs e)
         {
-            _pt_LBtnDown = e.Location;
+            _pt_LBtnDown = new OpenCvSharp.Point( e.Location.X, e.Location.Y );
         }
 
         public void Delete_Editing_ROI(Control ctrl_2be_del)
@@ -435,18 +439,18 @@ namespace CheckOffset
 
             User_Ctrls.Clear();
 
-            if (null != tnGlobal.Detect_Info.Align_Info)
+            if (null != tnGlobal.CAM_Info.Align_Info)
             {
                 TNCustCtrl_Rect new_align = new TNCustCtrl_Rect();
-                new_align.Pos_Info.Editing_Rect = tnGlobal.Detect_Info.Align_Info.Align_Rect;
+                new_align.Pos_Info.Editing_Rect = tnGlobal.CAM_Info.Align_Info.Align_Rect;
                 new_align.Display_Color = Color.Green;
                 //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
                 User_Ctrls.Add(new_align);
             }
 
-            if (null != tnGlobal.Detect_Info)
+            if (null != tnGlobal.CAM_Info)
             {
-                foreach (DS_Detect_Pin_Info detect_info in tnGlobal.Detect_Info.Detect_Pin_Infos)
+                foreach (DS_CAM_Pin_Info detect_info in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
                     TNCustCtrl_Rect new_detect = new TNCustCtrl_Rect();
                     new_detect.Pos_Info.Editing_Rect = detect_info.Detect_Rect;
@@ -459,7 +463,7 @@ namespace CheckOffset
 
         public void Apply_Ctrls_To_GlobalSetting()
         {
-            if (null == tnGlobal.Detect_Info)
+            if (null == tnGlobal.CAM_Info)
             {
                 Log_Utl.Log_Event(Event_Level.Warning
                                     , System.Reflection.MethodBase.GetCurrentMethod()?.Name
@@ -467,7 +471,7 @@ namespace CheckOffset
                 return;
             }
 
-            tnGlobal.Detect_Info.Detect_Pin_Infos.Clear();
+            tnGlobal.CAM_Info.Detect_Pin_Infos.Clear();
             if (null == User_Ctrls)
             {
                 Log_Utl.Log_Event(Event_Level.Warning
@@ -487,11 +491,11 @@ namespace CheckOffset
                     continue;
                 }
 
-                DS_Detect_Pin_Info new_detect_info = new DS_Detect_Pin_Info();
+                DS_CAM_Pin_Info new_detect_info = new DS_CAM_Pin_Info();
                 new_detect_info.Detect_Rect = rt_user_ctrl.Pos_Info.Editing_Rect;
                 //new_detect_info.Detect_Insp_param = tnGlobal.Insp_Param_Pin;
 
-                tnGlobal.Detect_Info.Detect_Pin_Infos.Add(new_detect_info);
+                tnGlobal.CAM_Info.Detect_Pin_Infos.Add(new_detect_info);
             }
         }
     } // end of     public partial class UserCtrl_Image : UserControl

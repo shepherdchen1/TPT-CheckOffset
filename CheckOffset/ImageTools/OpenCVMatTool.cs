@@ -15,6 +15,16 @@ namespace CheckOffset.ImageTools
     internal class OpenCVMatTool
     {
 
+        public static System.Drawing.Point ToSystemPoint(OpenCvSharp.Point cv_pt)
+        {
+            return new System.Drawing.Point(cv_pt.X, cv_pt.Y);
+        }
+
+        public static OpenCvSharp.Point ToOpenCvPoint(System.Drawing.Point drawing_pt)
+        {
+            return new OpenCvSharp.Point(drawing_pt.X, drawing_pt.Y);
+        }
+
         public static Mat<byte>? Clone_Bmp_2_Mat(Bitmap bmp)
         {
             try
@@ -31,25 +41,34 @@ namespace CheckOffset.ImageTools
                     if (bmp_data == null)
                         return null;
 
+                    int pixel_size = bmp_data.Stride / bmp_data.Width;
 
                     //Mat<byte> mat_buffer_1d = new Mat<byte>(bmp_data.Height, bmp_data.Stride, MatType.CV_8UC1);
                     //Marshal.Copy(bmp_data.Scan0, mat_buffer_1d, 0, bmp_data.Height * bmp_data.Stride);
 
                     Mat<byte> mat_buffer = new Mat<byte>(bmp_data.Height, bmp_data.Stride);
                     //byte[,] buffer = new byte[bmp.Height, bmp.Width];
+                    //unsafe
+                    //{
+                    //    for (int y = 0; y < bmp.Height; y++)
+                    //    {
+                    //        Buffer.MemoryCopy((void*) (bmp_data.Scan0 + y * bmp_data.Stride), (void*)mat_buffer.Get<byte>(y*bmp_data.Stride), y * bmp_data.Stride, bmp_data.Stride);
+                    //        //Marshal.Copy(bmp_data.Scan0, mat_buffer, y * bmp_data.Stride, bmp_data.Stride);
+                    //        //Buffer.BlockCopy(bmp_data.Scan0, y * bmp_data.Stride, mat_buffer, y * bmp_data.Stride, bmp_data.Stride);
+                    //    }
+                    //}
                     unsafe
                     {
                         for (int y = 0; y < bmp.Height; y++)
                         {
-                            Buffer.MemoryCopy((void*) (bmp_data.Scan0 + y * bmp_data.Stride), (void*)mat_buffer.Get<byte>(y*bmp_data.Stride), y * bmp_data.Stride, bmp_data.Stride);
-                            //Marshal.Copy(bmp_data.Scan0, mat_buffer, y * bmp_data.Stride, bmp_data.Stride);
-                            //Buffer.BlockCopy(bmp_data.Scan0, y * bmp_data.Stride, mat_buffer, y * bmp_data.Stride, bmp_data.Stride);
+                            IntPtr row = (IntPtr)(bmp_data.Scan0);
+                            row += y * bmp_data.Stride;
+                            for (int x = 0; x < bmp.Width; x++)
+                            {
+                                byte clr = (*(byte*)(row + x * pixel_size));
+                                mat_buffer.Set<byte>(y, x, *((byte*)(row + x * pixel_size)));
+                            }
                         }
-                    }
-                    for (int y = 0; y < bmp.Height; y++) 
-                    {
-                        //Marshal.Copy(bmp_data.Scan0, mat_buffer, y * bmp_data.Stride, bmp_data.Stride);
-                        //Buffer.BlockCopy(bmp_data.Scan0, y * bmp_data.Stride, mat_buffer, y * bmp_data.Stride, bmp_data.Stride);
                     }
 
                     Image_Buffer_Gray.ReleaseBuffer(bmp, ref bmp_data);

@@ -51,7 +51,7 @@ namespace CheckOffset
             // 
             this.pb_Image.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pb_Image.Image_Bmp = null;
-            this.pb_Image.Image_Offset = new System.Drawing.Point(0, 0);
+            this.pb_Image.Image_Offset = new OpenCvSharp.Point(0, 0);
             this.pb_Image.Image_Scale = 1F;
             this.pb_Image.Location = new System.Drawing.Point(0, 0);
             this.pb_Image.Name = "tnPictureBox1";

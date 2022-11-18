@@ -156,10 +156,10 @@ namespace CheckOffset.ImageTools
             contours = null;
             try
             {
-                if (tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH < 2)
+                if (tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_W < 0.1)
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
-                     , $"Min_Pin_WH is:{tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH}");
+                     , $"Insp_Param_PinPin_Tol_W is:{tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_W}");
                     return;
                 }
 
@@ -180,16 +180,16 @@ namespace CheckOffset.ImageTools
                 }
             Image_Buffer_Gray.Buffer_Save_File(mat_zero, "d:\\test\\blob_analyze_rect_array.bmp");
 
-                List<System.Drawing.Rectangle> blobs = new List<System.Drawing.Rectangle>();
+                List<Rect> blobs = new List<Rect>();
                 Mat imgWithContours = Mat.Zeros(buffer.Rows, buffer.Cols, MatType.CV_8UC1);
                 for(int i = 0; i < contours.Length; i++)
                 {
                     if ( Cv2.ContourArea(contours[i]) >= 1)
                     {
-                        System.Drawing.Rectangle rt = Get_Contour_Rect(contours, i);
+                        Rect rt = Get_Contour_Rect(contours, i);
 
-                        if (   rt.Width >= tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH
-                            || rt.Height >= tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH)
+                        if (   rt.Width >= tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_W
+                            || rt.Height >= tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_H)
                         {
                             blobs.Add(rt);
 
@@ -278,16 +278,16 @@ namespace CheckOffset.ImageTools
             {
                 for(int contour_id = 0; contour_id < contours.GetLength(0); contour_id++)
                 {
-                    System.Drawing.Rectangle rt = Get_Contour_Rect(contours, contour_id);
-                    if (   rt.Width  < tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH 
-                        && rt.Height < tnGlobal.Insp_Param.Insp_Param_Pin.Min_Pin_WH )
+                    Rect rt = Get_Contour_Rect(contours, contour_id);
+                    if (   rt.Width  < tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_W 
+                        && rt.Height < tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_H)
                     {
                         continue;
                     }
 
-                    DS_Detect_Pin_Info new_pin = new DS_Detect_Pin_Info();
+                    DS_CAM_Pin_Info new_pin = new DS_CAM_Pin_Info();
                     new_pin.Detect_Rect = rt;
-                    tnGlobal.Detect_Info.Detect_Pin_Infos.Add(new_pin);
+                    tnGlobal.CAM_Info.Detect_Pin_Infos.Add(new_pin);
                 }
             }
             catch (Exception ex)
@@ -299,13 +299,13 @@ namespace CheckOffset.ImageTools
             }
         }
 
-        private System.Drawing.Rectangle Get_Contour_Rect(OpenCvSharp.Point[][] contours, int contour_id)
+        private Rect Get_Contour_Rect(OpenCvSharp.Point[][] contours, int contour_id)
         {
             try
             {
                 if (contours[contour_id].Length <= 1 )
                 {
-                    return new System.Drawing.Rectangle(0, 0, 0, 0);
+                    return new Rect(0, 0, 0, 0);
                 }
 
                 int min_x = Int32.MaxValue;
@@ -320,7 +320,7 @@ namespace CheckOffset.ImageTools
                     max_y = System.Math.Max(max_y, contours[contour_id][pt_id].Y);
                 }
 
-                return new System.Drawing.Rectangle( min_x, min_y, max_x - min_x + 1, max_y - min_y + 1);
+                return new Rect( min_x, min_y, max_x - min_x + 1, max_y - min_y + 1);
             }
             catch (Exception ex)
             {
@@ -330,7 +330,7 @@ namespace CheckOffset.ImageTools
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
             }
 
-            return new System.Drawing.Rectangle(0, 0, 0, 0);
+            return new Rect(0, 0, 0, 0);
         }
     }
 }

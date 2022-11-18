@@ -14,6 +14,7 @@ using TN.Tools.Debug;
 using System.Runtime.InteropServices;
 using System.Reflection;
 //using CheckOffset.Controls;
+using CheckOffset.ImageTools;
 
 //namespace CheckOffset.Controls
 namespace TNControls
@@ -58,13 +59,13 @@ namespace TNControls
         public Point _pt_Current;
 
         private float _scale = 1.0f;
-        private Point _offset;     // 原始影像座標(_image)顯示的起點: 往右拉，X值為負值，代表影像原點座標要往負方向開始截取.
+        private OpenCvSharp.Point _offset;     // 原始影像座標(_image)顯示的起點: 往右拉，X值為負值，代表影像原點座標要往負方向開始截取.
 
         bool _busy = false;
         bool _enable_zoom = true;
 
-        Point _move_start_pt = new Point(0, 0);
-        Point _move_start_offset = new Point(0, 0);
+        OpenCvSharp.Point _move_start_pt     = new OpenCvSharp.Point(0, 0);
+        OpenCvSharp.Point _move_start_offset = new OpenCvSharp.Point(0, 0);
 
         // for _user_ctrls should be none null, for compile no warning.
         private List<Control> _user_ctrls = new List<Control>();
@@ -100,7 +101,7 @@ namespace TNControls
                 Redraw_Ctrl();
             }
         }
-        public Point Image_Offset 
+        public OpenCvSharp.Point Image_Offset 
         { 
             get => _offset;
             set
@@ -164,12 +165,12 @@ namespace TNControls
 
                 //Point center_pt = GetImagePointFromPB(new Point(Width / 2, Height / 2));
                 // zoomin/out by cursor
-                Point center_pt = GetImagePointFromPB(e.Location);
+                OpenCvSharp.Point center_pt = GetImagePointFromPB(OpenCVMatTool.ToOpenCvPoint(e.Location ) );
 
                 if (e.Delta > 0)
-                    ZoomIn(e.Location /*center_pt*/);
+                    ZoomIn(OpenCVMatTool.ToOpenCvPoint(e.Location /*center_pt*/) );
                 else if (e.Delta < 0)
-                    ZoomOut(e.Location/*center_pt*/);
+                    ZoomOut(OpenCVMatTool.ToOpenCvPoint(e.Location/*center_pt*/) );
 
                 _busy = false;
             }
@@ -192,7 +193,7 @@ namespace TNControls
                 //}
             }
 
-            _move_start_pt = e.Location;
+            _move_start_pt      = OpenCVMatTool.ToOpenCvPoint(e.Location);
             _move_start_offset = _offset;
         }
 
@@ -402,10 +403,10 @@ namespace TNControls
             }
         }
 
-        public Point GetImagePointFromPB(Point pt)
+        public OpenCvSharp.Point GetImagePointFromPB(OpenCvSharp.Point pt)
         {
-            Point real_pt = new Point((Int32)Math.Floor(pt.X / _scale + _offset.X)
-                                     , (Int32)Math.Floor(pt.Y / _scale + _offset.Y));
+            OpenCvSharp.Point real_pt = new OpenCvSharp.Point((Int32)Math.Floor(pt.X / _scale + _offset.X)
+                                                         , (Int32)Math.Floor(pt.Y / _scale + _offset.Y));
             return real_pt;
         }
 
@@ -432,11 +433,11 @@ namespace TNControls
                                  , (Int32)Math.Round(rt.Height * _scale, MidpointRounding.AwayFromZero));
         }
 
-        System.Drawing.Point CalcOffset(System.Drawing.Point display_cursor_pt, float old_scale, float new_scale)
+        OpenCvSharp.Point CalcOffset(OpenCvSharp.Point display_cursor_pt, float old_scale, float new_scale)
         {
             // 1. 以原有倍率取得滑鼠座標 在 _image 坐標系的位置
             _scale = old_scale;
-            Point pt_new = GetImagePointFromPB(display_cursor_pt);
+            OpenCvSharp.Point pt_new = GetImagePointFromPB(display_cursor_pt);
             _scale = new_scale;
 
             // 轉到新倍率坐標系
@@ -473,13 +474,13 @@ namespace TNControls
         public void ZoomFit()
         {
             _scale = GetBestFitScale();
-            _offset = new Point(0, 0);
+            _offset = new OpenCvSharp.Point(0, 0);
             DrawImageToBuffer();
             Redraw_Ctrl();
             //pb_Image.Image = _show_image;
         }
 
-        private void ZoomIn(Point display_cursor_pt)
+        private void ZoomIn(OpenCvSharp.Point display_cursor_pt)
         {
             float old_scale = _scale;
             _scale *= 1.25f;
@@ -499,7 +500,7 @@ namespace TNControls
             //OffsetChanged(this, new EventArgs());
         }
 
-        private void ZoomOut(Point display_cursor_pt)
+        private void ZoomOut(OpenCvSharp.Point display_cursor_pt)
         {
             float old_scale = _scale;
             _scale /= 1.25f;
@@ -548,12 +549,23 @@ namespace TNControls
                 return show_rect;
             }
 
-            show_rect.Location = _offset;
-            show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
+            //show_rect.Location.X = _offset.X;
+            //show_rect.Location.Y = _offset.Y;
+            //show_rect.Width = (Int32)(ClientSize.Width / _scale + 0.5f);
+            ////show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
+            //show_rect.Width = Math.Max(show_rect.Width, Image_Bmp.Width - _offset.X);
+
+            int width = (Int32)(ClientSize.Width / _scale + 0.5f);
             //show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
-            show_rect.Width = Math.Max(show_rect.Width, Image_Bmp.Width - _offset.X);
-            show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
-            show_rect.Height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y); 
+            width = Math.Max(width, Image_Bmp.Width - _offset.X);
+
+            int height = (Int32)(ClientSize.Height / _scale + 0.5f);
+            height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y);
+
+            show_rect = new Rectangle( _offset.X, _offset.Y, width, height );
+
+            //show_rect.Height = (Int32)(ClientSize.Height / _scale + 0.5f);
+            //show_rect.Height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y); 
 
             return show_rect;
         }

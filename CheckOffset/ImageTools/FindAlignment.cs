@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TN.ImageTools;
 using TN.Tools.Debug;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace CheckOffset.ImageTools
@@ -24,8 +25,15 @@ namespace CheckOffset.ImageTools
         {
             try
             {
-                Mat<byte> selected_buffer = OpenCVMatTool.Extract_Buffer(_buffer, rt_user_select);
-                Image_Buffer_Gray.Buffer_Save_File(selected_buffer, "d:\\test\\align.bmp");
+                //Mat<byte> selected_buffer = OpenCVMatTool.Extract_Buffer(_buffer, rt_user_select);
+                Mat<byte> selected_buffer = _buffer[ rt_user_select.Y, rt_user_select.Bottom
+                                                   , rt_user_select.X, rt_user_select.Right ];
+
+                string export_file = $"d:\\test\\align.bmp";
+                if (File.Exists(export_file))
+                    File.Delete(export_file);
+
+                Image_Buffer_Gray.Buffer_Save_File(selected_buffer, export_file);
                 selected_buffer.SaveImage("d:\\test\\align.jpg");
 
                 Cv2.FindContours(selected_buffer
@@ -47,8 +55,10 @@ namespace CheckOffset.ImageTools
                 if (max_blob_area_id > 0)
                 {
                     OpenCvSharp.Rect rt = Cv2.BoundingRect(contours[max_blob_area_id]);
-                    tnGlobal.Detect_Info.Align_Info.Align_Rect = new Rectangle(rt_user_select.X + rt.X, rt_user_select.Y + rt.Y, rt.Width, rt.Height);
+                    tnGlobal.CAM_Info.Align_Info.Align_Rect = new Rect(rt_user_select.X + rt.X, rt_user_select.Y + rt.Y, rt.Width, rt.Height);
                 }
+
+                selected_buffer.Dispose();
 
                 return true;
             }

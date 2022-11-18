@@ -349,18 +349,25 @@ namespace TN.Insp_Param
         /// 
         private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
 
-        private int _Min_Pin_WH = 5;
+        private int _Pin_Tol_W = 2; // 缺陷離 Pin 腳 bounding box 多少算缺陷
+        private int _Pin_Tol_H = 2; // 缺陷離 Pin 腳 bounding box 多少算缺陷
+
+        private int _Ext_WH = 15;   //! Pin 腳 往外長 幾個 pixel, 之外不檢， 用來產生不檢區 Mask
 
         /// <summary>
         /// member function
         /// </summary>
-        public int Min_Pin_WH { get => _Min_Pin_WH; set => _Min_Pin_WH = value; }
+        public int Pin_Tol_W { get => _Pin_Tol_W; set => _Pin_Tol_W = value; }
+        public int Pin_Tol_H { get => _Pin_Tol_H; set => _Pin_Tol_H = value; }
 
         public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+        public int Ext_WH { get => _Ext_WH; set => _Ext_WH = value; }
+
 
         public DS_Insp_Param_Pin()
         {
-            _Min_Pin_WH = 10;
+            Pin_Tol_W = 2;
+            Pin_Tol_H = 2;
             _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
         }
 

@@ -13,6 +13,8 @@ using TN.Insp_Param;
 using TN.Tools;
 using TN.Tools.Debug;
 
+using OpenCvSharp;
+
 //namespace CheckOffset
 //{
 //    internal class tnGlobal
@@ -117,7 +119,9 @@ namespace CheckOffset
 
         public static DS_Insp_Param Insp_Param = new DS_Insp_Param();
 
-        public static DS_Detect_Info Detect_Info = new DS_Detect_Info();
+        public static List<DS_Single_Insp_Info> Insp_Pools = new List<DS_Single_Insp_Info>();
+
+        public static DS_CAM_Info CAM_Info = new DS_CAM_Info();
 
         public static IT_Detect _IT_Detect = null;
 
@@ -447,9 +451,15 @@ namespace CheckOffset
     {
         public bool EnableLogStep = true;              // 是否輸出Log\Step.
 
+        public int CCD_Width = 640;
+        public int CCD_Height = 480;
+
         public DS_Setting_Info()
         {
             EnableLogStep = true;
+
+            CCD_Width = 640;
+            CCD_Height = 480;
         }
     }
 
@@ -474,40 +484,40 @@ namespace CheckOffset
         }
     }
 
-    public class DS_Detect_Info
+    public class DS_CAM_Info
     {
-        public DS_Detect_Align_Info Align_Info = new DS_Detect_Align_Info();
+        public DS_CAMt_Align_Info Align_Info = new DS_CAMt_Align_Info();
 
-        public List<DS_Detect_Pin_Info>   Detect_Pin_Infos = new List<DS_Detect_Pin_Info>();
+        public List<DS_CAM_Pin_Info>   Detect_Pin_Infos = new List<DS_CAM_Pin_Info>();
     }
 
     /// <summary>
     /// 定位點
     /// </summary>
-    public class DS_Detect_Align_Info
+    public class DS_CAMt_Align_Info
     {
-        public Rectangle Align_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
+        public Rect Align_Rect = new Rect(0, 0, 0, 0);              // 是否輸出Log\Step.
         public bool      Align_Is_White = true;
-        public DS_Detect_Align_Info()
+        public DS_CAMt_Align_Info()
         {
-            Align_Rect = new Rectangle(0, 0, 0, 0);
+            Align_Rect = new Rect(0, 0, 0, 0);
             Align_Is_White = true;
         }
     }
-    public class DS_Detect_Pin_Info
+    public class DS_CAM_Pin_Info
     {
         private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
 
 
-        public Rectangle Detect_Rect = new Rectangle(0, 0, 0, 0);              // 是否輸出Log\Step.
+        public OpenCvSharp.Rect Detect_Rect = new OpenCvSharp.Rect(0, 0, 0, 0);              // 是否輸出Log\Step.
 
         public DS_Insp_Result Detect_Insp_Result = new DS_Insp_Result();
 
         public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
 
-        public DS_Detect_Pin_Info()
+        public DS_CAM_Pin_Info()
         {
-            Detect_Rect = new Rectangle(0, 0, 0, 0);
+            Detect_Rect = new Rect(0, 0, 0, 0);
             _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
             Detect_Insp_Result = new DS_Insp_Result();
         }
