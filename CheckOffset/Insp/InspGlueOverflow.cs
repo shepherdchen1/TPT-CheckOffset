@@ -39,7 +39,7 @@ namespace CheckOffset.Insp
             try
             {
                 // pattern match 找位移 + 旋轉角度
-                if ( !Find_Offset() )
+                if ( !Find_Offset(insp_buffer, out OpenCvSharp.Point insp_align ) )
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                        , $"Find_Offset return false");
@@ -92,10 +92,42 @@ namespace CheckOffset.Insp
             return false;
         }
 
-        private bool Find_Offset()
+        private bool Find_Offset(Mat<byte> insp_buffer, out OpenCvSharp.Point insp_align_pos)
         {
+            insp_align_pos = new OpenCvSharp.Point(0, 0);
             try
             {
+                insp_buffer.SaveImage("d:\\temp\\diff_source.jpg");
+
+                int offline_x = 10;
+                int offline_y = 10;
+                Scalar fg_color = tnGlobal.CAM_Info.Align_Info.Align_Is_White ? Scalar.White : Scalar.Black;
+                Scalar bk_color = tnGlobal.CAM_Info.Align_Info.Align_Is_White ? Scalar.Black : Scalar.White;
+                Mat<byte> golden_align = new Mat<byte>(tnGlobal.CAM_Info.Align_Info.Align_Rect.Height + offline_y * 2
+                                                    , tnGlobal.CAM_Info.Align_Info.Align_Rect.Width + offline_x * 2
+                                                    , bk_color);
+
+                Mat<byte> align_buffer = new Mat<byte>(tnGlobal.CAM_Info.Align_Info.Align_Rect.Height, tnGlobal.CAM_Info.Align_Info.Align_Rect.Width
+                                        , fg_color );
+                golden_align[offline_y, tnGlobal.CAM_Info.Align_Info.Align_Rect.Height + offline_y
+                           , offline_x, tnGlobal.CAM_Info.Align_Info.Align_Rect.Width + offline_x]
+                                = align_buffer;
+
+                Mat<byte> align_result = new Mat<byte>(tnGlobal.CAM_Info.Align_Info.Align_Rect.Height , tnGlobal.CAM_Info.Align_Info.Align_Rect.Width
+                                                , bk_color );
+                Cv2.MatchTemplate(insp_buffer, golden_align, align_result, TemplateMatchModes.CCoeffNormed);
+
+                golden_align.SaveImage("d:\\temp\\golden_allign.jpg");
+                align_buffer.Dispose();
+
+                OpenCvSharp.Point minLock = new OpenCvSharp.Point(0,0);
+                OpenCvSharp.Point maxLock = new OpenCvSharp.Point(0, 0);
+                OpenCvSharp.Point matchLock = new OpenCvSharp.Point(0, 0);
+                Cv2.MinMaxLoc(align_result, out minLock, out maxLock);
+                matchLock = maxLock;
+
+                insp_align_pos = new OpenCvSharp.Point(matchLock.X + offline_x, matchLock.Y + offline_y);
+
                 return true;
             }
             catch (Exception ex)
