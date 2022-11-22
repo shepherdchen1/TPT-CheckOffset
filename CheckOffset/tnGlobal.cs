@@ -488,6 +488,8 @@ namespace CheckOffset
     {
         public DS_CAMt_Align_Info Align_Info = new DS_CAMt_Align_Info();
 
+        public DS_CAM_Chip_Info   Chip_Info = new DS_CAM_Chip_Info();
+
         public List<DS_CAM_Pin_Info>   Detect_Pin_Infos = new List<DS_CAM_Pin_Info>();
     }
 
@@ -504,22 +506,59 @@ namespace CheckOffset
             Align_Is_White = true;
         }
     }
+
+    /// <summary>
+    /// Pin 腳位置
+    /// </summary>
     public class DS_CAM_Pin_Info
     {
         private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
 
+        private int _Pin_Idx = 0;
 
         public OpenCvSharp.Rect Detect_Rect = new OpenCvSharp.Rect(0, 0, 0, 0);              // 是否輸出Log\Step.
 
         public DS_Insp_Result Detect_Insp_Result = new DS_Insp_Result();
 
         public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
+        public int Pin_Idx { get => _Pin_Idx; set => _Pin_Idx = value; }
 
         public DS_CAM_Pin_Info()
         {
             Detect_Rect = new Rect(0, 0, 0, 0);
             _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
             Detect_Insp_Result = new DS_Insp_Result();
+        }
+    }
+
+    /// <summary>
+    /// 晶片位置
+    /// </summary>
+    public class DS_CAM_Chip_Info
+    {
+        // 晶片的contour. 可能會有截角，所以不用Rect.
+        private OpenCvSharp.Point[] _Chip_Contour = new OpenCvSharp.Point[0];
+
+        //private OpenCvSharp.Rect _Select_Chip = new OpenCvSharp.Rect(0, 0, 0, 0);
+
+        //private OpenCvSharp.Rect _Select_ABF = new OpenCvSharp.Rect(0, 0, 0, 0);
+
+        public DS_Insp_Result _Detect_Insp_Result = new DS_Insp_Result();
+
+        private FindChipPosition _Chip_Pos_Finder = new FindChipPosition();
+
+        public FindChipPosition Chip_Pos_Finder { get => _Chip_Pos_Finder; set => _Chip_Pos_Finder = value; }
+
+
+        //public Rect Select_Chip { get => _Select_Chip; set => _Select_Chip = value; }
+        //public Rect Select_ABF { get => _Select_ABF; set => _Select_ABF = value; }
+
+        public DS_CAM_Chip_Info()
+        {
+            //_Select_Chip = new Rect(0, 0, 0, 0);
+            //_Select_ABF = new Rect(0, 0, 0, 0);
+
+            _Chip_Pos_Finder = new FindChipPosition();
         }
     }
 } // end of namespace CheckOffset

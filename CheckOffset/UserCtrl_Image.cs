@@ -154,6 +154,7 @@ namespace CheckOffset
                 {
                     case Editing_Mode.EDT_New_ROI:
                     case Editing_Mode.EDT_New_Align:
+                    case Editing_Mode.EDT_New_Chip:
                         {
                             if (null != editing_cttl)
                             {
@@ -240,6 +241,7 @@ namespace CheckOffset
                 {
                     case Editing_Mode.EDT_New_ROI:
                     case Editing_Mode.EDT_New_Align:
+                    case Editing_Mode.EDT_New_Chip:
                         {
                             if (null == editing_cttl)
                             {
@@ -439,22 +441,56 @@ namespace CheckOffset
 
             User_Ctrls.Clear();
 
-            if (null != tnGlobal.CAM_Info.Align_Info)
+            TNCustCtrl_Rect new_align = new TNCustCtrl_Rect();
+            new_align.Display_Color = Color.Green;
+            //if (null != tnGlobal.CAM_Info.Align_Info)
+            //{
+            //    TNCustCtrl_Rect new_align = new TNCustCtrl_Rect();
+            //    new_align.Pos_Info.Editing_Rect = tnGlobal.CAM_Info.Align_Info.Align_Rect;
+            //    new_align.Display_Color = Color.Green;
+            //    //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
+            //    User_Ctrls.Add(new_align);
+            //}
+            if (tnGlobal.Insp_Pools.Count <= 0)
             {
-                TNCustCtrl_Rect new_align = new TNCustCtrl_Rect();
                 new_align.Pos_Info.Editing_Rect = tnGlobal.CAM_Info.Align_Info.Align_Rect;
-                new_align.Display_Color = Color.Green;
-                //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
-                User_Ctrls.Add(new_align);
+            }
+            else
+            {
+                for (int insp_id = 0; insp_id < tnGlobal.Insp_Pools.Count; insp_id++)
+                {
+                    if (!tnGlobal.Insp_Pools[insp_id]._inspected || null == tnGlobal.Insp_Pools[insp_id]._insp_inst)
+                        continue;
+
+                    new_align.Pos_Info.Editing_Rect = new OpenCvSharp.Rect(tnGlobal.CAM_Info.Align_Info.Align_Rect.X + tnGlobal.Insp_Pools[insp_id]._insp_inst._align_offset.Width
+                                                                          , tnGlobal.CAM_Info.Align_Info.Align_Rect.Y + tnGlobal.Insp_Pools[insp_id]._insp_inst._align_offset.Height
+                                                                          , tnGlobal.CAM_Info.Align_Info.Align_Rect.Width, tnGlobal.CAM_Info.Align_Info.Align_Rect.Height);
+                }
             }
 
             if (null != tnGlobal.CAM_Info)
             {
+                int pin_idx = 1;
                 foreach (DS_CAM_Pin_Info detect_info in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
                     TNCustCtrl_Rect new_detect = new TNCustCtrl_Rect();
                     new_detect.Pos_Info.Editing_Rect = detect_info.Detect_Rect;
                     new_detect.Display_Color = Color.Blue;
+
+                    new_detect.Insp_param.Pin_Idx = pin_idx;
+                    pin_idx++;
+
+                    //if (tnGlobal.Insp_Pools.Count <= 0)
+                    //{
+                        new_detect.Pos_Info.Editing_Rect = detect_info.Detect_Rect;
+                    //}
+                    //else
+                    //{
+                    //    new_detect.Pos_Info.Editing_Rect = new OpenCvSharp.Rect(detect_info.Detect_Rect.X + detect_info._insp_inst._align_offset.Width
+                    //                                                          , detect_info.Detect_Rect.Y + detect_info._insp_inst._align_offset.Height
+                    //                                                          , detect_info.Detect_Rect.Width, detect_info.Detect_Rect.Height);
+
+                    //}
                     //new_detect.Insp_param = tnGlobal.Insp_Param_Pin;
                     User_Ctrls.Add(new_detect);
                 }
@@ -506,5 +542,6 @@ namespace CheckOffset
         , EDT_New_ROI
         , EDT_Editing_ROI
         , EDT_New_Align
+        , EDT_New_Chip
     }
 }

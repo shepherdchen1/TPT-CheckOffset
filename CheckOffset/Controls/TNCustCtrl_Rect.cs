@@ -123,7 +123,7 @@ namespace TNControls
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(rt_right_bottom));
             }
 
-            Font draw_font = new Font("Arial", 16);
+            Font draw_font = new Font("Arial", 8);
             string draw_string = _insp_param.Draw_String() + "\r\n" + _insp_result.Draw_String();
             Rectangle pb_rect = pb.GetPBRectFromImage(Insp_Base_Tools.To_System_Rect(Pos_Info.Editing_Rect));
             graphics_show.DrawString(_insp_param.Draw_String(), draw_font, new SolidBrush(Color.Green)

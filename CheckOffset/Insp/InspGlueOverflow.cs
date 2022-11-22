@@ -10,7 +10,7 @@ using TNControls;
 
 namespace CheckOffset.Insp
 {
-    internal class InspGlueOverflow
+    public class InspGlueOverflow
     {
 
         // Pin 腳位置
@@ -26,6 +26,7 @@ namespace CheckOffset.Insp
         // _insp_roi_sample 內， Pin 腳 boundingbox 往外 檢規大小
         public Mat<byte> _defect_candidate;
 
+        public OpenCvSharp.Size _align_offset = new OpenCvSharp.Size(0, 0);
         // 缺陷
         public Mat<byte> _diff_result;
 
@@ -39,7 +40,7 @@ namespace CheckOffset.Insp
             try
             {
                 // pattern match 找位移 + 旋轉角度
-                if ( !Find_Offset(insp_buffer, out OpenCvSharp.Point insp_align ) )
+                if ( !Find_Offset(insp_buffer, out _align_offset) )
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                        , $"Find_Offset return false");
@@ -48,15 +49,15 @@ namespace CheckOffset.Insp
 
                 // 填出比對基礎圖
                 // 填出 ROI index(每個Pixel屬於哪個檢測區) 
-                if (!Make_Diff_Base())
+                if (!Make_Diff_Base(_align_offset))
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                        , $"Make_Diff_Base return false");
                     return false;
                 }
 
-                // 填出藥檢測的區域
-                if (!Make_Insp_Roi())
+                // 填出要檢測的區域
+                if (!Make_Insp_Roi(_align_offset))
                 {
                     Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
                        , $"Make_Ignore return false");
@@ -92,9 +93,9 @@ namespace CheckOffset.Insp
             return false;
         }
 
-        private bool Find_Offset(Mat<byte> insp_buffer, out OpenCvSharp.Point insp_align_pos)
+        private bool Find_Offset(Mat<byte> insp_buffer, out OpenCvSharp.Size insp_align_offset)
         {
-            insp_align_pos = new OpenCvSharp.Point(0, 0);
+            insp_align_offset = new OpenCvSharp.Size(0, 0);
             try
             {
                 insp_buffer.SaveImage("d:\\temp\\diff_source.jpg");
@@ -126,7 +127,8 @@ namespace CheckOffset.Insp
                 Cv2.MinMaxLoc(align_result, out minLock, out maxLock);
                 matchLock = maxLock;
 
-                insp_align_pos = new OpenCvSharp.Point(matchLock.X + offline_x, matchLock.Y + offline_y);
+                insp_align_offset = new OpenCvSharp.Size(matchLock.X + offline_x - tnGlobal.CAM_Info.Align_Info.Align_Rect.X
+                                                    , matchLock.Y + offline_y - tnGlobal.CAM_Info.Align_Info.Align_Rect.Y );
 
                 return true;
             }
@@ -142,24 +144,26 @@ namespace CheckOffset.Insp
         }
 
         // 填出比對基礎圖
-        private bool Make_Diff_Base()
+        private bool Make_Diff_Base(OpenCvSharp.Size insp_align_offset)
         {
             try
             {
-                _golden_sample          = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width);
-                _insp_roi_index_sample  = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width);
+                _golden_sample          = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width, new Scalar(0) );
+                _insp_roi_index_sample  = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width, new Scalar(0) );
 
                 int insp_roi_index = 1; // 1 base.
                 foreach (DS_CAM_Pin_Info pin_info in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
                     Mat<byte> pin_buffer = new Mat<byte>(pin_info.Detect_Rect.Height, pin_info.Detect_Rect.Width, new Scalar(255) );
-                    _golden_sample[pin_info.Detect_Rect.Y, pin_info.Detect_Rect.Bottom
-                                    , pin_info.Detect_Rect.X, pin_info.Detect_Rect.Right] = pin_buffer;
+                    OpenCvSharp.Rect rect_offset = new OpenCvSharp.Rect(pin_info.Detect_Rect.X + insp_align_offset.Width, pin_info.Detect_Rect.Y + insp_align_offset.Height
+                                                                , pin_info.Detect_Rect.Width, pin_info.Detect_Rect.Height );
+                    _golden_sample[rect_offset.Y, rect_offset.Bottom
+                                    , rect_offset.X, rect_offset.Right] = pin_buffer;
                     pin_buffer.Dispose();
 
-                    Mat<byte> pin_index_buffer = new Mat<byte>(pin_info.Detect_Rect.Height, pin_info.Detect_Rect.Width, new Scalar(insp_roi_index));
-                    _insp_roi_index_sample[pin_info.Detect_Rect.Y, pin_info.Detect_Rect.Bottom
-                                    , pin_info.Detect_Rect.X, pin_info.Detect_Rect.Right] = pin_index_buffer;
+                    Mat<byte> pin_index_buffer = new Mat<byte>(rect_offset.Height, rect_offset.Width, new Scalar(insp_roi_index));
+                    _insp_roi_index_sample[rect_offset.Y, rect_offset.Bottom
+                                    , rect_offset.X, rect_offset.Right] = pin_index_buffer;
                     pin_index_buffer.Dispose();
                     insp_roi_index++;
                 }
@@ -180,16 +184,26 @@ namespace CheckOffset.Insp
             return false;
         }
 
-        private bool Make_Insp_Roi()
+        private bool Make_Insp_Roi(OpenCvSharp.Size insp_align_offset )
         {
             try
             {
-                _insp_roi_sample = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width);
+                _insp_roi_sample = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width, new Scalar(0) );
 
                 foreach (DS_CAM_Pin_Info pin_info in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
-                    Rect rt_ext = pin_info.Detect_Rect;
-                    rt_ext.Inflate(tnGlobal.Insp_Param.Insp_Param_Pin.Ext_WH, tnGlobal.Insp_Param.Insp_Param_Pin.Ext_WH);
+                    Rect rt_ext = new OpenCvSharp.Rect(  pin_info.Detect_Rect.X + insp_align_offset.Width, pin_info.Detect_Rect.Y + insp_align_offset.Height
+                                                        , pin_info.Detect_Rect.Width, pin_info.Detect_Rect.Height );
+
+                    if (rt_ext.Width > rt_ext.Height)
+                    {
+                        rt_ext.Inflate(tnGlobal.Insp_Param.Insp_Param_Pin.Ext_Pin_Dir, tnGlobal.Insp_Param.Insp_Param_Pin.Ext_Pin_Space_Dir);
+                    }
+                    else
+                    {
+                        rt_ext.Inflate(tnGlobal.Insp_Param.Insp_Param_Pin.Ext_Pin_Space_Dir, tnGlobal.Insp_Param.Insp_Param_Pin.Ext_Pin_Dir);
+                    }
+
                     TNCustCtrl_Rect.Normalize(ref rt_ext);
                     rt_ext = new Rect(System.Math.Max( 0, rt_ext.X), System.Math.Max( 0, rt_ext.Y)
                                     , System.Math.Min(rt_ext.Right, tnGlobal.Setting.CCD_Width) - rt_ext.Left
@@ -207,14 +221,17 @@ namespace CheckOffset.Insp
                 _insp_roi_sample.SaveImage("d:\\temp\\insp_roi.jpg");
 
                 // 落在本區即為缺陷
-                _defect_candidate = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width);
+                _defect_candidate = new Mat<byte>(tnGlobal.Setting.CCD_Height, tnGlobal.Setting.CCD_Width, new Scalar(0));
                 _defect_candidate[0, tnGlobal.Setting.CCD_Height
                                 , 0, tnGlobal.Setting.CCD_Width]
                              = _insp_roi_sample;
                 foreach (DS_CAM_Pin_Info pin_info in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
                     // Pin 腳 外擴檢規 以內為 合法點 填 0
-                    Rect rt_ext = pin_info.Detect_Rect;
+                    // 20221121+ insp_align_offset shift.
+                    Rect rt_offset = new OpenCvSharp.Rect(pin_info.Detect_Rect.X + insp_align_offset.Width, pin_info.Detect_Rect.Y + insp_align_offset.Height
+                                                    , pin_info.Detect_Rect.Width, pin_info.Detect_Rect.Height);
+                    Rect rt_ext = rt_offset;
                     //int tol_w = (int) ( 0.5f + pin_info.Detect_Rect.Width  * tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_W );
                     //int tol_h = (int) ( 0.5f + pin_info.Detect_Rect.Height * tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_H );
                     int tol_w = tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_W;
@@ -233,7 +250,7 @@ namespace CheckOffset.Insp
                                  = pin_buffer;
 
                     // Pin 腳 內縮檢規 以內為 缺陷 填 255
-                    Rect rt_shrink = pin_info.Detect_Rect;
+                    Rect rt_shrink = rt_offset;
 
                     rt_shrink.Inflate(-tol_w, -tol_h);
                     TNCustCtrl_Rect.Normalize(ref rt_shrink);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using OpenCvSharp;
+using CheckOffset.Insp;
 
 namespace CheckOffset.ProjectInspInfo
 {
@@ -13,13 +14,22 @@ namespace CheckOffset.ProjectInspInfo
     {
         public string _tobe_insp_file = "";
         public Mat<byte> _tobe_insp_buffer = new Mat<byte>();
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool _inspected = false;
+
+        public InspGlueOverflow _insp_inst = null;
+
 
         public DS_Single_Insp_Info()
         {
             _tobe_insp_file = "";
             _tobe_insp_buffer = new Mat<byte>();
+
             _inspected = false;
+            _insp_inst = null;
         }
     }
 

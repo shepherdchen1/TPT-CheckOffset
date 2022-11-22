@@ -172,7 +172,7 @@ namespace CheckOffset
             _userctrl_image.User_Ctrls.Clear();
 
             Paint_Align();
-            Paint_Pin_Pos();
+            Paint_Pin_Pos(null);
 
             _userctrl_image.Apply_GlobalSetting_To_Ctrls();
             _userctrl_image.Refresh();
@@ -436,6 +436,9 @@ namespace CheckOffset
 
             if (chkSelectPattern.Checked)
                 return Editing_Mode.EDT_New_Align;
+
+            if (chkSelectChip.Checked || chkSelectABF.Checked)
+                return Editing_Mode.EDT_New_Chip;
 
             if (null != _userctrl_image.Editing_Ctrl)
                 return Editing_Mode.EDT_Editing_ROI;
@@ -1057,7 +1060,7 @@ namespace CheckOffset
                 _userctrl_image.Cache_Ctrl.Add(exist_added_pgn);
             }
 
-            Paint_Pin_Pos();
+            Paint_Pin_Pos(null);
 
             labelCheckResult.Text = $"Found blob:{tnGlobal.CAM_Info.Detect_Pin_Infos.Count}";
     }
@@ -1078,18 +1081,32 @@ namespace CheckOffset
             tnGlobal.Insp_Param.Insp_Param_Pin.Pin_Tol_H = (int) numPinMinH.Value;
         }
 
-        private void Paint_Pin_Pos()
+        private void Paint_Pin_Pos(DS_Single_Insp_Info inspecting_info)
         {
             try
             {
+                int pin_idx = 1;
                 foreach (DS_CAM_Pin_Info insp_pin in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
                     TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
                     TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
-                    exist_added_rect.Pos_Info.Editing_Rect = insp_pin.Detect_Rect;
+                    if (null == inspecting_info)
+                    {
+                        exist_added_rect.Pos_Info.Editing_Rect = insp_pin.Detect_Rect;
+                    }
+                    else
+                    {
+                        exist_added_rect.Pos_Info.Editing_Rect = new OpenCvSharp.Rect(insp_pin.Detect_Rect.X + inspecting_info._insp_inst._align_offset.Width
+                                                                                , insp_pin.Detect_Rect.Y + inspecting_info._insp_inst._align_offset.Height
+                                                                                , insp_pin.Detect_Rect.Width, insp_pin.Detect_Rect.Height);
+                    }
+
+                    exist_added_rect.Insp_param.Pin_Idx = pin_idx;
+                    pin_idx++;
+
                     //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
                     exist_added_rect.Display_Color = Color.Green;
-                    _userctrl_image.Cache_Ctrl.Add(exist_added_rect);
+                    _userctrl_image.User_Ctrls.Add(exist_added_rect);
                 }
 
                 _userctrl_image.pb_Image.Repaint();
@@ -1108,8 +1125,24 @@ namespace CheckOffset
             try
             {
                 TNCustCtrl_Rect align_rect = new TNCustCtrl_Rect();
-                align_rect.Pos_Info.Editing_Rect = tnGlobal.CAM_Info.Align_Info.Align_Rect;
                 align_rect.Display_Color = Color.Green;
+
+                if (tnGlobal.Insp_Pools.Count <= 0)
+                {
+                    align_rect.Pos_Info.Editing_Rect = tnGlobal.CAM_Info.Align_Info.Align_Rect;
+                }
+                else
+                {
+                    for( int insp_id = 0; insp_id < tnGlobal.Insp_Pools.Count; insp_id++ )
+                    {
+                        if (!tnGlobal.Insp_Pools[insp_id]._inspected || null == tnGlobal.Insp_Pools[insp_id]._insp_inst )
+                            continue;
+
+                        align_rect.Pos_Info.Editing_Rect = new OpenCvSharp.Rect(tnGlobal.CAM_Info.Align_Info.Align_Rect.X + tnGlobal.Insp_Pools[insp_id]._insp_inst._align_offset.Width
+                                                                              , tnGlobal.CAM_Info.Align_Info.Align_Rect.Y + tnGlobal.Insp_Pools[insp_id]._insp_inst._align_offset.Height
+                                                                              , tnGlobal.CAM_Info.Align_Info.Align_Rect.Width, tnGlobal.CAM_Info.Align_Info.Align_Rect.Height );
+                    }
+                }
 
                 _userctrl_image.User_Ctrls.Add(align_rect);
 
@@ -1229,6 +1262,7 @@ namespace CheckOffset
             // repaint align.
             _userctrl_image.User_Ctrls.Clear();
             Paint_Align();
+            Paint_Pin_Pos( null );
             _userctrl_image.Refresh();
         }
 
@@ -1260,16 +1294,24 @@ namespace CheckOffset
 
         private void btnTestInsp_Click(object sender, EventArgs e)
         {
-            _inspGlueOverflow = new InspGlueOverflow();
-
             tnGlobal.Insp_Pools.Clear();
 
             DS_Single_Insp_Info new_tobe_insp_info = new DS_Single_Insp_Info();
             new_tobe_insp_info._tobe_insp_file = tbImgFile.Text;
             tnGlobal.Insp_Pools.Add(new_tobe_insp_info);
 
-            foreach( DS_Single_Insp_Info tobe_insp_info in tnGlobal.Insp_Pools )
+            _inspGlueOverflow = null; 
+            DS_Single_Insp_Info inspecting_info = null;
+            foreach ( DS_Single_Insp_Info tobe_insp_info in tnGlobal.Insp_Pools )
             {
+                if (tobe_insp_info._inspected)
+                {
+                    Log_Utl.Log_Event(Event_Level.Warning, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                      , $"file inspected:{tobe_insp_info._tobe_insp_file}");
+                    continue;
+                }
+
+                tobe_insp_info._insp_inst = new InspGlueOverflow();
                 if (   tobe_insp_info._tobe_insp_buffer.Width <= 0
                     || tobe_insp_info._tobe_insp_buffer.Height <= 0 )
                 {
@@ -1283,8 +1325,17 @@ namespace CheckOffset
                     tobe_insp_info._tobe_insp_buffer = OpenCVMatTool.Clone_Bmp_2_Mat(dest_bmp);
                 }
 
-                _inspGlueOverflow.Insp(tobe_insp_info._tobe_insp_buffer);
+                tobe_insp_info._insp_inst.Insp(tobe_insp_info._tobe_insp_buffer);
+                tobe_insp_info._inspected = true;
+
+                inspecting_info = tobe_insp_info;
+                _inspGlueOverflow = tobe_insp_info._insp_inst;
             }
+
+            _userctrl_image.User_Ctrls.Clear();
+            Paint_Align();
+            Paint_Pin_Pos(inspecting_info);
+            _userctrl_image.Refresh();
         }
 
         private void chkDisplayDefectMaskPos_CheckedChanged(object sender, EventArgs e)
@@ -1378,6 +1429,243 @@ namespace CheckOffset
                    , $"Exception catched: error:{ex.Message}");
                 // 儲存Exception到檔案
                 TN.Tools.Debug.ExceptionDump.SaveToDefaultFile(ex);
+            }
+        }
+
+        private void btnSelectChip_Click(object sender, EventArgs e)
+        {
+            if (chkSelectPattern.Checked)
+            {
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+
+                /////////////////////////////////////////////////
+                /// add exist rect.
+                if (null != _userctrl_image.User_Ctrls)
+                {
+                    _userctrl_image.User_Ctrls.Clear();
+                    foreach (DS_CAM_Pin_Info cur_detect_infos in tnGlobal.CAM_Info.Detect_Pin_Infos)
+                    {
+                        TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
+                        TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                        exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
+                        //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
+                        _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                    }
+
+                    _userctrl_image.CBMouse_Up += UserCtrl_Img_Mouse_Up;
+                }
+
+                /////////////////////////////////////////////////
+                // add new editing rect.
+                TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
+                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+
+                new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
+                new_added_rect.Display_Color = Color.Blue;
+                //DS_Insp_Param_Pin new_insp_param = new DS_Insp_Param_Pin();
+                //new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
+                //new_added_rect.Insp_param = new_insp_param;
+            }
+            else
+            {
+                _userctrl_image.CBMouse_Up -= UserCtrl_Img_Mouse_Up;
+                // 新增完畢
+                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                {
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+
+                    const int min_roi_valid_size = 2;
+                    if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
+                    {
+                        DS_CAMt_Align_Info new_align_info = new DS_CAMt_Align_Info();
+                        new_align_info.Align_Rect = editing_rect.Pos_Info.Editing_Rect;
+
+                        tnGlobal.CAM_Info.Align_Info = new_align_info;
+                    }
+
+                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                }
+
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+            }
+        }
+
+
+        private void btnDetectChip_Click(object sender, EventArgs e)
+        {
+            if ( null == tnGlobal.CAM_Info.Chip_Info.Chip_Pos_Finder )
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                    , $"_Chip_Pos_Finder is null");
+                return;
+            }
+
+            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            if (null == bmp)
+            {
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                    , $"bmp is null");
+                return;
+            }
+
+            tnGlobal.CAM_Info.Chip_Info.Chip_Pos_Finder.Find_Chip_Position(bmp, tbImgFile.Text);
+
+
+            //byte[,]? buffer = (byte[,]?)Image_Buffer_Gray.Clone_Bmp_2_2DArray(bmp);
+            //if (null == buffer)
+            //{
+            //    Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+            //                        , $"buffer is null");
+            //    return;
+            //}
+
+            //if (null == tnGlobal._IT_Detect)
+            //{
+            //    tnGlobal._IT_Detect = new IT_Detect(buffer);
+            //}
+            //else
+            //{
+            //    tnGlobal._IT_Detect.Clear_Result();
+            //}
+
+            //tnGlobal._IT_Detect.Detect_Pin();
+
+            //for (int y = 0; y < tnGlobal._IT_Detect.Pins.GetLength(0); y++)
+            //{
+            //    for (int x = 0; x < tnGlobal._IT_Detect.Pins.GetLength(1); x++)
+            //    {
+            //        if (tnGlobal._IT_Detect.Pins[y, x] <= 0)
+            //            continue;
+            //        else if (tnGlobal._IT_Detect.Pins[y, x] == 1)
+            //        {
+            //            TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
+            //            ctrl_string.Pos_Info.Points = new System.Drawing.Point[1];
+            //            ctrl_string.Pos_Info.Points[0].X = x;
+            //            ctrl_string.Pos_Info.Points[0].Y = y;
+            //            ctrl_string.Display_Color = Color.Blue;
+
+            //            _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+
+            //            //TNCustCtrl_String ctrl_string = new TNCustCtrl_String();
+            //            //ctrl_string.Pos_Info.Point_LT.X = x;
+            //            //ctrl_string.Pos_Info.Point_LT.Y = y;
+            //            //ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}";
+            //            ////ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._v_weight[y, x]}";
+            //            //ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._h_weight[y, x]}";
+            //            //ctrl_string.Display_Font_Size = 8;
+            //            //_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+            //        }
+            //        else if (tnGlobal._IT_Detect.Pins[y, x] >= 2)
+            //        {
+            //            TNCustCtrl_Points ctrl_string = new TNCustCtrl_Points();
+            //            ctrl_string.Pos_Info.Points = new System.Drawing.Point[1];
+            //            ctrl_string.Pos_Info.Points[0].X = x;
+            //            ctrl_string.Pos_Info.Points[0].Y = y;
+            //            ctrl_string.Display_Color = Color.BlueViolet;
+
+            //            _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+            //        }
+            //    }
+            //}
+
+            _userctrl_image.pb_Image.Repaint();
+        }
+
+        private void chkSelectChip_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkSelectChip.Checked)
+            {
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+
+                /////////////////////////////////////////////////
+                /// add exist rect.
+                _userctrl_image.CBMouse_Up += UserCtrl_Img_Mouse_Up;
+
+                /////////////////////////////////////////////////
+                // add new editing rect.
+                TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
+                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+
+                new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
+                new_added_rect.Display_Color = Color.Blue;
+            }
+            else
+            {
+                _userctrl_image.CBMouse_Up -= UserCtrl_Img_Mouse_Up;
+                // 新增完畢
+                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                {
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+
+                    const int min_roi_valid_size = 2;
+                    if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
+                    {
+                        if (null != tnGlobal.CAM_Info.Chip_Info)
+                        {
+                            tnGlobal.CAM_Info.Chip_Info.Chip_Pos_Finder.Select_Chip = editing_rect.Pos_Info.Editing_Rect;
+                        }
+                        else
+                        {
+                            DS_CAM_Chip_Info new_chip_info = new DS_CAM_Chip_Info();
+                            new_chip_info.Chip_Pos_Finder.Select_Chip = editing_rect.Pos_Info.Editing_Rect;
+
+                            tnGlobal.CAM_Info.Chip_Info = new_chip_info;
+                        }
+                    }
+
+                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                }
+
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+            }
+        }
+
+        private void chkSelectABF_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkSelectABF.Checked)
+            {
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
+
+                /////////////////////////////////////////////////
+                /// add exist rect.
+                _userctrl_image.CBMouse_Up += UserCtrl_Img_Mouse_Up;
+
+                /////////////////////////////////////////////////
+                // add new editing rect.
+                TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
+                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+
+                new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
+                new_added_rect.Display_Color = Color.Blue;
+            }
+            else
+            {
+                _userctrl_image.CBMouse_Up -= UserCtrl_Img_Mouse_Up;
+                // 新增完畢
+                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                {
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+
+                    const int min_roi_valid_size = 2;
+                    if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
+                    {
+                        if (null != tnGlobal.CAM_Info.Chip_Info)
+                        {
+                            tnGlobal.CAM_Info.Chip_Info.Chip_Pos_Finder.Select_ABF = editing_rect.Pos_Info.Editing_Rect;
+                        }
+                        else
+                        {
+                            DS_CAM_Chip_Info new_chip_info = new DS_CAM_Chip_Info();
+                            new_chip_info.Chip_Pos_Finder.Select_ABF = editing_rect.Pos_Info.Editing_Rect;
+
+                            tnGlobal.CAM_Info.Chip_Info = new_chip_info;
+                        }
+                    }
+
+                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                }
+
+                _userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
     } // end of     public partial class For_Main : Form

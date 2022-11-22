@@ -347,36 +347,52 @@ namespace TN.Insp_Param
         /// data member
         /// </summary>
         /// 
+
+        private int _Pin_Idx = 0;
         private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
 
-        private int _Pin_Tol_W = 2; // 缺陷離 Pin 腳 bounding box 多少算缺陷
-        private int _Pin_Tol_H = 2; // 缺陷離 Pin 腳 bounding box 多少算缺陷
+        private int _Pin_Tol_W = 1; // 2 缺陷離 Pin 腳 bounding box 多少算缺陷
+        private int _Pin_Tol_H = 1; // 2 缺陷離 Pin 腳 bounding box 多少算缺陷
+        //private int _Pin_Tol_Shrink_W = 1; // 缺陷離 Pin 腳 bounding box 多少算缺陷
+        //private int _Pin_Tol_Shrink_H = 1; // 缺陷離 Pin 腳 bounding box 多少算缺陷
 
-        private int _Ext_WH = 15;   //! Pin 腳 往外長 幾個 pixel, 之外不檢， 用來產生不檢區 Mask
+        private int _Ext_Pin_Dir = 0;          //! Pin 腳方向     往外長 幾個 pixel, 之外不檢， 用來產生不檢區 Mask
+        private int _Ext_Pin_Space_Dir = 15;    //! Pin 腳間距方向 往外長 幾個 pixel, 之外不檢， 用來產生不檢區 Mask
+
+        private OpenCvSharp.Size _Pin_Offset = new OpenCvSharp.Size(0, 0);   // 定位點有多少 offset.
 
         /// <summary>
         /// member function
         /// </summary>
+        
+        public int Pin_Idx { get => _Pin_Idx; set => _Pin_Idx = value; }
         public int Pin_Tol_W { get => _Pin_Tol_W; set => _Pin_Tol_W = value; }
         public int Pin_Tol_H { get => _Pin_Tol_H; set => _Pin_Tol_H = value; }
 
         public EN_Insp_Tol_Dir Insp_Tol_Dir { get => _Insp_Tol_Dir; set => _Insp_Tol_Dir = value; }
-        public int Ext_WH { get => _Ext_WH; set => _Ext_WH = value; }
 
+        public int Ext_Pin_Dir { get => _Ext_Pin_Dir; set => _Ext_Pin_Dir = value; }
+        public int Ext_Pin_Space_Dir { get => _Ext_Pin_Space_Dir; set => _Ext_Pin_Space_Dir = value; }
 
         public DS_Insp_Param_Pin()
         {
             Pin_Tol_W = 2;
             Pin_Tol_H = 2;
             _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
+
+            _Pin_Idx = 0;
         }
 
         public string Draw_String()
         {
-            if (EN_Insp_Tol_Dir.EN_Insp_Tol_None == Insp_Tol_Dir)
-                return "";
+            string draw_str = "";
+            if (_Pin_Idx > 0)
+                draw_str += $"ID:{_Pin_Idx}";
 
-            return $"Dir:{Insp_Tol_Dir}";
+            if (EN_Insp_Tol_Dir.EN_Insp_Tol_None == Insp_Tol_Dir)
+                return draw_str;
+
+            return draw_str + $"Dir:{Insp_Tol_Dir}";
         }
     }
 

@@ -73,6 +73,10 @@
             this.btnDetectPins = new System.Windows.Forms.Button();
             this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnFindPinPosition = new System.Windows.Forms.Button();
+            this.tabPage9 = new System.Windows.Forms.TabPage();
+            this.chkSelectABF = new System.Windows.Forms.CheckBox();
+            this.chkSelectChip = new System.Windows.Forms.CheckBox();
+            this.btnDetectChip = new System.Windows.Forms.Button();
             this.btnOpenCV = new System.Windows.Forms.Button();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.btnLoadInspPins = new System.Windows.Forms.Button();
@@ -126,6 +130,7 @@
             this.tabPage7.SuspendLayout();
             this.tabPage8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).BeginInit();
+            this.tabPage9.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabCtrl_Insp_Rules.SuspendLayout();
@@ -542,6 +547,7 @@
             // 
             this.tabControl2.Controls.Add(this.tabPage7);
             this.tabControl2.Controls.Add(this.tabPage8);
+            this.tabControl2.Controls.Add(this.tabPage9);
             this.tabControl2.Location = new System.Drawing.Point(17, 135);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
@@ -654,6 +660,52 @@
             this.btnFindPinPosition.Text = "Find Pin Pos";
             this.btnFindPinPosition.UseVisualStyleBackColor = true;
             this.btnFindPinPosition.Click += new System.EventHandler(this.btnFindPinPosition_Click);
+            // 
+            // tabPage9
+            // 
+            this.tabPage9.Controls.Add(this.chkSelectABF);
+            this.tabPage9.Controls.Add(this.chkSelectChip);
+            this.tabPage9.Controls.Add(this.btnDetectChip);
+            this.tabPage9.Location = new System.Drawing.Point(4, 32);
+            this.tabPage9.Name = "tabPage9";
+            this.tabPage9.Size = new System.Drawing.Size(399, 316);
+            this.tabPage9.TabIndex = 2;
+            this.tabPage9.Text = "晶片區";
+            this.tabPage9.UseVisualStyleBackColor = true;
+            // 
+            // chkSelectABF
+            // 
+            this.chkSelectABF.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectABF.AutoSize = true;
+            this.chkSelectABF.Location = new System.Drawing.Point(22, 81);
+            this.chkSelectABF.Name = "chkSelectABF";
+            this.chkSelectABF.Size = new System.Drawing.Size(108, 33);
+            this.chkSelectABF.TabIndex = 9;
+            this.chkSelectABF.Text = "Select ABF";
+            this.chkSelectABF.UseVisualStyleBackColor = true;
+            this.chkSelectABF.CheckedChanged += new System.EventHandler(this.chkSelectABF_CheckedChanged);
+            // 
+            // chkSelectChip
+            // 
+            this.chkSelectChip.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectChip.AutoSize = true;
+            this.chkSelectChip.Location = new System.Drawing.Point(22, 29);
+            this.chkSelectChip.Name = "chkSelectChip";
+            this.chkSelectChip.Size = new System.Drawing.Size(115, 33);
+            this.chkSelectChip.TabIndex = 8;
+            this.chkSelectChip.Text = "Select Chip";
+            this.chkSelectChip.UseVisualStyleBackColor = true;
+            this.chkSelectChip.CheckedChanged += new System.EventHandler(this.chkSelectChip_CheckedChanged);
+            // 
+            // btnDetectChip
+            // 
+            this.btnDetectChip.Location = new System.Drawing.Point(186, 52);
+            this.btnDetectChip.Name = "btnDetectChip";
+            this.btnDetectChip.Size = new System.Drawing.Size(166, 34);
+            this.btnDetectChip.TabIndex = 7;
+            this.btnDetectChip.Text = "Detect Chip";
+            this.btnDetectChip.UseVisualStyleBackColor = true;
+            this.btnDetectChip.Click += new System.EventHandler(this.btnDetectChip_Click);
             // 
             // btnOpenCV
             // 
@@ -1078,6 +1130,8 @@
             this.tabPage8.ResumeLayout(false);
             this.tabPage8.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).EndInit();
+            this.tabPage9.ResumeLayout(false);
+            this.tabPage9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
             this.tabPage5.ResumeLayout(false);
             this.tabCtrl_Insp_Rules.ResumeLayout(false);
@@ -1183,5 +1237,9 @@
         private CheckBox chkDisplayDefectMaskPos;
         private NumericUpDown numPinMinH;
         private Label label8;
+        private TabPage tabPage9;
+        private Button btnDetectChip;
+        private CheckBox chkSelectChip;
+        private CheckBox chkSelectABF;
     }
 }
