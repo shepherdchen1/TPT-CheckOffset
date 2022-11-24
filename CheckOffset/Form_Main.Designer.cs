@@ -60,20 +60,52 @@
             this.btnDetect = new System.Windows.Forms.Button();
             this.numThreshold = new System.Windows.Forms.NumericUpDown();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.chKDisplayDefect = new System.Windows.Forms.CheckBox();
-            this.chkDisplayDefectMaskPos = new System.Windows.Forms.CheckBox();
-            this.btnTestInsp = new System.Windows.Forms.Button();
             this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabPage10 = new System.Windows.Forms.TabPage();
+            this.btnTestInspAdhTapeRight = new System.Windows.Forms.Button();
+            this.numAdhTapeThresholdPin = new System.Windows.Forms.NumericUpDown();
+            this.label17 = new System.Windows.Forms.Label();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.TBPinDist = new System.Windows.Forms.TextBox();
+            this.chkSelectRightPin = new System.Windows.Forms.CheckBox();
+            this.chkSelectLeftPin = new System.Windows.Forms.CheckBox();
+            this.chkBlobIsWhite = new System.Windows.Forms.CheckBox();
+            this.numMaxDiffWH = new System.Windows.Forms.NumericUpDown();
+            this.label14 = new System.Windows.Forms.Label();
+            this.chkSelectSingle = new System.Windows.Forms.CheckBox();
+            this.numAdhTapeThreshold = new System.Windows.Forms.NumericUpDown();
+            this.btnTestInspAdhTapeLeft = new System.Windows.Forms.Button();
+            this.cmbSelectedColNum = new System.Windows.Forms.ComboBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.chkSelectRight = new System.Windows.Forms.CheckBox();
+            this.chkSelectLeft = new System.Windows.Forms.CheckBox();
+            this.chkSelectCenter = new System.Windows.Forms.CheckBox();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.chkSelectPattern = new System.Windows.Forms.CheckBox();
             this.chkPatternIsWhite = new System.Windows.Forms.CheckBox();
             this.tabPage8 = new System.Windows.Forms.TabPage();
+            this.chKDisplayDefect = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.chkDisplayDefectMaskPos = new System.Windows.Forms.CheckBox();
+            this.btnTestInsp = new System.Windows.Forms.Button();
             this.numMinHysteresisThreshold = new System.Windows.Forms.NumericUpDown();
             this.btnDetectPins = new System.Windows.Forms.Button();
             this.btnCannyEdgeDetect = new System.Windows.Forms.Button();
             this.btnFindPinPosition = new System.Windows.Forms.Button();
             this.tabPage9 = new System.Windows.Forms.TabPage();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.numChipPolysimplify = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
+            this.rbtnG = new System.Windows.Forms.RadioButton();
+            this.numSelectChip = new System.Windows.Forms.NumericUpDown();
+            this.rbtnR = new System.Windows.Forms.RadioButton();
+            this.label10 = new System.Windows.Forms.Label();
+            this.rbtnB = new System.Windows.Forms.RadioButton();
+            this.labelThreshold = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.chkSearchChipBoundingBox = new System.Windows.Forms.CheckBox();
             this.chkSelectABF = new System.Windows.Forms.CheckBox();
             this.chkSelectChip = new System.Windows.Forms.CheckBox();
             this.btnDetectChip = new System.Windows.Forms.Button();
@@ -106,9 +138,11 @@
             this.labelReason = new System.Windows.Forms.Label();
             this.labelCheckResult = new System.Windows.Forms.Label();
             this.pnlFooter = new System.Windows.Forms.Panel();
-            this.labelScale = new System.Windows.Forms.Label();
-            this.labelGrayLevel = new System.Windows.Forms.Label();
+            this.TBComment = new System.Windows.Forms.TextBox();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.labelCursorPos = new System.Windows.Forms.Label();
+            this.labelGrayLevel = new System.Windows.Forms.Label();
+            this.labelScale = new System.Windows.Forms.Label();
             this.tabUser = new System.Windows.Forms.TabControl();
             this.tabPage_View = new System.Windows.Forms.TabPage();
             this.openFileDialog_Img = new System.Windows.Forms.OpenFileDialog();
@@ -127,10 +161,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.tabControl2.SuspendLayout();
+            this.tabPage10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThresholdPin)).BeginInit();
+            this.groupBox10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMaxDiffWH)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThreshold)).BeginInit();
             this.tabPage7.SuspendLayout();
             this.tabPage8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).BeginInit();
             this.tabPage9.SuspendLayout();
+            this.groupBox9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numChipPolysimplify)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSelectChip)).BeginInit();
             this.groupBox8.SuspendLayout();
             this.tabPage5.SuspendLayout();
             this.tabCtrl_Insp_Rules.SuspendLayout();
@@ -142,6 +184,7 @@
             this.groupBox7.SuspendLayout();
             this.pnlHeader.SuspendLayout();
             this.pnlFooter.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.tabUser.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -151,9 +194,9 @@
             this.pnlSetting.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlSetting.Controls.Add(this.tabControl1);
             this.pnlSetting.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlSetting.Location = new System.Drawing.Point(1137, 0);
+            this.pnlSetting.Location = new System.Drawing.Point(1215, 0);
             this.pnlSetting.Name = "pnlSetting";
-            this.pnlSetting.Size = new System.Drawing.Size(481, 907);
+            this.pnlSetting.Size = new System.Drawing.Size(535, 907);
             this.pnlSetting.TabIndex = 0;
             // 
             // tabControl1
@@ -167,7 +210,7 @@
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.Padding = new System.Drawing.Point(20, 3);
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(453, 872);
+            this.tabControl1.Size = new System.Drawing.Size(507, 872);
             this.tabControl1.TabIndex = 15;
             // 
             // tabPage1
@@ -180,7 +223,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 32);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(445, 836);
+            this.tabPage1.Size = new System.Drawing.Size(499, 836);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "影像";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -394,7 +437,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 32);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(445, 836);
+            this.tabPage2.Size = new System.Drawing.Size(499, 836);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "過濾";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -485,6 +528,11 @@
             // numThreshold
             // 
             this.numThreshold.Location = new System.Drawing.Point(156, 63);
+            this.numThreshold.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
             this.numThreshold.Name = "numThreshold";
             this.numThreshold.Size = new System.Drawing.Size(112, 30);
             this.numThreshold.TabIndex = 13;
@@ -496,9 +544,6 @@
             // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add(this.chKDisplayDefect);
-            this.tabPage3.Controls.Add(this.chkDisplayDefectMaskPos);
-            this.tabPage3.Controls.Add(this.btnTestInsp);
             this.tabPage3.Controls.Add(this.tabControl2);
             this.tabPage3.Controls.Add(this.btnOpenCV);
             this.tabPage3.Controls.Add(this.groupBox8);
@@ -506,53 +551,282 @@
             this.tabPage3.Controls.Add(this.btnBmp2Array);
             this.tabPage3.Location = new System.Drawing.Point(4, 32);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(445, 836);
+            this.tabPage3.Size = new System.Drawing.Size(499, 836);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "測試";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // chKDisplayDefect
-            // 
-            this.chKDisplayDefect.AutoSize = true;
-            this.chKDisplayDefect.Location = new System.Drawing.Point(42, 559);
-            this.chKDisplayDefect.Name = "chKDisplayDefect";
-            this.chKDisplayDefect.Size = new System.Drawing.Size(97, 27);
-            this.chKDisplayDefect.TabIndex = 16;
-            this.chKDisplayDefect.Text = "Defect ";
-            this.chKDisplayDefect.UseVisualStyleBackColor = true;
-            this.chKDisplayDefect.CheckedChanged += new System.EventHandler(this.chKDisplayDefect_CheckedChanged);
-            // 
-            // chkDisplayDefectMaskPos
-            // 
-            this.chkDisplayDefectMaskPos.AutoSize = true;
-            this.chkDisplayDefectMaskPos.Location = new System.Drawing.Point(42, 520);
-            this.chkDisplayDefectMaskPos.Name = "chkDisplayDefectMaskPos";
-            this.chkDisplayDefectMaskPos.Size = new System.Drawing.Size(184, 27);
-            this.chkDisplayDefectMaskPos.TabIndex = 15;
-            this.chkDisplayDefectMaskPos.Text = "Defect Candidate";
-            this.chkDisplayDefectMaskPos.UseVisualStyleBackColor = true;
-            this.chkDisplayDefectMaskPos.CheckedChanged += new System.EventHandler(this.chkDisplayDefectMaskPos_CheckedChanged);
-            // 
-            // btnTestInsp
-            // 
-            this.btnTestInsp.Location = new System.Drawing.Point(301, 515);
-            this.btnTestInsp.Name = "btnTestInsp";
-            this.btnTestInsp.Size = new System.Drawing.Size(123, 34);
-            this.btnTestInsp.TabIndex = 9;
-            this.btnTestInsp.Text = "Test Insp";
-            this.btnTestInsp.UseVisualStyleBackColor = true;
-            this.btnTestInsp.Click += new System.EventHandler(this.btnTestInsp_Click);
-            // 
             // tabControl2
             // 
+            this.tabControl2.Controls.Add(this.tabPage10);
             this.tabControl2.Controls.Add(this.tabPage7);
             this.tabControl2.Controls.Add(this.tabPage8);
             this.tabControl2.Controls.Add(this.tabPage9);
-            this.tabControl2.Location = new System.Drawing.Point(17, 135);
+            this.tabControl2.Location = new System.Drawing.Point(17, 136);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(407, 352);
+            this.tabControl2.Size = new System.Drawing.Size(463, 521);
             this.tabControl2.TabIndex = 14;
+            // 
+            // tabPage10
+            // 
+            this.tabPage10.Controls.Add(this.btnTestInspAdhTapeRight);
+            this.tabPage10.Controls.Add(this.numAdhTapeThresholdPin);
+            this.tabPage10.Controls.Add(this.label17);
+            this.tabPage10.Controls.Add(this.groupBox10);
+            this.tabPage10.Controls.Add(this.chkSelectRightPin);
+            this.tabPage10.Controls.Add(this.chkSelectLeftPin);
+            this.tabPage10.Controls.Add(this.chkBlobIsWhite);
+            this.tabPage10.Controls.Add(this.numMaxDiffWH);
+            this.tabPage10.Controls.Add(this.label14);
+            this.tabPage10.Controls.Add(this.chkSelectSingle);
+            this.tabPage10.Controls.Add(this.numAdhTapeThreshold);
+            this.tabPage10.Controls.Add(this.btnTestInspAdhTapeLeft);
+            this.tabPage10.Controls.Add(this.cmbSelectedColNum);
+            this.tabPage10.Controls.Add(this.label12);
+            this.tabPage10.Controls.Add(this.chkSelectRight);
+            this.tabPage10.Controls.Add(this.chkSelectLeft);
+            this.tabPage10.Controls.Add(this.chkSelectCenter);
+            this.tabPage10.Location = new System.Drawing.Point(4, 32);
+            this.tabPage10.Name = "tabPage10";
+            this.tabPage10.Size = new System.Drawing.Size(455, 485);
+            this.tabPage10.TabIndex = 3;
+            this.tabPage10.Text = "貼膠帶";
+            this.tabPage10.UseVisualStyleBackColor = true;
+            // 
+            // btnTestInspAdhTapeRight
+            // 
+            this.btnTestInspAdhTapeRight.Location = new System.Drawing.Point(291, 388);
+            this.btnTestInspAdhTapeRight.Name = "btnTestInspAdhTapeRight";
+            this.btnTestInspAdhTapeRight.Size = new System.Drawing.Size(150, 34);
+            this.btnTestInspAdhTapeRight.TabIndex = 28;
+            this.btnTestInspAdhTapeRight.Text = "Test Insp Right";
+            this.btnTestInspAdhTapeRight.UseVisualStyleBackColor = true;
+            this.btnTestInspAdhTapeRight.Click += new System.EventHandler(this.btnTestInspAdhTapeRight_Click);
+            // 
+            // numAdhTapeThresholdPin
+            // 
+            this.numAdhTapeThresholdPin.Location = new System.Drawing.Point(181, 60);
+            this.numAdhTapeThresholdPin.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numAdhTapeThresholdPin.Name = "numAdhTapeThresholdPin";
+            this.numAdhTapeThresholdPin.Size = new System.Drawing.Size(80, 30);
+            this.numAdhTapeThresholdPin.TabIndex = 27;
+            this.numAdhTapeThresholdPin.Value = new decimal(new int[] {
+            70,
+            0,
+            0,
+            0});
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(167, 21);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(94, 23);
+            this.label17.TabIndex = 26;
+            this.label17.Text = "Threshold";
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.label16);
+            this.groupBox10.Controls.Add(this.label15);
+            this.groupBox10.Controls.Add(this.TBPinDist);
+            this.groupBox10.Location = new System.Drawing.Point(13, 340);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Size = new System.Drawing.Size(280, 82);
+            this.groupBox10.TabIndex = 25;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = "以左Pin為原點";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(214, 38);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(44, 23);
+            this.label16.TabIndex = 25;
+            this.label16.Text = "mm";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(11, 38);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(75, 23);
+            this.label15.TabIndex = 23;
+            this.label15.Text = "右Pin X:";
+            this.label15.Click += new System.EventHandler(this.label15_Click);
+            // 
+            // TBPinDist
+            // 
+            this.TBPinDist.Location = new System.Drawing.Point(102, 38);
+            this.TBPinDist.Name = "TBPinDist";
+            this.TBPinDist.Size = new System.Drawing.Size(105, 30);
+            this.TBPinDist.TabIndex = 24;
+            // 
+            // chkSelectRightPin
+            // 
+            this.chkSelectRightPin.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectRightPin.AutoSize = true;
+            this.chkSelectRightPin.Location = new System.Drawing.Point(275, 57);
+            this.chkSelectRightPin.Name = "chkSelectRightPin";
+            this.chkSelectRightPin.Size = new System.Drawing.Size(166, 33);
+            this.chkSelectRightPin.TabIndex = 22;
+            this.chkSelectRightPin.Text = "Select  Right(Pin)";
+            this.chkSelectRightPin.UseVisualStyleBackColor = true;
+            this.chkSelectRightPin.CheckedChanged += new System.EventHandler(this.chkSelectRightPin_CheckedChanged);
+            // 
+            // chkSelectLeftPin
+            // 
+            this.chkSelectLeftPin.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectLeftPin.AutoSize = true;
+            this.chkSelectLeftPin.Location = new System.Drawing.Point(13, 57);
+            this.chkSelectLeftPin.Name = "chkSelectLeftPin";
+            this.chkSelectLeftPin.Size = new System.Drawing.Size(152, 33);
+            this.chkSelectLeftPin.TabIndex = 21;
+            this.chkSelectLeftPin.Text = "Select  Left(Pin)";
+            this.chkSelectLeftPin.UseVisualStyleBackColor = true;
+            this.chkSelectLeftPin.CheckedChanged += new System.EventHandler(this.chkSelectLeftPin_CheckedChanged);
+            // 
+            // chkBlobIsWhite
+            // 
+            this.chkBlobIsWhite.AutoSize = true;
+            this.chkBlobIsWhite.Checked = true;
+            this.chkBlobIsWhite.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkBlobIsWhite.Location = new System.Drawing.Point(35, 441);
+            this.chkBlobIsWhite.Name = "chkBlobIsWhite";
+            this.chkBlobIsWhite.Size = new System.Drawing.Size(139, 27);
+            this.chkBlobIsWhite.TabIndex = 20;
+            this.chkBlobIsWhite.Text = "Select white";
+            this.chkBlobIsWhite.UseVisualStyleBackColor = true;
+            // 
+            // numMaxDiffWH
+            // 
+            this.numMaxDiffWH.Location = new System.Drawing.Point(158, 294);
+            this.numMaxDiffWH.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.numMaxDiffWH.Name = "numMaxDiffWH";
+            this.numMaxDiffWH.Size = new System.Drawing.Size(80, 30);
+            this.numMaxDiffWH.TabIndex = 19;
+            this.numMaxDiffWH.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.numMaxDiffWH.ValueChanged += new System.EventHandler(this.numMaxDiffWH_ValueChanged);
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(26, 301);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(119, 23);
+            this.label14.TabIndex = 18;
+            this.label14.Text = "Max Diff WH";
+            // 
+            // chkSelectSingle
+            // 
+            this.chkSelectSingle.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectSingle.AutoSize = true;
+            this.chkSelectSingle.Location = new System.Drawing.Point(35, 152);
+            this.chkSelectSingle.Name = "chkSelectSingle";
+            this.chkSelectSingle.Size = new System.Drawing.Size(181, 33);
+            this.chkSelectSingle.TabIndex = 17;
+            this.chkSelectSingle.Text = "Select  Single(中央)";
+            this.chkSelectSingle.UseVisualStyleBackColor = true;
+            this.chkSelectSingle.CheckedChanged += new System.EventHandler(this.chkSelectSingle_CheckedChanged);
+            // 
+            // numAdhTapeThreshold
+            // 
+            this.numAdhTapeThreshold.Location = new System.Drawing.Point(181, 99);
+            this.numAdhTapeThreshold.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numAdhTapeThreshold.Name = "numAdhTapeThreshold";
+            this.numAdhTapeThreshold.Size = new System.Drawing.Size(80, 30);
+            this.numAdhTapeThreshold.TabIndex = 16;
+            this.numAdhTapeThreshold.Value = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            // 
+            // btnTestInspAdhTapeLeft
+            // 
+            this.btnTestInspAdhTapeLeft.Location = new System.Drawing.Point(299, 340);
+            this.btnTestInspAdhTapeLeft.Name = "btnTestInspAdhTapeLeft";
+            this.btnTestInspAdhTapeLeft.Size = new System.Drawing.Size(142, 34);
+            this.btnTestInspAdhTapeLeft.TabIndex = 14;
+            this.btnTestInspAdhTapeLeft.Text = "Test Insp Left";
+            this.btnTestInspAdhTapeLeft.UseVisualStyleBackColor = true;
+            this.btnTestInspAdhTapeLeft.Click += new System.EventHandler(this.btnTestInspAdhTape_Click);
+            // 
+            // cmbSelectedColNum
+            // 
+            this.cmbSelectedColNum.FormattingEnabled = true;
+            this.cmbSelectedColNum.Items.AddRange(new object[] {
+            "1",
+            "2"});
+            this.cmbSelectedColNum.Location = new System.Drawing.Point(158, 235);
+            this.cmbSelectedColNum.Name = "cmbSelectedColNum";
+            this.cmbSelectedColNum.Size = new System.Drawing.Size(74, 31);
+            this.cmbSelectedColNum.TabIndex = 13;
+            this.cmbSelectedColNum.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(26, 243);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(86, 23);
+            this.label12.TabIndex = 12;
+            this.label12.Text = "Col Num";
+            this.label12.Click += new System.EventHandler(this.label12_Click);
+            // 
+            // chkSelectRight
+            // 
+            this.chkSelectRight.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectRight.AutoSize = true;
+            this.chkSelectRight.Location = new System.Drawing.Point(266, 96);
+            this.chkSelectRight.Name = "chkSelectRight";
+            this.chkSelectRight.Size = new System.Drawing.Size(175, 33);
+            this.chkSelectRight.TabIndex = 11;
+            this.chkSelectRight.Text = "Select  Right(槽孔)";
+            this.chkSelectRight.UseVisualStyleBackColor = true;
+            this.chkSelectRight.CheckedChanged += new System.EventHandler(this.chkSelectRight_CheckedChanged);
+            // 
+            // chkSelectLeft
+            // 
+            this.chkSelectLeft.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectLeft.AutoSize = true;
+            this.chkSelectLeft.Location = new System.Drawing.Point(13, 96);
+            this.chkSelectLeft.Name = "chkSelectLeft";
+            this.chkSelectLeft.Size = new System.Drawing.Size(161, 33);
+            this.chkSelectLeft.TabIndex = 10;
+            this.chkSelectLeft.Text = "Select  Left(槽孔)";
+            this.chkSelectLeft.UseVisualStyleBackColor = true;
+            this.chkSelectLeft.CheckedChanged += new System.EventHandler(this.chkSelectLeft_CheckedChanged);
+            // 
+            // chkSelectCenter
+            // 
+            this.chkSelectCenter.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSelectCenter.AutoSize = true;
+            this.chkSelectCenter.Location = new System.Drawing.Point(35, 191);
+            this.chkSelectCenter.Name = "chkSelectCenter";
+            this.chkSelectCenter.Size = new System.Drawing.Size(207, 33);
+            this.chkSelectCenter.TabIndex = 9;
+            this.chkSelectCenter.Text = "Select Content Center";
+            this.chkSelectCenter.UseVisualStyleBackColor = true;
+            this.chkSelectCenter.CheckedChanged += new System.EventHandler(this.chkSelectCenter_CheckedChanged);
             // 
             // tabPage7
             // 
@@ -561,7 +835,7 @@
             this.tabPage7.Location = new System.Drawing.Point(4, 32);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(399, 316);
+            this.tabPage7.Size = new System.Drawing.Size(455, 485);
             this.tabPage7.TabIndex = 0;
             this.tabPage7.Text = "定位";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -592,7 +866,10 @@
             // 
             // tabPage8
             // 
+            this.tabPage8.Controls.Add(this.chKDisplayDefect);
             this.tabPage8.Controls.Add(this.label2);
+            this.tabPage8.Controls.Add(this.chkDisplayDefectMaskPos);
+            this.tabPage8.Controls.Add(this.btnTestInsp);
             this.tabPage8.Controls.Add(this.numMinHysteresisThreshold);
             this.tabPage8.Controls.Add(this.btnDetectPins);
             this.tabPage8.Controls.Add(this.btnCannyEdgeDetect);
@@ -600,10 +877,21 @@
             this.tabPage8.Location = new System.Drawing.Point(4, 32);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(399, 316);
+            this.tabPage8.Size = new System.Drawing.Size(455, 485);
             this.tabPage8.TabIndex = 1;
             this.tabPage8.Text = "腳位";
             this.tabPage8.UseVisualStyleBackColor = true;
+            // 
+            // chKDisplayDefect
+            // 
+            this.chKDisplayDefect.AutoSize = true;
+            this.chKDisplayDefect.Location = new System.Drawing.Point(27, 361);
+            this.chKDisplayDefect.Name = "chKDisplayDefect";
+            this.chKDisplayDefect.Size = new System.Drawing.Size(97, 27);
+            this.chKDisplayDefect.TabIndex = 16;
+            this.chKDisplayDefect.Text = "Defect ";
+            this.chKDisplayDefect.UseVisualStyleBackColor = true;
+            this.chKDisplayDefect.CheckedChanged += new System.EventHandler(this.chKDisplayDefect_CheckedChanged);
             // 
             // label2
             // 
@@ -613,6 +901,27 @@
             this.label2.Size = new System.Drawing.Size(191, 23);
             this.label2.TabIndex = 2;
             this.label2.Text = "Min HysteresisThresh";
+            // 
+            // chkDisplayDefectMaskPos
+            // 
+            this.chkDisplayDefectMaskPos.AutoSize = true;
+            this.chkDisplayDefectMaskPos.Location = new System.Drawing.Point(27, 322);
+            this.chkDisplayDefectMaskPos.Name = "chkDisplayDefectMaskPos";
+            this.chkDisplayDefectMaskPos.Size = new System.Drawing.Size(184, 27);
+            this.chkDisplayDefectMaskPos.TabIndex = 15;
+            this.chkDisplayDefectMaskPos.Text = "Defect Candidate";
+            this.chkDisplayDefectMaskPos.UseVisualStyleBackColor = true;
+            this.chkDisplayDefectMaskPos.CheckedChanged += new System.EventHandler(this.chkDisplayDefectMaskPos_CheckedChanged);
+            // 
+            // btnTestInsp
+            // 
+            this.btnTestInsp.Location = new System.Drawing.Point(252, 317);
+            this.btnTestInsp.Name = "btnTestInsp";
+            this.btnTestInsp.Size = new System.Drawing.Size(123, 34);
+            this.btnTestInsp.TabIndex = 9;
+            this.btnTestInsp.Text = "Test Insp";
+            this.btnTestInsp.UseVisualStyleBackColor = true;
+            this.btnTestInsp.Click += new System.EventHandler(this.btnTestInsp_Click);
             // 
             // numMinHysteresisThreshold
             // 
@@ -663,15 +972,152 @@
             // 
             // tabPage9
             // 
+            this.tabPage9.Controls.Add(this.groupBox9);
+            this.tabPage9.Controls.Add(this.chkSearchChipBoundingBox);
             this.tabPage9.Controls.Add(this.chkSelectABF);
             this.tabPage9.Controls.Add(this.chkSelectChip);
             this.tabPage9.Controls.Add(this.btnDetectChip);
             this.tabPage9.Location = new System.Drawing.Point(4, 32);
             this.tabPage9.Name = "tabPage9";
-            this.tabPage9.Size = new System.Drawing.Size(399, 316);
+            this.tabPage9.Size = new System.Drawing.Size(455, 485);
             this.tabPage9.TabIndex = 2;
             this.tabPage9.Text = "晶片區";
             this.tabPage9.UseVisualStyleBackColor = true;
+            // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.numChipPolysimplify);
+            this.groupBox9.Controls.Add(this.label11);
+            this.groupBox9.Controls.Add(this.rbtnG);
+            this.groupBox9.Controls.Add(this.numSelectChip);
+            this.groupBox9.Controls.Add(this.rbtnR);
+            this.groupBox9.Controls.Add(this.label10);
+            this.groupBox9.Controls.Add(this.rbtnB);
+            this.groupBox9.Controls.Add(this.labelThreshold);
+            this.groupBox9.Controls.Add(this.label9);
+            this.groupBox9.Location = new System.Drawing.Point(22, 182);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(336, 211);
+            this.groupBox9.TabIndex = 18;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "groupBox9";
+            // 
+            // numChipPolysimplify
+            // 
+            this.numChipPolysimplify.DecimalPlaces = 1;
+            this.numChipPolysimplify.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.numChipPolysimplify.Location = new System.Drawing.Point(210, 72);
+            this.numChipPolysimplify.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.numChipPolysimplify.Name = "numChipPolysimplify";
+            this.numChipPolysimplify.Size = new System.Drawing.Size(82, 30);
+            this.numChipPolysimplify.TabIndex = 19;
+            this.numChipPolysimplify.Value = new decimal(new int[] {
+            25,
+            0,
+            0,
+            65536});
+            this.numChipPolysimplify.ValueChanged += new System.EventHandler(this.numChipPolysimplify_ValueChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(15, 74);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(142, 23);
+            this.label11.TabIndex = 18;
+            this.label11.Text = "PolySimplify tol";
+            // 
+            // rbtnG
+            // 
+            this.rbtnG.AutoSize = true;
+            this.rbtnG.Location = new System.Drawing.Point(81, 119);
+            this.rbtnG.Name = "rbtnG";
+            this.rbtnG.Size = new System.Drawing.Size(48, 27);
+            this.rbtnG.TabIndex = 12;
+            this.rbtnG.Text = "G";
+            this.rbtnG.UseVisualStyleBackColor = true;
+            // 
+            // numSelectChip
+            // 
+            this.numSelectChip.Location = new System.Drawing.Point(210, 24);
+            this.numSelectChip.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numSelectChip.Name = "numSelectChip";
+            this.numSelectChip.Size = new System.Drawing.Size(82, 30);
+            this.numSelectChip.TabIndex = 17;
+            // 
+            // rbtnR
+            // 
+            this.rbtnR.AutoSize = true;
+            this.rbtnR.Checked = true;
+            this.rbtnR.Location = new System.Drawing.Point(18, 119);
+            this.rbtnR.Name = "rbtnR";
+            this.rbtnR.Size = new System.Drawing.Size(47, 27);
+            this.rbtnR.TabIndex = 11;
+            this.rbtnR.TabStop = true;
+            this.rbtnR.Text = "R";
+            this.rbtnR.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(15, 26);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(153, 23);
+            this.label10.TabIndex = 16;
+            this.label10.Text = "Detect threshold";
+            // 
+            // rbtnB
+            // 
+            this.rbtnB.AutoSize = true;
+            this.rbtnB.Location = new System.Drawing.Point(149, 119);
+            this.rbtnB.Name = "rbtnB";
+            this.rbtnB.Size = new System.Drawing.Size(46, 27);
+            this.rbtnB.TabIndex = 13;
+            this.rbtnB.Text = "B";
+            this.rbtnB.UseVisualStyleBackColor = true;
+            this.rbtnB.CheckedChanged += new System.EventHandler(this.rbtnB_CheckedChanged);
+            // 
+            // labelThreshold
+            // 
+            this.labelThreshold.AutoSize = true;
+            this.labelThreshold.Location = new System.Drawing.Point(124, 166);
+            this.labelThreshold.Name = "labelThreshold";
+            this.labelThreshold.Size = new System.Drawing.Size(20, 23);
+            this.labelThreshold.TabIndex = 15;
+            this.labelThreshold.Text = "0";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(18, 166);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(94, 23);
+            this.label9.TabIndex = 14;
+            this.label9.Text = "Threshold";
+            // 
+            // chkSearchChipBoundingBox
+            // 
+            this.chkSearchChipBoundingBox.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSearchChipBoundingBox.AutoSize = true;
+            this.chkSearchChipBoundingBox.Location = new System.Drawing.Point(22, 143);
+            this.chkSearchChipBoundingBox.Name = "chkSearchChipBoundingBox";
+            this.chkSearchChipBoundingBox.Size = new System.Drawing.Size(156, 33);
+            this.chkSearchChipBoundingBox.TabIndex = 10;
+            this.chkSearchChipBoundingBox.Text = "Search Chip Pos";
+            this.chkSearchChipBoundingBox.UseVisualStyleBackColor = true;
+            this.chkSearchChipBoundingBox.CheckedChanged += new System.EventHandler(this.chkSearchChipBoundingBox_CheckedChanged);
             // 
             // chkSelectABF
             // 
@@ -699,7 +1145,7 @@
             // 
             // btnDetectChip
             // 
-            this.btnDetectChip.Location = new System.Drawing.Point(186, 52);
+            this.btnDetectChip.Location = new System.Drawing.Point(192, 80);
             this.btnDetectChip.Name = "btnDetectChip";
             this.btnDetectChip.Size = new System.Drawing.Size(166, 34);
             this.btnDetectChip.TabIndex = 7;
@@ -723,7 +1169,7 @@
             this.groupBox8.Controls.Add(this.btnSaveInspPins);
             this.groupBox8.Controls.Add(this.btnDetectBlobOld);
             this.groupBox8.Controls.Add(this.btnDetectBlob);
-            this.groupBox8.Location = new System.Drawing.Point(120, 592);
+            this.groupBox8.Location = new System.Drawing.Point(124, 677);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(300, 208);
             this.groupBox8.TabIndex = 6;
@@ -795,7 +1241,7 @@
             this.tabPage5.Controls.Add(this.tabCtrl_Insp_Rules);
             this.tabPage5.Location = new System.Drawing.Point(4, 32);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(445, 836);
+            this.tabPage5.Size = new System.Drawing.Size(499, 836);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "檢規";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -889,7 +1335,7 @@
             this.tabPage4.Controls.Add(this.groupBox6);
             this.tabPage4.Location = new System.Drawing.Point(4, 32);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(445, 836);
+            this.tabPage4.Size = new System.Drawing.Size(499, 836);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "檢測資料";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -992,14 +1438,14 @@
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1137, 52);
+            this.pnlHeader.Size = new System.Drawing.Size(1215, 52);
             this.pnlHeader.TabIndex = 2;
             // 
             // labelReason
             // 
             this.labelReason.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelReason.AutoSize = true;
-            this.labelReason.Location = new System.Drawing.Point(896, 17);
+            this.labelReason.Location = new System.Drawing.Point(889, 16);
             this.labelReason.Name = "labelReason";
             this.labelReason.Size = new System.Drawing.Size(72, 23);
             this.labelReason.TabIndex = 1;
@@ -1010,7 +1456,7 @@
             this.labelCheckResult.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelCheckResult.AutoSize = true;
             this.labelCheckResult.Font = new System.Drawing.Font("Microsoft JhengHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.labelCheckResult.Location = new System.Drawing.Point(431, 10);
+            this.labelCheckResult.Location = new System.Drawing.Point(509, 10);
             this.labelCheckResult.Name = "labelCheckResult";
             this.labelCheckResult.Size = new System.Drawing.Size(83, 30);
             this.labelCheckResult.TabIndex = 0;
@@ -1019,44 +1465,65 @@
             // pnlFooter
             // 
             this.pnlFooter.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.pnlFooter.Controls.Add(this.labelScale);
-            this.pnlFooter.Controls.Add(this.labelGrayLevel);
-            this.pnlFooter.Controls.Add(this.labelCursorPos);
+            this.pnlFooter.Controls.Add(this.TBComment);
+            this.pnlFooter.Controls.Add(this.panel1);
             this.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlFooter.Location = new System.Drawing.Point(0, 825);
+            this.pnlFooter.Location = new System.Drawing.Point(0, 766);
             this.pnlFooter.Name = "pnlFooter";
-            this.pnlFooter.Size = new System.Drawing.Size(1137, 82);
+            this.pnlFooter.Size = new System.Drawing.Size(1215, 141);
             this.pnlFooter.TabIndex = 3;
             // 
-            // labelScale
+            // TBComment
             // 
-            this.labelScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelScale.AutoSize = true;
-            this.labelScale.Location = new System.Drawing.Point(863, 47);
-            this.labelScale.Name = "labelScale";
-            this.labelScale.Size = new System.Drawing.Size(31, 23);
-            this.labelScale.TabIndex = 2;
-            this.labelScale.Text = "1X";
+            this.TBComment.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TBComment.Location = new System.Drawing.Point(0, 0);
+            this.TBComment.Multiline = true;
+            this.TBComment.Name = "TBComment";
+            this.TBComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.TBComment.Size = new System.Drawing.Size(915, 141);
+            this.TBComment.TabIndex = 5;
             // 
-            // labelGrayLevel
+            // panel1
             // 
-            this.labelGrayLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelGrayLevel.AutoSize = true;
-            this.labelGrayLevel.Location = new System.Drawing.Point(974, 14);
-            this.labelGrayLevel.Name = "labelGrayLevel";
-            this.labelGrayLevel.Size = new System.Drawing.Size(20, 23);
-            this.labelGrayLevel.TabIndex = 1;
-            this.labelGrayLevel.Text = "0";
+            this.panel1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.panel1.Controls.Add(this.labelCursorPos);
+            this.panel1.Controls.Add(this.labelGrayLevel);
+            this.panel1.Controls.Add(this.labelScale);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel1.Location = new System.Drawing.Point(915, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(300, 141);
+            this.panel1.TabIndex = 4;
             // 
             // labelCursorPos
             // 
             this.labelCursorPos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelCursorPos.AutoSize = true;
-            this.labelCursorPos.Location = new System.Drawing.Point(854, 14);
+            this.labelCursorPos.Location = new System.Drawing.Point(29, 28);
             this.labelCursorPos.Name = "labelCursorPos";
             this.labelCursorPos.Size = new System.Drawing.Size(46, 23);
             this.labelCursorPos.TabIndex = 0;
             this.labelCursorPos.Text = "(0,0)";
+            // 
+            // labelGrayLevel
+            // 
+            this.labelGrayLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelGrayLevel.AutoSize = true;
+            this.labelGrayLevel.Location = new System.Drawing.Point(149, 28);
+            this.labelGrayLevel.Name = "labelGrayLevel";
+            this.labelGrayLevel.Size = new System.Drawing.Size(20, 23);
+            this.labelGrayLevel.TabIndex = 1;
+            this.labelGrayLevel.Text = "0";
+            // 
+            // labelScale
+            // 
+            this.labelScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelScale.AutoSize = true;
+            this.labelScale.Location = new System.Drawing.Point(38, 61);
+            this.labelScale.Name = "labelScale";
+            this.labelScale.Size = new System.Drawing.Size(31, 23);
+            this.labelScale.TabIndex = 2;
+            this.labelScale.Text = "1X";
             // 
             // tabUser
             // 
@@ -1065,7 +1532,7 @@
             this.tabUser.Location = new System.Drawing.Point(0, 52);
             this.tabUser.Name = "tabUser";
             this.tabUser.SelectedIndex = 0;
-            this.tabUser.Size = new System.Drawing.Size(1137, 773);
+            this.tabUser.Size = new System.Drawing.Size(1215, 714);
             this.tabUser.TabIndex = 4;
             this.tabUser.SelectedIndexChanged += new System.EventHandler(this.tabUser_SelectedIndexChanged);
             // 
@@ -1074,7 +1541,7 @@
             this.tabPage_View.Location = new System.Drawing.Point(4, 32);
             this.tabPage_View.Name = "tabPage_View";
             this.tabPage_View.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_View.Size = new System.Drawing.Size(1129, 737);
+            this.tabPage_View.Size = new System.Drawing.Size(1207, 678);
             this.tabPage_View.TabIndex = 1;
             this.tabPage_View.Text = "tabPage";
             this.tabPage_View.UseVisualStyleBackColor = true;
@@ -1102,7 +1569,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1618, 907);
+            this.ClientSize = new System.Drawing.Size(1750, 907);
             this.Controls.Add(this.tabUser);
             this.Controls.Add(this.pnlFooter);
             this.Controls.Add(this.pnlHeader);
@@ -1123,8 +1590,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMaxValidPixel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numThreshold)).EndInit();
             this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
             this.tabControl2.ResumeLayout(false);
+            this.tabPage10.ResumeLayout(false);
+            this.tabPage10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThresholdPin)).EndInit();
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMaxDiffWH)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThreshold)).EndInit();
             this.tabPage7.ResumeLayout(false);
             this.tabPage7.PerformLayout();
             this.tabPage8.ResumeLayout(false);
@@ -1132,6 +1605,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMinHysteresisThreshold)).EndInit();
             this.tabPage9.ResumeLayout(false);
             this.tabPage9.PerformLayout();
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numChipPolysimplify)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSelectChip)).EndInit();
             this.groupBox8.ResumeLayout(false);
             this.tabPage5.ResumeLayout(false);
             this.tabCtrl_Insp_Rules.ResumeLayout(false);
@@ -1147,6 +1624,8 @@
             this.pnlHeader.PerformLayout();
             this.pnlFooter.ResumeLayout(false);
             this.pnlFooter.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.tabUser.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1241,5 +1720,39 @@
         private Button btnDetectChip;
         private CheckBox chkSelectChip;
         private CheckBox chkSelectABF;
+        private CheckBox chkSearchChipBoundingBox;
+        private RadioButton rbtnB;
+        private RadioButton rbtnG;
+        private RadioButton rbtnR;
+        private Label labelThreshold;
+        private Label label9;
+        private NumericUpDown numSelectChip;
+        private Label label10;
+        private GroupBox groupBox9;
+        private NumericUpDown numChipPolysimplify;
+        private Label label11;
+        private TabPage tabPage10;
+        private CheckBox chkSelectCenter;
+        private CheckBox chkSelectRight;
+        private CheckBox chkSelectLeft;
+        private ComboBox cmbSelectedColNum;
+        private Label label12;
+        private Button btnTestInspAdhTapeLeft;
+        private NumericUpDown numAdhTapeThreshold;
+        private CheckBox chkSelectSingle;
+        private NumericUpDown numMaxDiffWH;
+        private Label label14;
+        private CheckBox chkBlobIsWhite;
+        private Label label15;
+        private CheckBox chkSelectRightPin;
+        private CheckBox chkSelectLeftPin;
+        private TextBox TBPinDist;
+        private GroupBox groupBox10;
+        private Label label16;
+        private NumericUpDown numAdhTapeThresholdPin;
+        private Label label17;
+        private Panel panel1;
+        private TextBox TBComment;
+        private Button btnTestInspAdhTapeRight;
     }
 }

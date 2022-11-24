@@ -22,6 +22,9 @@ namespace TNControls
         public TNCustCtrl_Rect()
         {
             InitializeComponent();
+
+            Display_Pen_Width = 1;
+            Display_Cross = false;
         }
 
         /// <summary>
@@ -48,6 +51,8 @@ namespace TNControls
         public bool Editing { get => _bEditing; set => _bEditing = value; }
 
         public Color Display_Color { get; set; }
+        public int   Display_Pen_Width { get; set; }
+        public bool Display_Cross { get; set; }
 
         public HitTest_Result HitTest_Rresult { get => _HitTest_Rresult; set => _HitTest_Rresult = value; }
         public DS_Insp_Param_Pin Insp_param { get => _insp_param; set => _insp_param = value; }
@@ -81,8 +86,19 @@ namespace TNControls
         {
             if (!Editing)
             {
-                Pen pen_ctrl = new Pen(Display_Color, 1);
+                Pen pen_ctrl = new Pen(Display_Color, Display_Pen_Width);
                 graphics_show.DrawRectangle(pen_ctrl, pb.GetPBRectFromImage(Insp_Base_Tools.To_System_Rect( Pos_Info.Editing_Rect)  ) );
+
+                if ( Display_Cross )
+                {
+                    Rectangle display_rt = pb.GetPBRectFromImage(Insp_Base_Tools.To_System_Rect(Pos_Info.Editing_Rect));
+                    System.Drawing.Point pt_left  = new System.Drawing.Point(display_rt.X,     display_rt.Y + display_rt.Height / 2 );
+                    System.Drawing.Point pt_right = new System.Drawing.Point(display_rt.Right, display_rt.Y + display_rt.Height / 2);
+                    graphics_show.DrawLine(pen_ctrl, pt_left, pt_right);
+                    System.Drawing.Point pt_top    = new System.Drawing.Point(display_rt.X + display_rt.Width / 2, display_rt.Y);
+                    System.Drawing.Point pt_bottom = new System.Drawing.Point(display_rt.X + display_rt.Width / 2, display_rt.Y + display_rt.Height);
+                    graphics_show.DrawLine(pen_ctrl, pt_top, pt_bottom);
+                }
             }
             else
             {

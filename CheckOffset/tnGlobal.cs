@@ -14,6 +14,7 @@ using TN.Tools;
 using TN.Tools.Debug;
 
 using OpenCvSharp;
+using CheckOffset.Insp;
 
 //namespace CheckOffset
 //{
@@ -469,6 +470,10 @@ namespace CheckOffset
 
         public DS_Insp_Param_Pin Insp_Param_Pin = new DS_Insp_Param_Pin();
 
+        public DS_Insp_Param_Chip Insp_Param_Chip = new DS_Insp_Param_Chip();
+
+        public DS_Insp_Param_Adh_Tape Insp_Param_Adh_Tape = new DS_Insp_Param_Adh_Tape();
+
         //private int _Min_Pin_WH = 10;
 
         //private EN_Insp_Tol_Dir _Insp_Tol_Dir = EN_Insp_Tol_Dir.EN_Insp_Tol_None;
@@ -478,6 +483,10 @@ namespace CheckOffset
         public DS_Insp_Param()
         {
              Insp_Param_Pin = new DS_Insp_Param_Pin();
+
+            Insp_Param_Chip = new DS_Insp_Param_Chip();
+
+            Insp_Param_Adh_Tape = new DS_Insp_Param_Adh_Tape();
             //Detect_Rect = new Rectangle(0, 0, 0, 0);
             //Detect_Insp_param = new DS_Insp_Param_Pin();
             //Detect_Insp_Result = new DS_Insp_Result();
@@ -491,6 +500,8 @@ namespace CheckOffset
         public DS_CAM_Chip_Info   Chip_Info = new DS_CAM_Chip_Info();
 
         public List<DS_CAM_Pin_Info>   Detect_Pin_Infos = new List<DS_CAM_Pin_Info>();
+
+        public DS_CAM_Adh_Tape_Info Adh_Tape_Info = new DS_CAM_Adh_Tape_Info();
     }
 
     /// <summary>
@@ -560,5 +571,54 @@ namespace CheckOffset
 
             _Chip_Pos_Finder = new FindChipPosition();
         }
-    }
+    }// end of class DS_CAM_Chip_Info
+
+    public class DS_CAM_Adh_Tape_Info
+    {
+        // 左右 Pin.
+        private OpenCvSharp.Rect _left_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private OpenCvSharp.Rect _left_center_pin = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private OpenCvSharp.Rect _right_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private OpenCvSharp.Rect _right_center_pin = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private bool _blob_is_white = true;
+        private int _threshold_pin = 70;
+        private int _threshold_slot = 60;
+
+        private int _pin_dist = 3700; // 單位 pixel. 130mm-->3700 pixel
+
+        // 內容物
+        private OpenCvSharp.Rect _single_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+
+        private OpenCvSharp.Rect[] _content_detail_center = new OpenCvSharp.Rect[0];
+        private OpenCvSharp.Point _content_center = new OpenCvSharp.Point(0, 0);
+
+        private ImageTools.Band_Info[] _Band_Info_Res = new ImageTools.Band_Info[3];
+
+        public OpenCvSharp.Rect Left_center { get => _left_center; set => _left_center = value; }
+        public OpenCvSharp.Rect Right_center { get => _right_center; set => _right_center = value; }
+        public OpenCvSharp.Rect[] Content_detail_center { get => _content_detail_center; set => _content_detail_center = value; }
+        public OpenCvSharp.Point Content_center { get => _content_center; set => _content_center = value; }
+        public Band_Info[] Band_Info_Res { get => _Band_Info_Res; set => _Band_Info_Res = value; }
+        public Rect Single_center { get => _single_center; set => _single_center = value; }
+        public Rect Left_center_pin { get => _left_center_pin; set => _left_center_pin = value; }
+        public Rect Right_center_pin { get => _right_center_pin; set => _right_center_pin = value; }
+        public bool Blob_is_white { get => _blob_is_white; set => _blob_is_white = value; }
+        public int Threshold_pin { get => _threshold_pin; set => _threshold_pin = value; }
+        public int Threshold_slot { get => _threshold_slot; set => _threshold_slot = value; }
+
+        //public Rect Select_Chip { get => _Select_Chip; set => _Select_Chip = value; }
+        //public Rect Select_ABF { get => _Select_ABF; set => _Select_ABF = value; }
+
+        public DS_CAM_Adh_Tape_Info(Rect right_center_pin = default)
+        {
+            _left_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+            _right_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+
+            _content_detail_center = new OpenCvSharp.Rect[0];
+            _content_center = new OpenCvSharp.Point(0, 0);
+
+            _Band_Info_Res = new ImageTools.Band_Info[3];
+            _right_center_pin = right_center_pin;
+        }
+    }// end of class DS_CAM_Chip_Info
 } // end of namespace CheckOffset

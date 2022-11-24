@@ -25,6 +25,16 @@ namespace CheckOffset.ImageTools
             return new OpenCvSharp.Point(drawing_pt.X, drawing_pt.Y);
         }
 
+        public static System.Drawing.Rectangle ToSystemRect(OpenCvSharp.Rect cv_rt)
+        {
+            return new System.Drawing.Rectangle(cv_rt.X, cv_rt.Y, cv_rt.Width, cv_rt.Height);
+        }
+
+        public static OpenCvSharp.Rect ToOpenCvRect(System.Drawing.Rectangle drawing_rt)
+        {
+            return new OpenCvSharp.Rect(drawing_rt.X, drawing_rt.Y, drawing_rt.Width, drawing_rt.Height);
+        }
+
         public static Mat<byte>? Clone_Bmp_2_Mat(Bitmap bmp)
         {
             try

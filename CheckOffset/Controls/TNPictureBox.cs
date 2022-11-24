@@ -364,11 +364,18 @@ namespace TNControls
 
                 int pixel_size = bmp_data.Stride / bmp_data.Width;
                 int gray_level = 0;
+                int r_val = 0, g_val = 0, b_val = 0;
                 unsafe
                 {
                     byte* ptr = (byte*)ptr_buffer.ToPointer();
                     //gray_level = (int)*(ptr + pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size);
                     gray_level = (int)(ptr[pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size]);
+                    if (pixel_size >= 3 )
+                    {
+                        b_val = (int)(ptr[pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size]);
+                        g_val = (int)(ptr[pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size + 1]);
+                        r_val = (int)(ptr[pt_Current.Y * bmp_data.Stride + pt_Current.X * pixel_size + 2]);
+                    }
                 }
 
                 //Image_Buffer_Gray.ReleaseBuffer((Bitmap)Image, bmp_data);
@@ -379,10 +386,14 @@ namespace TNControls
                 Report_Display_Info report_display_info = new Report_Display_Info
                 {
                     Pos = pt_image
-                                ,
-                    Gray_Level = gray_level
-                                ,
-                    Scale = _scale
+                                
+                    , Gray_Level = gray_level
+                                                
+                    , B_Val = b_val                                
+                    , G_Val = g_val
+                    , R_Val = r_val
+
+                    , Scale = _scale
                 };
                 if (null != Report_GrayLevel_Gray)
                 {
@@ -557,10 +568,10 @@ namespace TNControls
 
             int width = (Int32)(ClientSize.Width / _scale + 0.5f);
             //show_rect.Width = Math.Max(show_rect.Width, Show_Image.Width);
-            width = Math.Max(width, Image_Bmp.Width - _offset.X);
+            width = Math.Max(width, (int) ( (Image_Bmp.Width - _offset.X) / _scale + 0.5f ) );
 
             int height = (Int32)(ClientSize.Height / _scale + 0.5f);
-            height = Math.Max(show_rect.Height, Image_Bmp.Height - _offset.Y);
+            height = Math.Max(show_rect.Height, (int) (  ( Image_Bmp.Height - _offset.Y) / _scale + 0.5f ) );
 
             show_rect = new Rectangle( _offset.X, _offset.Y, width, height );
 
@@ -836,6 +847,12 @@ namespace TNControls
 
                 user_ctrl.Draw2PB(graphics_show, this);
             }
+            else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Line))
+            {
+                TNCustCtrl_Line user_ctrl = (TNCustCtrl_Line)enu_ctrl;
+
+                user_ctrl.Draw2PB(graphics_show, this);
+            }
             else if (enu_ctrl.GetType() == typeof(TNCustCtrl_Polygon))
             {
                 TNCustCtrl_Polygon user_ctrl = (TNCustCtrl_Polygon)enu_ctrl;
@@ -871,8 +888,17 @@ namespace TNControls
 
                         //int gray_level = *(Image_Buffer_Gray.Get_Pointer(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
                         //                                                , x, y));
-                        int gray_level = Image_Buffer_Gray.Get_Pixel(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
-                                                                        , x, y);
+                        int gray_level = 0;
+                        if (bmp_data.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed )
+                        {
+                            gray_level = Image_Buffer_Gray.Get_Pixel(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
+                                                    , x, y);
+                        }
+                        else
+                        {
+                            gray_level = ImageBuffer.Get_Pixel(bmp_data, (byte*)bmp_data.Scan0.ToPointer()
+                                                    , x, y);
+                        }
                         graphics_show.DrawString($"{gray_level}", draw_font, brush_ctrl, pt_draw);
                     }
                 }
@@ -957,6 +983,19 @@ namespace TNControls
     {
         public Point Pos;
         public int Gray_Level;
+        public int R_Val;
+        public int G_Val;
+        public int B_Val;
         public float Scale;
+
+        public Report_Display_Info()
+        {
+            Pos = new System.Drawing.Point(0,0);
+            Gray_Level = 0;
+            R_Val = 0;
+            G_Val = 0;
+            B_Val = 0;
+            Scale = 0.0f;
+        }
     }
 }
