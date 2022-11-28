@@ -15,6 +15,8 @@ using TN.Tools.Debug;
 
 using OpenCvSharp;
 using CheckOffset.Insp;
+using TN.CCD;
+using TNControls;
 
 //namespace CheckOffset
 //{
@@ -126,6 +128,8 @@ namespace CheckOffset
 
         public static IT_Detect _IT_Detect = null;
 
+        public static BaslerProxy CCD_Camera = new BaslerProxy();
+        
         //public static DS_Defect_Pin_Info? Detect_Pins = null;
 
         // change to public for update progress
@@ -134,6 +138,9 @@ namespace CheckOffset
 
         public static void Initialize()
         {
+            if (Setting.Enable_CCD)
+                CCD_Camera.Basler_CameraInit();
+
             Log_Utl.Init();
 
             Log_Utl.EnableLogStep = Setting.EnableLogStep;
@@ -451,6 +458,7 @@ namespace CheckOffset
     public class DS_Setting_Info
     {
         public bool EnableLogStep = true;              // 是否輸出Log\Step.
+        public bool Enable_CCD = false;
 
         public int CCD_Width = 640;
         public int CCD_Height = 480;
@@ -593,6 +601,7 @@ namespace CheckOffset
         private OpenCvSharp.Point _content_center = new OpenCvSharp.Point(0, 0);
 
         private ImageTools.Band_Info[] _Band_Info_Res = new ImageTools.Band_Info[3];
+        private DS_Content_Detail_Group[] _detail_group = new DS_Content_Detail_Group[0];
 
         public OpenCvSharp.Rect Left_center { get => _left_center; set => _left_center = value; }
         public OpenCvSharp.Rect Right_center { get => _right_center; set => _right_center = value; }
@@ -605,6 +614,7 @@ namespace CheckOffset
         public bool Blob_is_white { get => _blob_is_white; set => _blob_is_white = value; }
         public int Threshold_pin { get => _threshold_pin; set => _threshold_pin = value; }
         public int Threshold_slot { get => _threshold_slot; set => _threshold_slot = value; }
+        public DS_Content_Detail_Group[] Detail_group { get => _detail_group; set => _detail_group = value; }
 
         //public Rect Select_Chip { get => _Select_Chip; set => _Select_Chip = value; }
         //public Rect Select_ABF { get => _Select_ABF; set => _Select_ABF = value; }

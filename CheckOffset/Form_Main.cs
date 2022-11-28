@@ -49,27 +49,37 @@ namespace CheckOffset
             Init_Data();
         }
 
-
-        private UserCtrl_Image  _userctrl_image = new UserCtrl_Image();
+        private UserCtrl_Image userCtrl_Image_File;
+        private UserCtrl_Image userCtrl_Image_CCD;
+        private UserCtrl_Image _active_userctrl_image;
         //private MatProxy        _mat_proxy      = new MatProxy();
 
         private InspGlueOverflow _inspGlueOverflow = null;
 
         private void Init_Data()
         {
-            //_userctrl_image = new UserCtrl_Image();
+            userCtrl_Image_File = new UserCtrl_Image();
+            userCtrl_Image_File.Dock = DockStyle.Fill;
+            tabPage_View.Controls.Add(userCtrl_Image_File);
 
-            tabUser.TabPages.Clear();
+            userCtrl_Image_CCD = new UserCtrl_Image();
+            userCtrl_Image_CCD.Dock = DockStyle.Fill;
+            tabPage_View_CCD.Controls.Add(userCtrl_Image_CCD);
 
-            //////////////////////////////////////
-            // manual add tab...
-            TabPage new_tab_page = new TabPage("Image");
-            _userctrl_image.Dock = DockStyle.Fill;
-            new_tab_page.Controls.Add(_userctrl_image);
-            tabUser.TabPages.Add(new_tab_page);
+            _active_userctrl_image = userCtrl_Image_File;
+            //tabUser.TabPages.Clear();
 
-            _userctrl_image.Report_GrayLevel_Gray += Event_Update_Gray_Level;
-            _userctrl_image.Query_Editing_Mode    += Query_Editing_Mode;
+            ////////////////////////////////////////
+            //// manual add tab...
+            //TabPage new_tab_page = new TabPage("Image");
+            //_active_userctrl_image.Dock = DockStyle.Fill;
+            //new_tab_page.Controls.Add(_active_userctrl_image);
+            //tabUser.TabPages.Add(new_tab_page);
+
+            _active_userctrl_image.Report_GrayLevel_Gray += Event_Update_Gray_Level;
+            _active_userctrl_image.Query_Editing_Mode    += Query_Editing_Mode;
+
+            tnGlobal.CCD_Camera.Camera_Image_Event += _active_userctrl_image.Camera_CameraImageEvent;
 
             cmbSelectedColNum.SelectedIndex = 0;
         }
@@ -80,19 +90,19 @@ namespace CheckOffset
             if (dlg_res != DialogResult.OK)
                 return;
 
-            if (null != _userctrl_image.Image )
-                _userctrl_image.Image.Dispose();
+            if (null != _active_userctrl_image.Image )
+                _active_userctrl_image.Image.Dispose();
 
             tbImgFile.Text = openFileDialog_Img.FileName;
-            _userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
-            _userctrl_image.Editing_Ctrl = null;
-            _userctrl_image.User_Ctrls.Clear();
-            _userctrl_image.Cache_Ctrl.Clear();
-            _userctrl_image.pb_Image.ZoomFit();
+            _active_userctrl_image.Image = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
+            _active_userctrl_image.Editing_Ctrl = null;
+            _active_userctrl_image.User_Ctrls.Clear();
+            _active_userctrl_image.Cache_Ctrl.Clear();
+            _active_userctrl_image.pb_Image.ZoomFit();
 
-            _userctrl_image.ll_Test.Text = tbImgFile.Text;
+            _active_userctrl_image.ll_Test.Text = tbImgFile.Text;
 
-            OpenCvSharp.Rect rt_fill = new OpenCvSharp.Rect(0, 0, _userctrl_image.Image.Width, _userctrl_image.Image.Height);
+            OpenCvSharp.Rect rt_fill = new OpenCvSharp.Rect(0, 0, _active_userctrl_image.Image.Width, _active_userctrl_image.Image.Height);
 
             tnGlobal.Insp_Pools.Clear();
         }
@@ -105,27 +115,27 @@ namespace CheckOffset
             //aaa
             if (chkNewInsp_Rect.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                if (null != _userctrl_image.User_Ctrls)
+                if (null != _active_userctrl_image.User_Ctrls)
                 {
-                    _userctrl_image.User_Ctrls.Clear();
+                    _active_userctrl_image.User_Ctrls.Clear();
                     foreach (DS_CAM_Pin_Info cur_detect_infos in tnGlobal.CAM_Info.Detect_Pin_Infos)
                     {
                         TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
-                        TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                        TNPictureBox tn_pb = _active_userctrl_image.pb_Image as TNPictureBox;
                         exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
                         //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
-                        _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                        _active_userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
                 }
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 DS_Insp_Param_Pin new_insp_param = new DS_Insp_Param_Pin();
@@ -135,9 +145,9 @@ namespace CheckOffset
             else
             {
                 // 新增完畢
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     DS_Insp_Param_Pin new_insp_param = new DS_Insp_Param_Pin();
                     new_insp_param.Insp_Tol_Dir = Get_Insp_Tol_Dir();
@@ -152,10 +162,10 @@ namespace CheckOffset
                         tnGlobal.CAM_Info.Detect_Pin_Infos.Add(new_defect_info);
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -163,7 +173,7 @@ namespace CheckOffset
         {
             //if (tabUser.SelectedTab.Name == tabpage_Image.Name)
             //{
-            //    _userctrl_image.Visible = true;
+            //    _active_userctrl_image.Visible = true;
             //}
         }
 
@@ -175,13 +185,13 @@ namespace CheckOffset
             string jsonString = File.ReadAllText(openFileDialog_Setting.FileName);
             tnGlobal.CAM_Info = Newtonsoft.Json.JsonConvert.DeserializeObject<DS_CAM_Info>(jsonString);
 
-            _userctrl_image.User_Ctrls.Clear();
+            _active_userctrl_image.User_Ctrls.Clear();
 
             Paint_Align();
             Paint_Pin_Pos(null);
 
-            _userctrl_image.Apply_GlobalSetting_To_Ctrls();
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
+            _active_userctrl_image.Refresh();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -204,14 +214,14 @@ namespace CheckOffset
             {
                 Bitmap bmp = (Bitmap) System.Drawing.Image.FromFile(tbImgFile.Text);
 
-                _userctrl_image.Cache_Ctrl.Clear();
+                _active_userctrl_image.Cache_Ctrl.Clear();
 
                 bool check_res = true;
                 if (null != tnGlobal.CAM_Info)
                 {
                     //bool first_white = false;
                     int max_valid_gap = (int)numMaxValidPixel.Value;
-                    foreach (Control ctrl_defect_info in _userctrl_image.User_Ctrls)
+                    foreach (Control ctrl_defect_info in _active_userctrl_image.User_Ctrls)
                     {
                         TNCustCtrl_Rect rect_user_ctrl = (TNCustCtrl_Rect)ctrl_defect_info;
                         DS_Insp_Param_Pin chk_insp_param = rect_user_ctrl.Insp_param;
@@ -297,7 +307,7 @@ namespace CheckOffset
                         labelReason.Text = $"";
                     }
 
-                    _userctrl_image.pb_Image.Repaint();
+                    _active_userctrl_image.pb_Image.Repaint();
                 }
             }
             catch(Exception ex)
@@ -402,44 +412,44 @@ namespace CheckOffset
             {
                 Image_Binary.Binary_Image(org_bmp, (int) numThreshold.Value, out Bitmap? dest_bmp);
 
-                _userctrl_image.Image = dest_bmp;
+                _active_userctrl_image.Image = dest_bmp;
             }
             else
             {
-                _userctrl_image.Image = org_bmp;
+                _active_userctrl_image.Image = org_bmp;
             }
 
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Refresh();
         }
 
         private void btn1X_Click(object sender, EventArgs e)
         {
-            if (null != _userctrl_image.Image)
-                _userctrl_image.Image.Dispose();
+            if (null != _active_userctrl_image.Image)
+                _active_userctrl_image.Image.Dispose();
 
-            _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-            _userctrl_image.Image_Scale = 1.0f;
-            _userctrl_image.Offset = new OpenCvSharp.Point(0, 0);
+            _active_userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            _active_userctrl_image.Image_Scale = 1.0f;
+            _active_userctrl_image.Offset = new OpenCvSharp.Point(0, 0);
 
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Refresh();
         }
 
         private void btnFit_Click(object sender, EventArgs e)
         {
-            if (null != _userctrl_image.Image)
-                _userctrl_image.Image.Dispose();
+            if (null != _active_userctrl_image.Image)
+                _active_userctrl_image.Image.Dispose();
 
-            _userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
-            _userctrl_image.pb_Image.ZoomFit();
+            _active_userctrl_image.Image = (Bitmap)System.Drawing.Image.FromFile(tbImgFile.Text);
+            _active_userctrl_image.pb_Image.ZoomFit();
         }
 
         private void btnDeleteROI_Click(object sender, EventArgs e)
         {
-            if (_userctrl_image.Editing_Ctrl == null)
+            if (_active_userctrl_image.Editing_Ctrl == null)
                 return;
 
-            _userctrl_image.Delete_Editing_ROI(_userctrl_image.Editing_Ctrl);
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Delete_Editing_ROI(_active_userctrl_image.Editing_Ctrl);
+            _active_userctrl_image.Refresh();
         }
 
         Editing_Mode Query_Editing_Mode()
@@ -461,7 +471,7 @@ namespace CheckOffset
                 return Editing_Mode.EDT_New_Chip;
             }
 
-            if (null != _userctrl_image.Editing_Ctrl)
+            if (null != _active_userctrl_image.Editing_Ctrl)
                 return Editing_Mode.EDT_Editing_ROI;
 
             return Editing_Mode.EDT_None;
@@ -530,9 +540,9 @@ namespace CheckOffset
             TNControls.TNCustCtrl_Points edge_points = new TNCustCtrl_Points();
             edge_points.Display_Color = Color.YellowGreen;
             edge_points.Pos_Info.Points = detected_edge_points.ToArray();
-            _userctrl_image.Cache_Ctrl.Add(edge_points);
+            _active_userctrl_image.Cache_Ctrl.Add(edge_points);
 
-            _userctrl_image.pb_Image.Repaint();
+            _active_userctrl_image.pb_Image.Repaint();
 
 
         }
@@ -543,10 +553,10 @@ namespace CheckOffset
             if (DialogResult.OK != saveFileDialog.ShowDialog())
                 return;
 
-            _userctrl_image.pb_Image.Image.Save(saveFileDialog.FileName);
-            if (null != _userctrl_image.Image)
+            _active_userctrl_image.pb_Image.Image.Save(saveFileDialog.FileName);
+            if (null != _active_userctrl_image.Image)
             {
-                _userctrl_image.Image.Save(saveFileDialog.FileName); // $"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
+                _active_userctrl_image.Image.Save(saveFileDialog.FileName); // $"D:\\test\\SD2_000\\221014_092537\\My\\Binary.bmp");
             }
         }
 
@@ -586,7 +596,7 @@ namespace CheckOffset
                         ctrl_string.Pos_Info.Points[0].Y = y;
                         ctrl_string.Display_Color = Color.Blue;
 
-                        _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+                        _active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
 
                         //TNCustCtrl_String ctrl_string = new TNCustCtrl_String();
                         //ctrl_string.Pos_Info.Point_LT.X = x;
@@ -595,7 +605,7 @@ namespace CheckOffset
                         ////ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._v_weight[y, x]}";
                         //ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._h_weight[y, x]}";
                         //ctrl_string.Display_Font_Size = 8;
-                        //_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+                        //_active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
                     }
                     else if (tnGlobal._IT_Detect.Pins[y, x] >= 2)
                     {
@@ -605,12 +615,12 @@ namespace CheckOffset
                         ctrl_string.Pos_Info.Points[0].Y = y;
                         ctrl_string.Display_Color = Color.BlueViolet;
 
-                        _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+                        _active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
                     }
                 }
             }
 
-            _userctrl_image.pb_Image.Repaint();
+            _active_userctrl_image.pb_Image.Repaint();
         }
 
         private void btnProjectFile_Click(object sender, EventArgs e)
@@ -632,7 +642,7 @@ namespace CheckOffset
 
         private void btnClearCacheItems_Click(object sender, EventArgs e)
         {
-            _userctrl_image.Cache_Ctrl.Clear();
+            _active_userctrl_image.Cache_Ctrl.Clear();
         }
 
         //private void btnDetectBlob_Click(object sender, EventArgs e)
@@ -687,7 +697,7 @@ namespace CheckOffset
 
         //        //Image_Tools.DisposeImageToolsCLRClass(img_tool_clr);
 
-        //        //_userctrl_image.pb_Image.Repaint();
+        //        //_active_userctrl_image.pb_Image.Repaint();
 
 
 
@@ -722,10 +732,10 @@ namespace CheckOffset
         //                cust_ctrl.Pos_Info.Points[pt_id].Y = (int) blob_infos[blob_id]._blob_points[pt_id].y;
         //            }
 
-        //            _userctrl_image.pb_Image.Cache_Ctrl.Add(cust_ctrl);
+        //            _active_userctrl_image.pb_Image.Cache_Ctrl.Add(cust_ctrl);
         //        }
 
-        //        _userctrl_image.pb_Image.Repaint();
+        //        _active_userctrl_image.pb_Image.Repaint();
         //    }
         //    catch (Exception ex)
         //    {
@@ -790,10 +800,10 @@ namespace CheckOffset
                         cust_ctrl.Pos_Info.Points[pt_id].Y = (int)blob_infos[blob_id]._blob_points[pt_id].y;
                     }
 
-                    _userctrl_image.pb_Image.Cache_Ctrl.Add(cust_ctrl);
+                    _active_userctrl_image.pb_Image.Cache_Ctrl.Add(cust_ctrl);
                 }
 
-                _userctrl_image.pb_Image.Repaint();
+                _active_userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {
@@ -845,11 +855,11 @@ namespace CheckOffset
                         ctrl_string.Pos_Info.Point_LT.Y = y;
                         ctrl_string.Display_Str = $"{blob_analyze.Blob[y, x]}";
                         ctrl_string.Display_Font_Size = 8;
-                        _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+                        _active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
                     }
                 }
 
-                _userctrl_image.pb_Image.Repaint();
+                _active_userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {
@@ -1019,8 +1029,8 @@ namespace CheckOffset
         //        //}
 
         //        //mainForm.FormBorderStyle = FormBorderStyle.None;
-        //        _userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
-        //        //mainForm.Owner = (Form) _userctrl_image;
+        //        _active_userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
+        //        //mainForm.Owner = (Form) _active_userctrl_image;
         //        //mainForm.ShowDialog();
 
         //        //imshow("Grayscale image", image);
@@ -1047,7 +1057,7 @@ namespace CheckOffset
                 var img = @"D:\test\blobSource_24.bmp";
                 Mat image = Cv2.ImRead(@"D:\\test\\blobSource_opencv_8.bmp", ImreadModes.Unchanged); // ImreadModes.GrayScale);
                                                                                                      //var mainForm = new ImageViewer(img);
-                _userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
+                _active_userctrl_image.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
             }
             catch (Exception ex)
             {
@@ -1065,7 +1075,7 @@ namespace CheckOffset
             FindPinPosition pin_finder = new FindPinPosition();
             pin_finder.Find_Pin_Position(tnGlobal._IT_Detect);
 
-            _userctrl_image.pb_Image.Cache_Ctrl.Clear();
+            _active_userctrl_image.pb_Image.Cache_Ctrl.Clear();
 
             for (int contour_id = 0; contour_id < pin_finder.Found_Contours.GetLength(0); contour_id++)
             {
@@ -1078,7 +1088,7 @@ namespace CheckOffset
                 }
 
                 exist_added_pgn.Display_Color = Color.Purple;
-                _userctrl_image.Cache_Ctrl.Add(exist_added_pgn);
+                _active_userctrl_image.Cache_Ctrl.Add(exist_added_pgn);
             }
 
             Paint_Pin_Pos(null);
@@ -1110,7 +1120,7 @@ namespace CheckOffset
                 foreach (DS_CAM_Pin_Info insp_pin in tnGlobal.CAM_Info.Detect_Pin_Infos)
                 {
                     TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
-                    TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                    TNPictureBox tn_pb = _active_userctrl_image.pb_Image as TNPictureBox;
                     if (null == inspecting_info)
                     {
                         exist_added_rect.Pos_Info.Editing_Rect = insp_pin.Detect_Rect;
@@ -1127,10 +1137,10 @@ namespace CheckOffset
 
                     //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
                     exist_added_rect.Display_Color = Color.Green;
-                    _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                    _active_userctrl_image.User_Ctrls.Add(exist_added_rect);
                 }
 
-                _userctrl_image.pb_Image.Repaint();
+                _active_userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {
@@ -1165,9 +1175,9 @@ namespace CheckOffset
                     }
                 }
 
-                _userctrl_image.User_Ctrls.Add(align_rect);
+                _active_userctrl_image.User_Ctrls.Add(align_rect);
 
-                _userctrl_image.pb_Image.Repaint();
+                _active_userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {
@@ -1191,7 +1201,7 @@ namespace CheckOffset
                                                       , adh_tape_info.Left_center.Y
                                                       , adh_tape_info.Left_center.Width
                                                       , adh_tape_info.Left_center.Height);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
                 if (adh_tape_info.Left_center_pin.X > 0)
@@ -1203,7 +1213,7 @@ namespace CheckOffset
                                                       , adh_tape_info.Left_center_pin.Y
                                                       , adh_tape_info.Left_center_pin.Width
                                                       , adh_tape_info.Left_center_pin.Height);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
                 if (adh_tape_info.Right_center.X > 0)
@@ -1215,7 +1225,7 @@ namespace CheckOffset
                                                       , adh_tape_info.Right_center.Y
                                                       , adh_tape_info.Right_center.Width
                                                       , adh_tape_info.Right_center.Height);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
                 if (adh_tape_info.Right_center_pin.X > 0)
@@ -1227,7 +1237,7 @@ namespace CheckOffset
                                                       , adh_tape_info.Right_center_pin.Y
                                                       , adh_tape_info.Right_center_pin.Width
                                                       , adh_tape_info.Right_center_pin.Height);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
                 if (adh_tape_info.Right_center.X > 0
@@ -1241,7 +1251,7 @@ namespace CheckOffset
                                                       , adh_tape_info.Left_center.Y + adh_tape_info.Left_center.Height / 2);
                     disp_rect.Pos_Info.PT_End = new System.Drawing.Point(adh_tape_info.Right_center.X + adh_tape_info.Right_center.Width / 2
                                                     , adh_tape_info.Right_center.Y + adh_tape_info.Right_center.Height / 2);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
                 if (adh_tape_info.Right_center_pin.X > 0
@@ -1255,7 +1265,7 @@ namespace CheckOffset
                                                       , adh_tape_info.Left_center_pin.Y + adh_tape_info.Left_center_pin.Height / 2);
                     disp_rect.Pos_Info.PT_End = new System.Drawing.Point(adh_tape_info.Right_center_pin.X + adh_tape_info.Right_center_pin.Width / 2
                                                     , adh_tape_info.Right_center_pin.Y + adh_tape_info.Right_center_pin.Height / 2);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
                 if (adh_tape_info.Single_center.X > 0)
@@ -1266,10 +1276,11 @@ namespace CheckOffset
                     disp_rect.Pos_Info.Editing_Rect = new OpenCvSharp.Rect(adh_tape_info.Single_center.X
                                                       , adh_tape_info.Single_center.Y
                                                       , adh_tape_info.Single_center.Width, adh_tape_info.Single_center.Height);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
 
+                List<OpenCvSharp.Rect> rt_detail = new List<OpenCvSharp.Rect>(); 
                 for (int content_id = 0; content_id < adh_tape_info.Content_detail_center.Length; content_id++)
                 {
                     TNCustCtrl_Rect disp_rect = new TNCustCtrl_Rect();
@@ -1281,10 +1292,13 @@ namespace CheckOffset
                                                         , adh_tape_info.Content_detail_center[content_id].Y
                                                         , adh_tape_info.Content_detail_center[content_id].Width
                                                         , adh_tape_info.Content_detail_center[content_id].Height);
-                    _userctrl_image.Cache_Ctrl.Add(disp_rect);
+                    rt_detail.Add(disp_rect.Pos_Info.Editing_Rect);
+                    _active_userctrl_image.Cache_Ctrl.Add(disp_rect);
                 }
 
-                _userctrl_image.pb_Image.Repaint();
+                tnGlobal.CAM_Info.Adh_Tape_Info.Content_detail_center = rt_detail.ToArray();
+
+                _active_userctrl_image.pb_Image.Repaint();
             }
             catch (Exception ex)
             {
@@ -1309,29 +1323,29 @@ namespace CheckOffset
         {
             if (chkSelectPattern.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                if (null != _userctrl_image.User_Ctrls)
+                if (null != _active_userctrl_image.User_Ctrls)
                 {
-                    _userctrl_image.User_Ctrls.Clear();
+                    _active_userctrl_image.User_Ctrls.Clear();
                     foreach (DS_CAM_Pin_Info cur_detect_infos in tnGlobal.CAM_Info.Detect_Pin_Infos)
                     {
                         TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
-                        TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                        TNPictureBox tn_pb = _active_userctrl_image.pb_Image as TNPictureBox;
                         exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
                         //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
-                        _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                        _active_userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
 
-                    _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                    _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
                 }
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
@@ -1341,11 +1355,11 @@ namespace CheckOffset
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -1356,10 +1370,10 @@ namespace CheckOffset
                         tnGlobal.CAM_Info.Align_Info = new_align_info;
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -1369,10 +1383,10 @@ namespace CheckOffset
             //    return;
 
             // 新增完畢
-            if (null == _userctrl_image.pb_Image.Editing_Ctrl)
+            if (null == _active_userctrl_image.pb_Image.Editing_Ctrl)
                 return;
 
-            TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+            TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
             const int min_roi_valid_size = 2;
             if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -1444,7 +1458,7 @@ namespace CheckOffset
                 {
                     Insp_Adh_Tape insp_Adh_Tape = new Insp_Adh_Tape();
                     Mat mat = new Mat(tbImgFile.Text);
-                    insp_Adh_Tape.Select_Adh_Tape_Blob(mat, editing_rect.Pos_Info.Editing_Rect, chkBlobIsWhite.Checked, (int)(numAdhTapeThreshold.Value), out OpenCvSharp.Rect rt_bounding_box);
+                    insp_Adh_Tape.Select_Adh_Tape_Blob(mat, editing_rect.Pos_Info.Editing_Rect, chkBlobIsWhite.Checked, (int)(numAdhTapeThreshold_Content.Value), out OpenCvSharp.Rect rt_bounding_box);
                     tnGlobal.CAM_Info.Adh_Tape_Info.Single_center = rt_bounding_box;
 
                     labelReason.Text = $"W:{rt_bounding_box.Width}, H:{rt_bounding_box.Height}";
@@ -1456,14 +1470,16 @@ namespace CheckOffset
                 {
                     Insp_Adh_Tape insp_Adh_Tape = new Insp_Adh_Tape();
                     Mat mat = new Mat(tbImgFile.Text);
-                    insp_Adh_Tape.Select_Adh_Tape_Content_Blob(mat, editing_rect.Pos_Info.Editing_Rect, chkBlobIsWhite.Checked, (int)(numAdhTapeThreshold.Value), out OpenCvSharp.Rect[] rt_bounding_boxs);
+                    insp_Adh_Tape.Select_Adh_Tape_Content_Blob(mat, editing_rect.Pos_Info.Editing_Rect, chkBlobIsWhite.Checked, (int)(numAdhTapeThreshold_Content.Value), out OpenCvSharp.Rect[] rt_bounding_boxs);
                     tnGlobal.CAM_Info.Adh_Tape_Info.Content_detail_center = rt_bounding_boxs;
 
                     labelReason.Text = $"rt_bounding_boxs:{rt_bounding_boxs.Length}";
+
+                    Find_Content_Offset();
                 }
             }
 
-            _userctrl_image.pb_Image.Editing_Ctrl = null;
+            _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
             if (chkSelectPattern.Checked)
             {
@@ -1483,12 +1499,12 @@ namespace CheckOffset
             }
 
             // repaint align.
-            _userctrl_image.User_Ctrls.Clear();
-            _userctrl_image.Cache_Ctrl.Clear();
+            _active_userctrl_image.User_Ctrls.Clear();
+            _active_userctrl_image.Cache_Ctrl.Clear();
             Paint_Align();
             Paint_Pin_Pos( null );
             Paint_Adh_Tape(tnGlobal.CAM_Info.Adh_Tape_Info);
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Refresh();
         }
 
         private void btnCreateInspMap_Click(object sender, EventArgs e)
@@ -1557,17 +1573,17 @@ namespace CheckOffset
                 _inspGlueOverflow = tobe_insp_info._insp_inst;
             }
 
-            _userctrl_image.User_Ctrls.Clear();
+            _active_userctrl_image.User_Ctrls.Clear();
             Paint_Align();
             Paint_Pin_Pos(inspecting_info);
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Refresh();
         }
 
         private void chkDisplayDefectMaskPos_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
-                _userctrl_image.Cache_Ctrl.Clear();
+                _active_userctrl_image.Cache_Ctrl.Clear();
 
                 if (!chkDisplayDefectMaskPos.Checked)
                 {
@@ -1597,9 +1613,9 @@ namespace CheckOffset
                 }
                 defect_mask_ctrl.Pos_Info.Points = defect_mask_pts.ToArray();
 
-                _userctrl_image.Cache_Ctrl.Add(defect_mask_ctrl);
+                _active_userctrl_image.Cache_Ctrl.Add(defect_mask_ctrl);
 
-                _userctrl_image.Refresh();
+                _active_userctrl_image.Refresh();
             }
             catch (Exception ex)
             {
@@ -1614,7 +1630,7 @@ namespace CheckOffset
         {
             try
             {
-                _userctrl_image.Cache_Ctrl.Clear();
+                _active_userctrl_image.Cache_Ctrl.Clear();
 
                 if (!chKDisplayDefect.Checked)
                 {
@@ -1644,9 +1660,9 @@ namespace CheckOffset
                 }
                 cust_pts_ctrl.Pos_Info.Points = defect_mask_pts.ToArray();
 
-                _userctrl_image.Cache_Ctrl.Add(cust_pts_ctrl);
+                _active_userctrl_image.Cache_Ctrl.Add(cust_pts_ctrl);
 
-                _userctrl_image.Refresh();
+                _active_userctrl_image.Refresh();
             }
             catch (Exception ex)
             {
@@ -1661,29 +1677,29 @@ namespace CheckOffset
         {
             if (chkSelectPattern.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                if (null != _userctrl_image.User_Ctrls)
+                if (null != _active_userctrl_image.User_Ctrls)
                 {
-                    _userctrl_image.User_Ctrls.Clear();
+                    _active_userctrl_image.User_Ctrls.Clear();
                     foreach (DS_CAM_Pin_Info cur_detect_infos in tnGlobal.CAM_Info.Detect_Pin_Infos)
                     {
                         TNCustCtrl_Rect exist_added_rect = new TNCustCtrl_Rect();
-                        TNPictureBox tn_pb = _userctrl_image.pb_Image as TNPictureBox;
+                        TNPictureBox tn_pb = _active_userctrl_image.pb_Image as TNPictureBox;
                         exist_added_rect.Pos_Info.Editing_Rect = cur_detect_infos.Detect_Rect;
                         //exist_added_rect.Insp_param = cur_detect_infos.Detect_Insp_param;
-                        _userctrl_image.User_Ctrls.Add(exist_added_rect);
+                        _active_userctrl_image.User_Ctrls.Add(exist_added_rect);
                     }
 
-                    _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                    _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
                 }
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
@@ -1693,11 +1709,11 @@ namespace CheckOffset
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -1708,10 +1724,10 @@ namespace CheckOffset
                         tnGlobal.CAM_Info.Align_Info = new_align_info;
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -1786,7 +1802,7 @@ namespace CheckOffset
             //            ctrl_string.Pos_Info.Points[0].Y = y;
             //            ctrl_string.Display_Color = Color.Blue;
 
-            //            _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+            //            _active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
 
             //            //TNCustCtrl_String ctrl_string = new TNCustCtrl_String();
             //            //ctrl_string.Pos_Info.Point_LT.X = x;
@@ -1795,7 +1811,7 @@ namespace CheckOffset
             //            ////ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._v_weight[y, x]}";
             //            //ctrl_string.Display_Str = $"{iT_Detect.Pins[y, x]}:{iT_Detect._h_weight[y, x]}";
             //            //ctrl_string.Display_Font_Size = 8;
-            //            //_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+            //            //_active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
             //        }
             //        else if (tnGlobal._IT_Detect.Pins[y, x] >= 2)
             //        {
@@ -1805,18 +1821,18 @@ namespace CheckOffset
             //            ctrl_string.Pos_Info.Points[0].Y = y;
             //            ctrl_string.Display_Color = Color.BlueViolet;
 
-            //            _userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
+            //            _active_userctrl_image.pb_Image.Cache_Ctrl.Add(ctrl_string);
             //        }
             //    }
             //}
 
-            _userctrl_image.pb_Image.Repaint();
+            _active_userctrl_image.pb_Image.Repaint();
         }
 
         //sssss
         private void Draw_Contour(Band_Info band_info)
         {
-            _userctrl_image.pb_Image.Cache_Ctrl.Clear();
+            _active_userctrl_image.pb_Image.Cache_Ctrl.Clear();
 
             double max_blob_area = 0;
             int contour_id = 0;
@@ -1862,34 +1878,34 @@ namespace CheckOffset
 
             cus_ctrl.Display_Color = Color.Blue;
 
-            _userctrl_image.pb_Image.Cache_Ctrl.Add(cus_ctrl);
+            _active_userctrl_image.pb_Image.Cache_Ctrl.Add(cus_ctrl);
         }
 
         private void chkSelectChip_CheckedChanged(object sender, EventArgs e)
         {
             if (chkSelectChip.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -1907,10 +1923,10 @@ namespace CheckOffset
                         }
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -1918,27 +1934,27 @@ namespace CheckOffset
         {
             if (chkSelectABF.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -1956,10 +1972,10 @@ namespace CheckOffset
                         }
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -1967,27 +1983,27 @@ namespace CheckOffset
         {
             if (chkSearchChipBoundingBox.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -2005,10 +2021,10 @@ namespace CheckOffset
                         }
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -2021,28 +2037,28 @@ namespace CheckOffset
         {
             if (chkSelectCenter.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
                 Set_Adh_Tape_Comment(tnGlobal.CAM_Info.Adh_Tape_Info);
-                if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 {
-                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                     const int min_roi_valid_size = 2;
                     if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -2060,39 +2076,96 @@ namespace CheckOffset
                         }
                     }
 
-                    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 }
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
+        }
+
+        private bool Find_Content_Offset()
+        {
+            //List<OpenCvSharp.Rect> col_group = new List<Rect>();
+            //List<int> col_group_x = new List<int>();
+
+            List<DS_Content_Detail_Group> detail_groups = new List<DS_Content_Detail_Group>();
+
+            int group_tol = 10;
+            for (int detail_id = 0; detail_id < tnGlobal.CAM_Info.Adh_Tape_Info.Content_detail_center.Length; detail_id++)
+            {
+                DS_Content_Detail_Group_Item new_group_item = new DS_Content_Detail_Group_Item();
+                new_group_item.Item_Rect = tnGlobal.CAM_Info.Adh_Tape_Info.Content_detail_center[detail_id];
+
+                int x = new_group_item.Item_Rect.X + new_group_item.Item_Rect.Width / 2;
+
+                bool new_grp_found = true;
+                for (int grp_x_id = 0; grp_x_id < detail_groups.Count; grp_x_id++)
+                {
+                    DS_Content_Detail_Group exist_detail_group = detail_groups[grp_x_id];
+                    if (System.Math.Abs(exist_detail_group.Group_X - x) < group_tol)
+                    {
+                        // same group (same column) found.
+                        new_grp_found = false;
+                        exist_detail_group.Group_Items.Add(new_group_item);
+
+                        continue;
+                    }
+                }
+
+                if ( new_grp_found )
+                { 
+                    // new group ...
+
+                    DS_Content_Detail_Group new_detail_group = new DS_Content_Detail_Group();
+                    new_detail_group.Group_X = x;
+                    new_detail_group.Group_Items = new List<DS_Content_Detail_Group_Item>();
+                    new_detail_group.Group_Items.Add(new_group_item);
+                    detail_groups.Add(new_detail_group);
+                }
+            }
+
+            foreach(DS_Content_Detail_Group single_group in tnGlobal.CAM_Info.Adh_Tape_Info.Detail_group)
+            {
+                int sum_x = 0;
+                foreach (DS_Content_Detail_Group_Item group_item in single_group.Group_Items)
+                {
+                    sum_x += (group_item.Item_Rect.X + group_item.Item_Rect.Width / 2);
+                }
+
+                single_group.Group_X = sum_x / single_group.Group_Items.Count;
+            }
+
+            tnGlobal.CAM_Info.Adh_Tape_Info.Detail_group = detail_groups.ToArray();
+
+            return true;
         }
 
         private void chkSelectLeft_CheckedChanged(object sender, EventArgs e)
         {
             if (chkSelectLeft.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
                 Set_Adh_Tape_Comment(tnGlobal.CAM_Info.Adh_Tape_Info);
-                //if (null != _userctrl_image.pb_Image.Editing_Ctrl)
+                //if (null != _active_userctrl_image.pb_Image.Editing_Ctrl)
                 //{
-                //    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userctrl_image.pb_Image.Editing_Ctrl;
+                //    TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
 
                 //    const int min_roi_valid_size = 2;
                 //    if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -2110,10 +2183,10 @@ namespace CheckOffset
                 //        }
                 //    }
 
-                //    _userctrl_image.Apply_GlobalSetting_To_Ctrls();
+                //    _active_userctrl_image.Apply_GlobalSetting_To_Ctrls();
                 //}
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -2121,27 +2194,27 @@ namespace CheckOffset
         {
             if (chkSelectLeftPin.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
                 Set_Adh_Tape_Comment(tnGlobal.CAM_Info.Adh_Tape_Info);
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -2149,27 +2222,27 @@ namespace CheckOffset
         {
             if (chkSelectRight.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
                 Set_Adh_Tape_Comment(tnGlobal.CAM_Info.Adh_Tape_Info);
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -2177,27 +2250,27 @@ namespace CheckOffset
         {
             if (chkSelectRightPin.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
                 Set_Adh_Tape_Comment(tnGlobal.CAM_Info.Adh_Tape_Info);
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -2205,27 +2278,27 @@ namespace CheckOffset
         {
             if (chkSelectSingle.Checked)
             {
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
 
                 /////////////////////////////////////////////////
                 /// add exist rect.
-                _userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up += CB_UserCtrl_Img_Mouse_Up;
 
                 /////////////////////////////////////////////////
                 // add new editing rect.
                 TNCustCtrl_Rect new_added_rect = new TNCustCtrl_Rect();
-                _userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = new_added_rect;
 
                 new_added_rect.Pos_Info.Editing_Rect = new Rect(0, 0, 100, 100);
                 new_added_rect.Display_Color = Color.Blue;
             }
             else
             {
-                _userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
+                _active_userctrl_image.CBMouse_Up -= CB_UserCtrl_Img_Mouse_Up;
                 // 新增完畢
                 Set_Adh_Tape_Comment(tnGlobal.CAM_Info.Adh_Tape_Info);
 
-                _userctrl_image.pb_Image.Editing_Ctrl = null;
+                _active_userctrl_image.pb_Image.Editing_Ctrl = null;
             }
         }
 
@@ -2294,11 +2367,11 @@ namespace CheckOffset
                 //_inspGlueOverflow = tobe_insp_info._insp_inst;
             }
 
-            _userctrl_image.User_Ctrls.Clear();
+            _active_userctrl_image.User_Ctrls.Clear();
             Paint_Align();
             Paint_Adh_Tape(inspecting_info._insp_adh_tape_res);
             //Paint_Pin_Pos(inspecting_info);
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Refresh();
 
             Set_Adh_Tape_Comment(inspecting_info._insp_adh_tape_res);
         }
@@ -2358,11 +2431,11 @@ namespace CheckOffset
                 //_inspGlueOverflow = tobe_insp_info._insp_inst;
             }
 
-            _userctrl_image.User_Ctrls.Clear();
+            _active_userctrl_image.User_Ctrls.Clear();
             Paint_Align();
             Paint_Adh_Tape(inspecting_info._insp_adh_tape_res);
             //Paint_Pin_Pos(inspecting_info);
-            _userctrl_image.Refresh();
+            _active_userctrl_image.Refresh();
 
             Set_Adh_Tape_Comment(inspecting_info._insp_adh_tape_res);
         }
@@ -2425,11 +2498,11 @@ namespace CheckOffset
         //        //_inspGlueOverflow = tobe_insp_info._insp_inst;
         //    }
 
-        //    _userctrl_image.User_Ctrls.Clear();
+        //    _active_userctrl_image.User_Ctrls.Clear();
         //    Paint_Align();
         //    Paint_Adh_Tape();
         //    //Paint_Pin_Pos(inspecting_info);
-        //    _userctrl_image.Refresh();
+        //    _active_userctrl_image.Refresh();
 
         //    Set_Adh_Tape_Comment();
         //}
@@ -2497,6 +2570,49 @@ namespace CheckOffset
                 str_comment += $"\r\nSingle_center:{adh_tape_info.Single_center}";
             }
 
+            double content_degree = 0;
+            DS_Content_Detail_Group max_group = null;
+            int max_group_detail_num = 0;
+            foreach ( DS_Content_Detail_Group detail_group in tnGlobal.CAM_Info.Adh_Tape_Info.Detail_group)
+            {
+                if (max_group_detail_num >= detail_group.Group_Items.Count)
+                    continue;
+
+                max_group_detail_num = detail_group.Group_Items.Count;
+                max_group = detail_group;
+            }
+
+            if (null != max_group)
+            {
+                Rect top_rt = new Rect(0, 0, 0, 0);
+                Rect bottom_rt = new Rect(0, 0, 0, 0);
+                int min_y = int.MaxValue;
+                int max_y = int.MinValue;
+                foreach (DS_Content_Detail_Group_Item group_item in max_group.Group_Items)
+                {
+                    if (min_y > group_item.Item_Rect.Y)
+                    {
+                        min_y = group_item.Item_Rect.Y;
+                        top_rt = group_item.Item_Rect;
+                    }
+
+                    if (max_y < group_item.Item_Rect.Y)
+                    {
+                        max_y = group_item.Item_Rect.Y;
+                        bottom_rt = group_item.Item_Rect;
+                    }
+                }
+
+                if (adh_tape_info.Single_center.X > 0)
+                {
+                    OpenCvSharp.Point pt_top = new OpenCvSharp.Point(top_rt.X + top_rt.Width / 2, top_rt.Y + top_rt.Height / 2);
+                    OpenCvSharp.Point pt_bottom = new OpenCvSharp.Point(bottom_rt.X + bottom_rt.Width / 2, bottom_rt.Y + bottom_rt.Height / 2);
+
+                    double angle_content = Insp_Base_Tools.AngleBetween(pt_top, pt_bottom);
+                    str_comment += $"\r\n Content num:{max_group.Group_Items.Count}, Degree: {angle_content} at X:{pt_top.X}";
+                }
+            }
+
 
             TBComment.Text = str_comment;
         }
@@ -2505,5 +2621,80 @@ namespace CheckOffset
         {
             tnGlobal.Insp_Param.Insp_Param_Adh_Tape.Max_Diff_WH = (int) ( numMaxDiffWH.Value );
         }
+
+        private void chkCCDLive_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!chkCCDLive.Checked)
+            {
+                chkCCDLive.BackColor = Color.Transparent;
+
+                tnGlobal.CCD_Camera.Close();
+                return;
+            }
+
+            chkCCDLive.BackColor = Color.Red;
+
+            rbtnCCDView.Checked = true;
+
+            tabUser.SelectedIndex = 1;
+            _active_userctrl_image = userCtrl_Image_CCD;
+
+            tnGlobal.CCD_Camera.Open();
+            tnGlobal.CCD_Camera.KeepShot();
+        }
+
+        private void btnGrab_Click(object sender, EventArgs e)
+        {
+            rbtnCCDView.Checked = true;
+            tabUser.SelectedIndex = 1;
+            _active_userctrl_image = userCtrl_Image_CCD;
+
+            tnGlobal.CCD_Camera.Open();
+
+            tnGlobal.CCD_Camera.OneShot();
+
+            tnGlobal.CCD_Camera.Close();
+        }
+
+        private void rbtnSelectFile_CheckedChanged(object sender, EventArgs e)
+        {
+            tabUser.SelectedIndex = 0;
+            _active_userctrl_image = userCtrl_Image_File;
+    }
+
+        private void rbtnCCDView_CheckedChanged(object sender, EventArgs e)
+        {
+            tabUser.SelectedIndex = 1;
+            _active_userctrl_image = userCtrl_Image_CCD;
+        }
+
+        private Mat Init_Buffer()
+        {
+            if (rbtnSelectFile.Checked)
+            {
+                if (tbImgFile.Text.Length > 0)
+                {
+                    return new Mat(tbImgFile.Text);
+                }
+            }
+            else
+            {
+                System.Drawing.Image ccd_bmp = _active_userctrl_image.Image;
+                BitmapData bmpData = null;
+                Image_Buffer_Gray.GetBuffer((Bitmap?) ccd_bmp, ref bmpData);
+
+                return new Mat(bmpData.Scan0);
+
+                //Image_Buffer_Gray.ReleaseBuffer(ccd_bmp, ref bmpData);
+            }
+
+            return new Mat(0, 0, MatType.CV_8UC1 );
+        }
+
+        private void Release_Buffer(System.Drawing.Image ccd_bmp, ref BitmapData bmpData)
+        {
+            Image_Buffer_Gray.ReleaseBuffer((Bitmap?) ccd_bmp, ref bmpData);
+        }
+
     } // end of     public partial class For_Main : Form
 } // end of namespace CheckOffset

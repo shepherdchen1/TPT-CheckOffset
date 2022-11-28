@@ -534,6 +534,20 @@ namespace CheckOffset
                 tnGlobal.CAM_Info.Detect_Pin_Infos.Add(new_detect_info);
             }
         }
+
+        public void Camera_CameraImageEvent(Bitmap bmp)
+        {
+            //pbCamera.Invoke(new MethodInvoker(delegate
+            //{
+                Bitmap old = Image as Bitmap;
+                Image = bmp;
+                if (null != old)
+                {
+                    old.Dispose();
+                }
+            //}
+            //));
+        }
     } // end of     public partial class UserCtrl_Image : UserControl
 
     public enum Editing_Mode

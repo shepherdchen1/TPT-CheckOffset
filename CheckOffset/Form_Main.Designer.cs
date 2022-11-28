@@ -36,7 +36,10 @@
             this.btnSettingLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.chkCCDLive = new System.Windows.Forms.CheckBox();
+            this.btnGrab = new System.Windows.Forms.Button();
+            this.rbtnCCDView = new System.Windows.Forms.RadioButton();
+            this.rbtnSelectFile = new System.Windows.Forms.RadioButton();
             this.btnSelectFile = new System.Windows.Forms.Button();
             this.tbImgFile = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -62,6 +65,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage10 = new System.Windows.Forms.TabPage();
+            this.numAdhTapeThreshold_Content = new System.Windows.Forms.NumericUpDown();
             this.btnTestInspAdhTapeRight = new System.Windows.Forms.Button();
             this.numAdhTapeThresholdPin = new System.Windows.Forms.NumericUpDown();
             this.label17 = new System.Windows.Forms.Label();
@@ -145,6 +149,7 @@
             this.labelScale = new System.Windows.Forms.Label();
             this.tabUser = new System.Windows.Forms.TabControl();
             this.tabPage_View = new System.Windows.Forms.TabPage();
+            this.tabPage_View_CCD = new System.Windows.Forms.TabPage();
             this.openFileDialog_Img = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_Setting = new System.Windows.Forms.OpenFileDialog();
@@ -162,6 +167,7 @@
             this.tabPage3.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThreshold_Content)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThresholdPin)).BeginInit();
             this.groupBox10.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMaxDiffWH)).BeginInit();
@@ -230,7 +236,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(27, 633);
+            this.button3.Location = new System.Drawing.Point(27, 673);
             this.button3.Margin = new System.Windows.Forms.Padding(5);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(129, 35);
@@ -245,7 +251,7 @@
             this.groupBox4.Controls.Add(this.btnSave);
             this.groupBox4.Location = new System.Drawing.Point(12, 8);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(308, 93);
+            this.groupBox4.Size = new System.Drawing.Size(398, 93);
             this.groupBox4.TabIndex = 16;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Setting";
@@ -274,28 +280,69 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Controls.Add(this.chkCCDLive);
+            this.groupBox3.Controls.Add(this.btnGrab);
+            this.groupBox3.Controls.Add(this.rbtnCCDView);
+            this.groupBox3.Controls.Add(this.rbtnSelectFile);
             this.groupBox3.Controls.Add(this.btnSelectFile);
             this.groupBox3.Controls.Add(this.tbImgFile);
             this.groupBox3.Location = new System.Drawing.Point(12, 117);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(308, 121);
+            this.groupBox3.Size = new System.Drawing.Size(398, 230);
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "影像";
             // 
-            // label1
+            // chkCCDLive
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 35);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(95, 23);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Select File";
+            this.chkCCDLive.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkCCDLive.Location = new System.Drawing.Point(230, 162);
+            this.chkCCDLive.Name = "chkCCDLive";
+            this.chkCCDLive.Size = new System.Drawing.Size(151, 33);
+            this.chkCCDLive.TabIndex = 6;
+            this.chkCCDLive.Text = "Live";
+            this.chkCCDLive.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkCCDLive.UseVisualStyleBackColor = true;
+            this.chkCCDLive.CheckedChanged += new System.EventHandler(this.chkCCDLive_CheckedChanged);
+            // 
+            // btnGrab
+            // 
+            this.btnGrab.Location = new System.Drawing.Point(53, 159);
+            this.btnGrab.Name = "btnGrab";
+            this.btnGrab.Size = new System.Drawing.Size(151, 36);
+            this.btnGrab.TabIndex = 5;
+            this.btnGrab.Text = "Grab";
+            this.btnGrab.UseVisualStyleBackColor = true;
+            this.btnGrab.Click += new System.EventHandler(this.btnGrab_Click);
+            // 
+            // rbtnCCDView
+            // 
+            this.rbtnCCDView.AutoSize = true;
+            this.rbtnCCDView.Location = new System.Drawing.Point(25, 122);
+            this.rbtnCCDView.Name = "rbtnCCDView";
+            this.rbtnCCDView.Size = new System.Drawing.Size(73, 27);
+            this.rbtnCCDView.TabIndex = 4;
+            this.rbtnCCDView.TabStop = true;
+            this.rbtnCCDView.Text = "CCD";
+            this.rbtnCCDView.UseVisualStyleBackColor = true;
+            this.rbtnCCDView.CheckedChanged += new System.EventHandler(this.rbtnCCDView_CheckedChanged);
+            // 
+            // rbtnSelectFile
+            // 
+            this.rbtnSelectFile.AutoSize = true;
+            this.rbtnSelectFile.Checked = true;
+            this.rbtnSelectFile.Location = new System.Drawing.Point(21, 29);
+            this.rbtnSelectFile.Name = "rbtnSelectFile";
+            this.rbtnSelectFile.Size = new System.Drawing.Size(120, 27);
+            this.rbtnSelectFile.TabIndex = 3;
+            this.rbtnSelectFile.TabStop = true;
+            this.rbtnSelectFile.Text = "Select File";
+            this.rbtnSelectFile.UseVisualStyleBackColor = true;
+            this.rbtnSelectFile.CheckedChanged += new System.EventHandler(this.rbtnSelectFile_CheckedChanged);
             // 
             // btnSelectFile
             // 
-            this.btnSelectFile.Location = new System.Drawing.Point(200, 29);
+            this.btnSelectFile.Location = new System.Drawing.Point(302, 29);
             this.btnSelectFile.Name = "btnSelectFile";
             this.btnSelectFile.Size = new System.Drawing.Size(79, 34);
             this.btnSelectFile.TabIndex = 2;
@@ -305,9 +352,9 @@
             // 
             // tbImgFile
             // 
-            this.tbImgFile.Location = new System.Drawing.Point(15, 72);
+            this.tbImgFile.Location = new System.Drawing.Point(53, 72);
             this.tbImgFile.Name = "tbImgFile";
-            this.tbImgFile.Size = new System.Drawing.Size(264, 30);
+            this.tbImgFile.Size = new System.Drawing.Size(328, 30);
             this.tbImgFile.TabIndex = 1;
             // 
             // groupBox2
@@ -318,9 +365,9 @@
             this.groupBox2.Controls.Add(this.rbtnHorz);
             this.groupBox2.Controls.Add(this.btnDeleteROI);
             this.groupBox2.Controls.Add(this.chkNewInsp_Rect);
-            this.groupBox2.Location = new System.Drawing.Point(12, 376);
+            this.groupBox2.Location = new System.Drawing.Point(12, 460);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(308, 173);
+            this.groupBox2.Size = new System.Drawing.Size(398, 173);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "檢測區";
@@ -396,9 +443,9 @@
             // 
             this.groupBox1.Controls.Add(this.btnFit);
             this.groupBox1.Controls.Add(this.btn1X);
-            this.groupBox1.Location = new System.Drawing.Point(12, 244);
+            this.groupBox1.Location = new System.Drawing.Point(12, 366);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(308, 79);
+            this.groupBox1.Size = new System.Drawing.Size(398, 79);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Display";
@@ -570,6 +617,7 @@
             // 
             // tabPage10
             // 
+            this.tabPage10.Controls.Add(this.numAdhTapeThreshold_Content);
             this.tabPage10.Controls.Add(this.btnTestInspAdhTapeRight);
             this.tabPage10.Controls.Add(this.numAdhTapeThresholdPin);
             this.tabPage10.Controls.Add(this.label17);
@@ -593,6 +641,23 @@
             this.tabPage10.TabIndex = 3;
             this.tabPage10.Text = "貼膠帶";
             this.tabPage10.UseVisualStyleBackColor = true;
+            // 
+            // numAdhTapeThreshold_Content
+            // 
+            this.numAdhTapeThreshold_Content.Location = new System.Drawing.Point(266, 194);
+            this.numAdhTapeThreshold_Content.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numAdhTapeThreshold_Content.Name = "numAdhTapeThreshold_Content";
+            this.numAdhTapeThreshold_Content.Size = new System.Drawing.Size(80, 30);
+            this.numAdhTapeThreshold_Content.TabIndex = 29;
+            this.numAdhTapeThreshold_Content.Value = new decimal(new int[] {
+            125,
+            0,
+            0,
+            0});
             // 
             // btnTestInspAdhTapeRight
             // 
@@ -706,7 +771,7 @@
             // 
             // numMaxDiffWH
             // 
-            this.numMaxDiffWH.Location = new System.Drawing.Point(158, 294);
+            this.numMaxDiffWH.Location = new System.Drawing.Point(167, 240);
             this.numMaxDiffWH.Maximum = new decimal(new int[] {
             20,
             0,
@@ -716,7 +781,7 @@
             this.numMaxDiffWH.Size = new System.Drawing.Size(80, 30);
             this.numMaxDiffWH.TabIndex = 19;
             this.numMaxDiffWH.Value = new decimal(new int[] {
-            5,
+            15,
             0,
             0,
             0});
@@ -725,7 +790,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(26, 301);
+            this.label14.Location = new System.Drawing.Point(35, 247);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(119, 23);
             this.label14.TabIndex = 18;
@@ -776,7 +841,7 @@
             this.cmbSelectedColNum.Items.AddRange(new object[] {
             "1",
             "2"});
-            this.cmbSelectedColNum.Location = new System.Drawing.Point(158, 235);
+            this.cmbSelectedColNum.Location = new System.Drawing.Point(314, 287);
             this.cmbSelectedColNum.Name = "cmbSelectedColNum";
             this.cmbSelectedColNum.Size = new System.Drawing.Size(74, 31);
             this.cmbSelectedColNum.TabIndex = 13;
@@ -785,7 +850,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(26, 243);
+            this.label12.Location = new System.Drawing.Point(182, 295);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(86, 23);
             this.label12.TabIndex = 12;
@@ -1528,6 +1593,7 @@
             // tabUser
             // 
             this.tabUser.Controls.Add(this.tabPage_View);
+            this.tabUser.Controls.Add(this.tabPage_View_CCD);
             this.tabUser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabUser.Location = new System.Drawing.Point(0, 52);
             this.tabUser.Name = "tabUser";
@@ -1543,8 +1609,17 @@
             this.tabPage_View.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage_View.Size = new System.Drawing.Size(1207, 678);
             this.tabPage_View.TabIndex = 1;
-            this.tabPage_View.Text = "tabPage";
+            this.tabPage_View.Text = "Image";
             this.tabPage_View.UseVisualStyleBackColor = true;
+            // 
+            // tabPage_View_CCD
+            // 
+            this.tabPage_View_CCD.Location = new System.Drawing.Point(4, 32);
+            this.tabPage_View_CCD.Name = "tabPage_View_CCD";
+            this.tabPage_View_CCD.Size = new System.Drawing.Size(1207, 678);
+            this.tabPage_View_CCD.TabIndex = 2;
+            this.tabPage_View_CCD.Text = "CCD";
+            this.tabPage_View_CCD.UseVisualStyleBackColor = true;
             // 
             // openFileDialog_Img
             // 
@@ -1593,6 +1668,7 @@
             this.tabControl2.ResumeLayout(false);
             this.tabPage10.ResumeLayout(false);
             this.tabPage10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThreshold_Content)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numAdhTapeThresholdPin)).EndInit();
             this.groupBox10.ResumeLayout(false);
             this.groupBox10.PerformLayout();
@@ -1636,7 +1712,6 @@
         private Panel pnlSetting;
         private Button btnSelectFile;
         private TextBox tbImgFile;
-        private Label label1;
         private Panel pnlHeader;
         private Panel pnlFooter;
         private TabControl tabUser;
@@ -1754,5 +1829,11 @@
         private Panel panel1;
         private TextBox TBComment;
         private Button btnTestInspAdhTapeRight;
+        private CheckBox chkCCDLive;
+        private Button btnGrab;
+        private RadioButton rbtnCCDView;
+        private RadioButton rbtnSelectFile;
+        private TabPage tabPage_View_CCD;
+        private NumericUpDown numAdhTapeThreshold_Content;
     }
 }
