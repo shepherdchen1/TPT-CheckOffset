@@ -173,6 +173,7 @@ namespace CheckOffset
 
         public static void Uninitialize()
         {
+            CCD_Camera.Close();
             BKWorker_Delete_Log.CancelAsync();
         }
 
@@ -458,7 +459,8 @@ namespace CheckOffset
     public class DS_Setting_Info
     {
         public bool EnableLogStep = true;              // 是否輸出Log\Step.
-        public bool Enable_CCD = false;
+        public bool Enable_CCD = true;
+        public bool Display_Color = true;
 
         public int CCD_Width = 640;
         public int CCD_Height = 480;
@@ -585,9 +587,13 @@ namespace CheckOffset
     {
         // 左右 Pin.
         private OpenCvSharp.Rect _left_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private bool _blob_is_white_left_center = true;
         private OpenCvSharp.Rect _left_center_pin = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private bool _blob_is_white_left_center_pin = true;
         private OpenCvSharp.Rect _right_center = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private bool _blob_is_white_right_center = true;
         private OpenCvSharp.Rect _right_center_pin = new OpenCvSharp.Rect(0, 0, 0, 0);
+        private bool _blob_is_white_right_center_pin = true;
         private bool _blob_is_white = true;
         private int _threshold_pin = 70;
         private int _threshold_slot = 60;
@@ -615,6 +621,10 @@ namespace CheckOffset
         public int Threshold_pin { get => _threshold_pin; set => _threshold_pin = value; }
         public int Threshold_slot { get => _threshold_slot; set => _threshold_slot = value; }
         public DS_Content_Detail_Group[] Detail_group { get => _detail_group; set => _detail_group = value; }
+        public bool Blob_is_white_left_center { get => _blob_is_white_left_center; set => _blob_is_white_left_center = value; }
+        public bool Blob_is_white_left_center_pin { get => _blob_is_white_left_center_pin; set => _blob_is_white_left_center_pin = value; }
+        public bool Blob_is_white_right_center { get => _blob_is_white_right_center; set => _blob_is_white_right_center = value; }
+        public bool Blob_is_white_right_center_pin { get => _blob_is_white_right_center_pin; set => _blob_is_white_right_center_pin = value; }
 
         //public Rect Select_Chip { get => _Select_Chip; set => _Select_Chip = value; }
         //public Rect Select_ABF { get => _Select_ABF; set => _Select_ABF = value; }

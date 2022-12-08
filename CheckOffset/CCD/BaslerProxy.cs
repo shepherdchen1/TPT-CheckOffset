@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Basler.Pylon;
+using CheckOffset;
+using OpenCvSharp.Extensions;
 using TN.Tools.Debug;
 
 namespace TN.CCD
@@ -18,7 +20,7 @@ namespace TN.CCD
         ///  data member
         /// </summary>
         private string _userID = "";
-        private Camera _camera = null;
+        public Camera _camera = null;
         private bool _grab_over = false;
 
         private PixelDataConverter px_convert = new PixelDataConverter();
@@ -35,18 +37,33 @@ namespace TN.CCD
             if ( _camera == null)
                 return;
 
+            _camera.Close();
+
             _camera.Dispose();
             _camera = null;
         }
 
         public void Basler_CameraInit()
         {
-            _camera = new Camera();
-            _camera.CameraOpened += Configuration.AcquireContinuous;
-            _camera.ConnectionLost += Camera_ConnectionLost;
-            _camera.StreamGrabber.GrabStarted += StreamGrabber_GrabStarted;
-            _camera.StreamGrabber.ImageGrabbed += StreamGrabber_ImageGrabed;
-            _camera.StreamGrabber.GrabStopped += StreamGrabber_GrabStoped;
+            try
+            {
+                _camera = new Camera();
+                _camera.CameraOpened += Configuration.AcquireContinuous;
+                _camera.ConnectionLost += Camera_ConnectionLost;
+                _camera.StreamGrabber.GrabStarted += StreamGrabber_GrabStarted;
+                _camera.StreamGrabber.ImageGrabbed += StreamGrabber_ImageGrabed;
+                _camera.StreamGrabber.GrabStopped += StreamGrabber_GrabStoped;
+
+                _camera.Open();
+            }
+            catch (Exception ex)
+            {
+                Close();
+
+                Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                   , $"Exception catched: error:{ex.Message}");
+                return;
+            }
         }
 
         public bool Basler_CameraInit(string userID)
@@ -62,8 +79,8 @@ namespace TN.CCD
                     {
                         this._userID = userID;
                         _camera = new Camera(cameraInfo);
-                        _camera.StreamGrabber.ImageGrabbed -= StreamGrabber_ImageGrabed;
-                        _camera.StreamGrabber.ImageGrabbed += StreamGrabber_ImageGrabed;
+                        //_camera.StreamGrabber.ImageGrabbed -= StreamGrabber_ImageGrabed;
+                        //_camera.StreamGrabber.ImageGrabbed += StreamGrabber_ImageGrabed;
                     }
                 }
                 if (_camera == null)
@@ -118,11 +135,15 @@ namespace TN.CCD
                     return;
                 }
 
+                _camera.ConnectionLost -= Camera_ConnectionLost;
+                _camera.StreamGrabber.GrabStarted -= StreamGrabber_GrabStarted;
+                _camera.StreamGrabber.ImageGrabbed -= StreamGrabber_ImageGrabed;
+                _camera.StreamGrabber.GrabStopped -= StreamGrabber_GrabStoped;
+
                 _camera.Close();
                 _camera.Dispose();
 
                 _camera = null;
-
             }
             catch (Exception ex)
             {
@@ -155,7 +176,17 @@ namespace TN.CCD
                 {
                     if (_grab_over)
                     {
-                        Camera_Image_Event(GrabResult2Bmp(grab_result));
+                        if (null == Camera_Image_Event)
+                        {
+                            Log_Utl.Log_Event(Event_Level.Error, System.Reflection.MethodBase.GetCurrentMethod()?.Name
+                               , $"Camera_Image_Event is null");
+                        }
+                        else
+                        {
+                            Bitmap bmp = GrabResult2Bmp(grab_result);
+                            Camera_Image_Event(bmp);
+                            bmp.Dispose();
+                        }
                     }
                 }
             }

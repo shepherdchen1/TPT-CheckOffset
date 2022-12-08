@@ -18,6 +18,7 @@ using OpenCvSharp;
 
 using static System.Net.Mime.MediaTypeNames;
 using CheckOffset.ImageTools;
+using OpenCvSharp.Extensions;
 
 namespace CheckOffset
 {
@@ -90,6 +91,9 @@ namespace CheckOffset
             set { 
                 if (pb_Image != null)
                 {
+                    if ( null != pb_Image.Image_Bmp )
+                        pb_Image.Image_Bmp.Dispose();
+
                     pb_Image.Image_Bmp = value;
                     pb_Image.Report_GrayLevel_Gray -= Report_GrayLevel_Gray;
                     pb_Image.Report_GrayLevel_Gray += Report_GrayLevel_Gray;
@@ -540,11 +544,30 @@ namespace CheckOffset
             //pbCamera.Invoke(new MethodInvoker(delegate
             //{
                 Bitmap old = Image as Bitmap;
-                Image = bmp;
-                if (null != old)
+
+            //int used_band = 0;
+            //if (tnGlobal.Setting.Display_Color)
+            //    used_band = 1;
+            if (!tnGlobal.Setting.Display_Color)
+            {
+                Mat color_mat = BitmapConverter.ToMat(bmp);
+                Mat[] mats = Cv2.Split(color_mat);
+                Image = BitmapConverter.ToBitmap(mats[1]);
+            }
+            else
+            {
+                Image = (Bitmap)bmp.Clone();
+            }
+
+            pb_Image.ZoomFit();
+            //Image.Save("d:\\temp\\a.bmp");
+            //Image = bmp;
+            if (null != old)
                 {
-                    old.Dispose();
+                    //old.Dispose();
                 }
+
+            Invalidate();
             //}
             //));
         }

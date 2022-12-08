@@ -44,9 +44,10 @@ namespace TN.ImageTools
                         byte* dest_buf = (byte*) dest_bmp_data.Scan0.ToPointer();
                         dest_buf += y * dest_bmp_data.Stride;
 
+                        // 1129+ get g band
                         for (int x = 0; x < src_bmp_data.Width; x++)
                         {
-                            if ( src_buf[x * pixel_size_src] > threshold)
+                            if ( src_buf[x * pixel_size_src + 1] > threshold) // +1 for g band
                                 dest_buf[x * pixel_size_dest] = 255;
                             else
                                 dest_buf[x * pixel_size_dest] = 0;

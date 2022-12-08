@@ -101,6 +101,10 @@ namespace CheckOffset.Insp
         {
             try
             {
+                buffer.SaveImage("D:\\temp\\adhtape\\Src.jpg");
+                Mat[] mats_2 = Cv2.Split(buffer);
+                mats_2[0].SaveImage("d:\\temp\\adhtape\\mat_2_b.jpg");
+
                 Mat extract_buffer = buffer[rt_roi.Y, rt_roi.Bottom
                                                 , rt_roi.X, rt_roi.Right];
 
@@ -178,10 +182,10 @@ namespace CheckOffset.Insp
             //    return;
 
             // 新增完畢
-            //if (null == _active_userctrl_image.pb_Image.Editing_Ctrl)
+            //if (null == _userCtrl_Image.pb_Image.Editing_Ctrl)
             //    return;
 
-            //TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
+            //TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userCtrl_Image.pb_Image.Editing_Ctrl;
 
             const int min_roi_valid_size = 2;
             //if (null != editing_rect && editing_rect.Pos_Info.Editing_Rect.Width > min_roi_valid_size && editing_rect.Pos_Info.Editing_Rect.Height > min_roi_valid_size)
@@ -193,13 +197,18 @@ namespace CheckOffset.Insp
                 double max_blob_area = double.MinValue;
                 int max_blob_id = -1;
                 OpenCvSharp.Rect rt_bounding_box_max = new OpenCvSharp.Rect(0, 0, 0, 0);
-                for (int blob_id = 0; blob_id < tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[0].contours.Length; blob_id++)
+                int used_band = 0; 
+                if ( tnGlobal.Setting.Display_Color)
+                    used_band = 1;
+
+                // 1129 change to Band_Info_Res[0] Band_Info_Res[1].
+                for (int blob_id = 0; blob_id < tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[used_band].contours.Length; blob_id++)
                 {
-                    double blob_area = Cv2.ContourArea(tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[0].contours[blob_id]);
+                    double blob_area = Cv2.ContourArea(tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[used_band].contours[blob_id]);
                     if (blob_area < max_blob_area)
                         continue;
 
-                    OpenCvSharp.Rect rt_bounding_box_chk = Cv2.BoundingRect(tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[0].contours[blob_id]);
+                    OpenCvSharp.Rect rt_bounding_box_chk = Cv2.BoundingRect(tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[used_band].contours[blob_id]);
                     if (rt_bounding_box_chk.Left <= 0 || rt_bounding_box_chk.Top <= 0
                         || rt_bounding_box_chk.Right >= rt.Width
                         || rt_bounding_box_chk.Height >= rt.Height)
@@ -229,10 +238,10 @@ namespace CheckOffset.Insp
             //    return;
 
             // 新增完畢
-            //if (null == _active_userctrl_image.pb_Image.Editing_Ctrl)
+            //if (null == _userCtrl_Image.pb_Image.Editing_Ctrl)
             //    return;
 
-            //TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_active_userctrl_image.pb_Image.Editing_Ctrl;
+            //TNCustCtrl_Rect editing_rect = (TNCustCtrl_Rect)_userCtrl_Image.pb_Image.Editing_Ctrl;
 
             const int min_roi_valid_size = 2;
             List<OpenCvSharp.Rect> candidate_rts = new List<OpenCvSharp.Rect>();
@@ -248,9 +257,14 @@ namespace CheckOffset.Insp
 
                 OpenCvSharp.Rect rt_pattern = tnGlobal.CAM_Info.Adh_Tape_Info.Single_center;
 
-                for (int blob_id = 0; blob_id < tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[0].contours.Length; blob_id++)
+                // 1129 change to Band_Info_Res[0] Band_Info_Res[1].
+                int used_band = 0;
+                if (tnGlobal.Setting.Display_Color)
+                    used_band = 1;
+
+                for (int blob_id = 0; blob_id < tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[used_band].contours.Length; blob_id++)
                 {
-                    OpenCvSharp.Rect rt_bounding_box_chk = Cv2.BoundingRect(tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[0].contours[blob_id]);
+                    OpenCvSharp.Rect rt_bounding_box_chk = Cv2.BoundingRect(tnGlobal.CAM_Info.Adh_Tape_Info.Band_Info_Res[used_band].contours[blob_id]);
                     if (   System.Math.Abs(rt_bounding_box_chk.Width - rt_pattern.Width)   > tnGlobal.Insp_Param.Insp_Param_Adh_Tape.Max_Diff_WH
                         || System.Math.Abs(rt_bounding_box_chk.Height - rt_pattern.Height) > tnGlobal.Insp_Param.Insp_Param_Adh_Tape.Max_Diff_WH )
                     {
